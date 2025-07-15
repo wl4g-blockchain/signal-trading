@@ -34,4 +34,4 @@ class ServiceManager {
 }
 
 export const serviceManager = new ServiceManager();
-export { ApiService } from './api_service';
+export type { ApiService } from './api_service';

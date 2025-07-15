@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Github, Loader } from 'lucide-react';
 import { serviceManager } from '../../services';
+import { User } from '../../types';
 
 interface LoginPageProps {
-  onLogin: (user: any) => void;
+  onLogin: (user: User) => void;
 }
 
 export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {

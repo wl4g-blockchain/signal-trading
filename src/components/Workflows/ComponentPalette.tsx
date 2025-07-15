@@ -83,11 +83,17 @@ export const ComponentPalette: React.FC<ComponentPaletteProps> = ({ onAddNode })
       <div className="mt-6 p-4 bg-gray-700 rounded-lg">
         <h4 className="font-medium text-white mb-2">Connection Rules</h4>
         <div className="text-xs text-gray-400 space-y-1">
-          <p>• Start → Listener</p>
-          <p>• Listener → Evaluator</p>
-          <p>• Evaluator → Executor</p>
-          <p>• Executor → Collector</p>
-          <p>• Collector → End</p>
+          <p>• Start → Data Listener</p>
+          <p>• Data Listener → AI Evaluator</p>
+          <p>• AI Evaluator → AI Evaluator (multi-level)</p>
+          <p>• AI Evaluator → TX Executor</p>
+          <p>• TX Executor → Async Collector</p>
+          <p>• Async Collector → End</p>
+        </div>
+        <div className="mt-3 text-xs text-blue-400">
+          <p>💡 Hover over nodes to see delete/config buttons</p>
+          <p>🖱️ Right-click + drag to pan canvas</p>
+          <p>🔍 Mouse wheel to zoom in/out</p>
         </div>
       </div>
     </div>

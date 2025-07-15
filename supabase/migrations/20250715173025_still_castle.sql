@@ -1,6 +1,6 @@
 -- Create database schema for AI Trading Platform
 
--- Workflows table
+-- WorkflowPage table
 CREATE TABLE IF NOT EXISTS t_workflow (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(255) NOT NULL,

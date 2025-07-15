@@ -9,13 +9,17 @@ import {
   TrendingUp,
   DollarSign,
   BarChart3,
+  Trash2,
+  Settings,
 } from 'lucide-react';
 
 interface NodeComponentProps {
   node: ComponentNode;
   onDragStart: (nodeId: string, event: React.MouseEvent) => void;
-  onConnectionStart: (nodeId: string, outputId: string) => void;
+  onConnectionStart: (nodeId: string, outputId: string, event: React.MouseEvent) => void;
   onConnectionEnd: (nodeId: string, inputId: string) => void;
+  onDelete: (nodeId: string) => void;
+  onConfig: (node: ComponentNode) => void;
   isConnecting: boolean;
 }
 
@@ -78,6 +82,8 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
   onDragStart,
   onConnectionStart,
   onConnectionEnd,
+  onDelete,
+  onConfig,
   isConnecting,
 }) => {
   const Icon = getNodeIcon(node.type);
@@ -105,18 +111,26 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
         {/* Output port for start node */}
         {node.type === 'start' && (
           <div
-            className="absolute right-0 top-1/2 w-3 h-3 bg-gray-500 rounded-full border-2 border-gray-700 cursor-pointer hover:bg-green-400 transform -translate-y-1/2"
-            style={{ right: '-6px' }}
-            onMouseDown={() => onConnectionStart(node.id, 'trigger')}
+            className="absolute right-0 top-1/2 w-4 h-4 bg-green-500 rounded-full border-2 border-gray-700 cursor-pointer hover:bg-green-400 transform -translate-y-1/2 z-10"
+            style={{ right: '-8px' }}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onConnectionStart(node.id, 'output', e);
+            }}
           />
         )}
         
         {/* Input port for end node */}
         {node.type === 'end' && (
           <div
-            className="absolute left-0 top-1/2 w-3 h-3 bg-gray-500 rounded-full border-2 border-gray-700 cursor-pointer hover:bg-blue-400 transform -translate-y-1/2"
-            style={{ left: '-6px' }}
-            onMouseUp={() => onConnectionEnd(node.id, 'result')}
+            className="absolute left-0 top-1/2 w-4 h-4 bg-blue-500 rounded-full border-2 border-gray-700 cursor-pointer hover:bg-blue-400 transform -translate-y-1/2 z-10"
+            style={{ left: '-8px' }}
+            onMouseUp={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onConnectionEnd(node.id, 'input');
+            }}
           />
         )}
       </div>
@@ -135,9 +149,35 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
         <div className={`p-3 ${colorClass} rounded-t-lg flex items-center space-x-2`}>
           <Icon className="w-5 h-5 text-white" />
           {SubIcon && <SubIcon className="w-4 h-4 text-white opacity-80" />}
-          <span className="text-white font-medium text-sm">
+          <span className="text-white font-medium text-sm flex-1">
             {node.data?.name || `${node.type.charAt(0).toUpperCase() + node.type.slice(1)}`}
           </span>
+          
+          {/* 操作按钮 */}
+          <div className="flex items-center space-x-1">
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onConfig(node);
+              }}
+              className="p-1 hover:bg-white hover:bg-opacity-20 rounded transition-colors"
+              title="Configure"
+            >
+              <Settings className="w-3 h-3 text-white" />
+            </button>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onDelete(node.id);
+              }}
+              className="p-1 hover:bg-red-500 hover:bg-opacity-50 rounded transition-colors"
+              title="Delete"
+            >
+              <Trash2 className="w-3 h-3 text-white" />
+            </button>
+          </div>
         </div>
 
         {/* Content */}
@@ -160,23 +200,29 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
         </div>
 
         {/* Input/Output Ports */}
-        {node.inputs.map((input, index) => (
+        {node.inputs.length > 0 && (
           <div
-            key={input}
-            className="absolute left-0 w-3 h-3 bg-gray-500 rounded-full border-2 border-gray-700 cursor-pointer hover:bg-blue-400"
-            style={{ top: `${40 + index * 20}px`, left: '-6px' }}
-            onMouseUp={() => onConnectionEnd(node.id, input)}
+            className="absolute left-0 top-1/2 w-4 h-4 bg-blue-500 rounded-full border-2 border-gray-700 cursor-pointer hover:bg-blue-400 transform -translate-y-1/2 z-10"
+            style={{ left: '-8px' }}
+            onMouseUp={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onConnectionEnd(node.id, 'input');
+            }}
           />
-        ))}
+        )}
 
-        {node.outputs.map((output, index) => (
+        {node.outputs.length > 0 && (
           <div
-            key={output}
-            className="absolute right-0 w-3 h-3 bg-gray-500 rounded-full border-2 border-gray-700 cursor-pointer hover:bg-green-400"
-            style={{ top: `${40 + index * 20}px`, right: '-6px' }}
-            onMouseDown={() => onConnectionStart(node.id, output)}
+            className="absolute right-0 top-1/2 w-4 h-4 bg-green-500 rounded-full border-2 border-gray-700 cursor-pointer hover:bg-green-400 transform -translate-y-1/2 z-10"
+            style={{ right: '-8px' }}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onConnectionStart(node.id, 'output', e);
+            }}
           />
-        ))}
+        )}
       </div>
     </div>
   );

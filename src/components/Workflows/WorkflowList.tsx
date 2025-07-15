@@ -8,21 +8,21 @@ interface WorkflowListProps {
 }
 
 export const WorkflowList: React.FC<WorkflowListProps> = ({ onLoadWorkflow }) => {
-  const [workflows, setWorkflows] = useState<Workflow[]>([]);
+  const [workflows, setWorkflowPage] = useState<Workflow[]>([]);
   const [workflowRuns, setWorkflowRuns] = useState<WorkflowRun[]>([]);
   const [selectedWorkflowId, setSelectedWorkflowId] = useState<string | null>(null);
   const [view, setView] = useState<'workflows' | 'runs'>('workflows');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    loadWorkflows();
+    loadWorkflowPage();
   }, []);
 
-  const loadWorkflows = async () => {
+  const loadWorkflowPage = async () => {
     setLoading(true);
     try {
       const data = await serviceManager.getService().getWorkflows();
-      setWorkflows(data);
+      setWorkflowPage(data);
     } catch (error) {
       console.error('Failed to load workflows:', error);
     } finally {
@@ -115,7 +115,7 @@ export const WorkflowList: React.FC<WorkflowListProps> = ({ onLoadWorkflow }) =>
                           className="flex items-center space-x-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm transition-colors"
                         >
                           <Play className="w-4 h-4" />
-                          <span>重新设计</span>
+                          <span>Design</span>
                         </button>
                         
                         <button
@@ -123,7 +123,7 @@ export const WorkflowList: React.FC<WorkflowListProps> = ({ onLoadWorkflow }) =>
                           className="flex items-center space-x-1 px-3 py-2 bg-gray-600 hover:bg-gray-500 text-white rounded text-sm transition-colors"
                         >
                           <History className="w-4 h-4" />
-                          <span>运行记录</span>
+                          <span>Runs</span>
                         </button>
                       </div>
                     </div>

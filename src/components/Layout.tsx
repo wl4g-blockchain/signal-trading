@@ -24,7 +24,6 @@ export const Layout: React.FC<LayoutProps> = ({
   const navItems = [
     { id: 'monitor', label: 'Dashboard', icon: Activity },
     { id: 'workflow', label: 'Workflows', icon: BarChart3 },
-    { id: 'reports', label: 'Reports', icon: FileText },
     { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
@@ -61,18 +60,21 @@ export const Layout: React.FC<LayoutProps> = ({
             );
           })}
         </nav>
+        {/* 删除原底部 Service Mode 和 Vault Balance */}
+      </div>
 
-        <div className="absolute bottom-6 left-6 right-6">
-          {/* Service Switcher */}
-          <div className="bg-gray-700 rounded-lg p-4 mb-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-gray-400">Service Mode</span>
-              <Globe className="w-4 h-4 text-gray-400" />
-            </div>
-            <div className="flex space-x-2">
+      {/* Main Content */}
+      <div className="flex-1 overflow-hidden flex flex-col">
+        {/* Top Bar */}
+        <div className="bg-gray-800 border-b border-gray-700 px-6 py-4 flex items-center justify-end space-x-8">
+          {/* 新增 Service Mode 和 Vault Balance 到顶部栏 */}
+          <div className="flex items-center space-x-6">
+            {/* Service Switcher */}
+            <div className="flex items-center space-x-2 bg-gray-700 rounded-lg px-3 py-1">
+              <span className="text-sm text-gray-400 mr-2">Service Mode</span>
               <button
                 onClick={() => handleServiceSwitch('mock')}
-                className={`flex-1 px-3 py-2 text-xs rounded transition-colors ${
+                className={`px-2 py-1 text-xs rounded transition-colors ${
                   serviceType === 'mock'
                     ? 'bg-blue-600 text-white'
                     : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
@@ -82,7 +84,7 @@ export const Layout: React.FC<LayoutProps> = ({
               </button>
               <button
                 onClick={() => handleServiceSwitch('http')}
-                className={`flex-1 px-3 py-2 text-xs rounded transition-colors ${
+                className={`px-2 py-1 text-xs rounded transition-colors ${
                   serviceType === 'http'
                     ? 'bg-blue-600 text-white'
                     : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
@@ -91,25 +93,15 @@ export const Layout: React.FC<LayoutProps> = ({
                 HTTP
               </button>
             </div>
-          </div>
-
-          <div className="bg-gray-700 rounded-lg p-4">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-400">Vault Balance</span>
+            {/* Vault Balance */}
+            <div className="flex items-center bg-gray-700 rounded-lg px-3 py-1 space-x-3">
+              <span className="text-gray-400 text-sm">Vault Balance</span>
               <span className="text-green-400 font-medium">$12,450.00</span>
-            </div>
-            <div className="flex items-center justify-between text-sm mt-2">
-              <span className="text-gray-400">Active Strategies</span>
+              <span className="text-gray-400 text-sm ml-4">Active Strategies</span>
               <span className="text-blue-400 font-medium">3</span>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="flex-1 overflow-hidden flex flex-col">
-        {/* Top Bar */}
-        <div className="bg-gray-800 border-b border-gray-700 px-6 py-4 flex items-center justify-end">
+          {/* 用户信息 */}
           <div className="relative">
             <button
               onClick={() => setShowUserMenu(!showUserMenu)}
@@ -139,7 +131,6 @@ export const Layout: React.FC<LayoutProps> = ({
             )}
           </div>
         </div>
-
         {/* Content */}
         <div className="flex-1 overflow-hidden">
         {children}

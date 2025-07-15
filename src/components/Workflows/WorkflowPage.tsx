@@ -6,7 +6,7 @@ import { WorkflowList } from './WorkflowList';
 import { Play, Pause, Save, Settings, ChevronUp, ChevronDown } from 'lucide-react';
 import { serviceManager } from '../../services';
 
-export const WorkflowBuilder: React.FC = () => {
+export const WorkflowPage: React.FC = () => {
   const [nodes, setNodes] = useState<ComponentNode[]>([]);
   const [connections, setConnections] = useState<Connection[]>([]);
   const [workflowName, setWorkflowName] = useState('Untitled Workflow');
@@ -15,6 +15,19 @@ export const WorkflowBuilder: React.FC = () => {
   const [showWorkflowList, setShowWorkflowList] = useState(true);
   const [saving, setSaving] = useState(false);
   const [running, setRunning] = useState(false);
+  const [canvasScale, setCanvasScale] = useState(100);
+
+  // 监听画布缩放更新
+  useEffect(() => {
+    const handleScaleUpdate = (event: CustomEvent) => {
+      setCanvasScale(event.detail.scale);
+    };
+
+    window.addEventListener('canvas-scale-update', handleScaleUpdate as EventListener);
+    return () => {
+      window.removeEventListener('canvas-scale-update', handleScaleUpdate as EventListener);
+    };
+  }, []);
 
   // Initialize with start and end nodes
   useEffect(() => {
@@ -25,7 +38,7 @@ export const WorkflowBuilder: React.FC = () => {
         position: { x: 50, y: 200 },
         data: { name: 'Start', status: 'idle' },
         inputs: [],
-        outputs: ['trigger'],
+        outputs: ['output'],
       };
 
       const endNode: ComponentNode = {
@@ -33,7 +46,7 @@ export const WorkflowBuilder: React.FC = () => {
         type: 'end',
         position: { x: 800, y: 200 },
         data: { name: 'End', status: 'idle' },
-        inputs: ['result'],
+        inputs: ['input'],
         outputs: [],
       };
 
@@ -71,23 +84,23 @@ export const WorkflowBuilder: React.FC = () => {
   const getInputs = (type: string) => {
     switch (type) {
       case 'start': return [];
-      case 'end': return ['result'];
-      case 'listener': return [];
-      case 'evaluator': return ['trigger', 'data'];
-      case 'executor': return ['strategy'];
-      case 'collector': return ['tx_result'];
+      case 'end': return ['input'];
+      case 'listener': return ['input'];
+      case 'evaluator': return ['input'];
+      case 'executor': return ['input'];
+      case 'collector': return ['input'];
       default: return [];
     }
   };
 
   const getOutputs = (type: string) => {
     switch (type) {
-      case 'start': return ['trigger'];
+      case 'start': return ['output'];
       case 'end': return [];
-      case 'listener': return ['data'];
-      case 'evaluator': return ['strategy'];
-      case 'executor': return ['tx_result'];
-      case 'collector': return ['result'];
+      case 'listener': return ['output'];
+      case 'evaluator': return ['output'];
+      case 'executor': return ['output'];
+      case 'collector': return ['output'];
       default: return [];
     }
   };
@@ -185,10 +198,11 @@ export const WorkflowBuilder: React.FC = () => {
               )}
               <span>{running ? 'Starting...' : isRunning ? 'Stop' : 'Run'}</span>
             </button>
-            
+            <button
               onClick={handleSaveWorkflow}
               disabled={saving}
-            <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors">
+              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
+            >
               {saving ? (
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : (
@@ -196,10 +210,41 @@ export const WorkflowBuilder: React.FC = () => {
               )}
               <span>{saving ? 'Saving...' : 'Save'}</span>
             </button>
-            
             <button className="p-2 bg-gray-600 hover:bg-gray-500 text-white rounded transition-colors">
               <Settings className="w-4 h-4" />
             </button>
+            
+            {/* 缩放控制器 - 移动到右上角 */}
+            <div className="flex items-center space-x-2 bg-gray-700 rounded-lg p-2">
+              <button
+                onClick={() => {
+                  const event = new CustomEvent('canvas-zoom', { detail: { action: 'in' } });
+                  window.dispatchEvent(event);
+                }}
+                className="px-2 py-1 bg-gray-600 hover:bg-gray-500 text-white rounded text-xs"
+              >
+                +
+              </button>
+              <span className="text-white text-xs min-w-[40px] text-center">{canvasScale}%</span>
+              <button
+                onClick={() => {
+                  const event = new CustomEvent('canvas-zoom', { detail: { action: 'out' } });
+                  window.dispatchEvent(event);
+                }}
+                className="px-2 py-1 bg-gray-600 hover:bg-gray-500 text-white rounded text-xs"
+              >
+                -
+              </button>
+              <button
+                onClick={() => {
+                  const event = new CustomEvent('canvas-zoom', { detail: { action: 'reset' } });
+                  window.dispatchEvent(event);
+                }}
+                className="px-2 py-1 bg-gray-600 hover:bg-gray-500 text-white rounded text-xs"
+              >
+                Reset
+              </button>
+            </div>
           </div>
         </div>
 
@@ -210,6 +255,11 @@ export const WorkflowBuilder: React.FC = () => {
             connections={connections}
             onNodesChange={setNodes}
             onConnectionsChange={setConnections}
+            onDeleteNode={(nodeId) => {
+              // 删除节点及其相关连接
+              setNodes(nodes.filter(n => n.id !== nodeId));
+              setConnections(connections.filter(c => c.source !== nodeId && c.target !== nodeId));
+            }}
           />
         </div>
       </div>
@@ -218,19 +268,23 @@ export const WorkflowBuilder: React.FC = () => {
       <ComponentPalette onAddNode={addNode} />
 
       {/* Workflow List Panel */}
-      <div className={`absolute bottom-0 left-0 right-80 bg-gray-800 border-t border-gray-700 transition-transform duration-300 ${
-        showWorkflowList ? 'translate-y-0' : 'translate-y-full'
-      }`} style={{ height: '40%' }}>
-        <div className="flex items-center justify-center py-2 border-b border-gray-700 cursor-pointer"
+      <div className="absolute bottom-0 left-0 right-80 z-10">
+        {/* Toggle Button - Always Visible */}
+        <div className="flex items-center justify-center py-2 bg-gray-800 border-t border-gray-700 cursor-pointer hover:bg-gray-700 transition-colors"
              onClick={() => setShowWorkflowList(!showWorkflowList)}>
           {showWorkflowList ? (
-            <ChevronDown className="w-5 h-5 text-gray-400" />
+            <ChevronDown className="w-5 h-5 text-gray-400 hover:text-white transition-colors" />
           ) : (
-            <ChevronUp className="w-5 h-5 text-gray-400" />
+            <ChevronUp className="w-5 h-5 text-gray-400 hover:text-white transition-colors" />
           )}
         </div>
         
-        <WorkflowList onLoadWorkflow={handleLoadWorkflow} />
+        {/* Panel Content - Conditionally Visible */}
+        <div className={`bg-gray-800 border-t border-gray-700 transition-all duration-300 overflow-hidden ${
+          showWorkflowList ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+        }`} style={{ height: showWorkflowList ? '40vh' : '0' }}>
+          <WorkflowList onLoadWorkflow={handleLoadWorkflow} />
+        </div>
       </div>
     </div>
   );

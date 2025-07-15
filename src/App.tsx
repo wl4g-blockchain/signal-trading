@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Layout } from './components/Layout';
 import { LoginPage } from './components/Auth/LoginPage';
-import { WorkflowBuilder } from './components/WorkflowBuilder/WorkflowBuilder';
-import { LiveMonitor } from './components/Monitor/LiveMonitor';
-import { Reports } from './components/Reports/Reports';
+import { WorkflowPage } from './components/Workflows/WorkflowPage';
+import { LiveDashboard } from './components/Dashboard/Dashboard';
 import { Settings } from './components/Settings/Settings';
 import { User } from './types';
 import { serviceManager } from './services';
@@ -21,7 +20,7 @@ function App() {
         if (currentUser) {
           setUser(currentUser);
         }
-      } catch (error) {
+      } catch {
         console.log('No user logged in');
       } finally {
         setLoading(false);
@@ -47,15 +46,13 @@ function App() {
   const renderCurrentView = () => {
     switch (currentView) {
       case 'monitor':
-        return <LiveMonitor />;
+        return <LiveDashboard showReports={true} />;
       case 'workflow':
-        return <WorkflowBuilder />;
-      case 'reports':
-        return <Reports />;
+        return <WorkflowPage />;
       case 'settings':
         return <Settings />;
       default:
-        return <LiveMonitor />;
+        return <LiveDashboard showReports={true} />;
     }
   };
 

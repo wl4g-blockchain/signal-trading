@@ -1,17 +1,19 @@
 import { Workflow, WorkflowRun, TradeRecord } from '../types';
+import * as mockService from './mock_service';
+// import * as httpService from './http_service'; // 循环依赖，已移除
 
 export interface ApiService {
   // Auth
-  login(provider: string, credentials?: any): Promise<{ token: string; user: any }>;
+  login(provider: string, credentials?: Record<string, unknown>): Promise<{ token: string; user: unknown }>;
   logout(): Promise<void>;
-  getCurrentUser(): Promise<any>;
+  getCurrentUser(): Promise<unknown>;
 
-  // Workflows
+  // WorkflowPage
   getWorkflows(): Promise<Workflow[]>;
   getWorkflow(id: string): Promise<Workflow>;
   saveWorkflow(workflow: Workflow): Promise<Workflow>;
   deleteWorkflow(id: string): Promise<void>;
-  runWorkflow(id: string, params?: any): Promise<WorkflowRun>;
+  runWorkflow(id: string, params?: Record<string, unknown>): Promise<WorkflowRun>;
 
   // Workflow Runs
   getWorkflowRuns(workflowId: string): Promise<WorkflowRun[]>;
@@ -19,8 +21,8 @@ export interface ApiService {
   getWorkflowRunLogs(runId: string, nodeId: string): Promise<string[]>;
 
   // Trading
-  getTradeHistory(params?: any): Promise<TradeRecord[]>;
-  getReports(params?: any): Promise<any[]>;
+  getTradeHistory(params?: Record<string, unknown>): Promise<TradeRecord[]>;
+  getReports(params?: Record<string, unknown>): Promise<unknown[]>;
 }
 
 export class HttpApiService implements ApiService {
@@ -51,12 +53,11 @@ export class HttpApiService implements ApiService {
     return response.json();
   }
 
-  async login(provider: string, credentials?: any) {
+  async login(provider: string, credentials?: Record<string, unknown>) {
     const result = await this.request('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ provider, credentials }),
     });
-    
     this.token = result.token;
     localStorage.setItem('auth_token', result.token);
     return result;
@@ -85,7 +86,7 @@ export class HttpApiService implements ApiService {
     const endpoint = workflow.id ? `/workflows/${workflow.id}` : '/workflows';
     return this.request(endpoint, {
       method,
-      body: JSON.stringify(workflow),
+      body: JSON.stringify(workflow as Workflow),
     });
   }
 
@@ -93,7 +94,7 @@ export class HttpApiService implements ApiService {
     return this.request(`/workflows/${id}`, { method: 'DELETE' });
   }
 
-  async runWorkflow(id: string, params?: any) {
+  async runWorkflow(id: string, params?: Record<string, unknown>) {
     return this.request(`/workflows/${id}/run`, {
       method: 'POST',
       body: JSON.stringify({ params }),
@@ -112,13 +113,19 @@ export class HttpApiService implements ApiService {
     return this.request(`/workflow-runs/${runId}/nodes/${nodeId}/logs`);
   }
 
-  async getTradeHistory(params?: any) {
-    const query = new URLSearchParams(params).toString();
-    return this.request(`/trades/history?${query}`);
+  async getTradeHistory(params?: Record<string, unknown>) {
+    const query = params ? `?${new URLSearchParams(params as Record<string, string>).toString()}` : '';
+    return this.request(`/trades/history${query}`);
   }
 
-  async getReports(params?: any) {
-    const query = new URLSearchParams(params).toString();
-    return this.request(`/reports?${query}`);
+  async getReports(params?: Record<string, unknown>): Promise<unknown[]> {
+    const query = params ? `?${new URLSearchParams(params as Record<string, string>).toString()}` : '';
+    return this.request(`/reports${query}`);
   }
 }
+
+const useMock = (import.meta as any)?.env?.VITE_USE_MOCK === 'true';
+const service: ApiService = useMock ? new mockService.MockApiService() : new HttpApiService();
+
+export const login = service.login.bind(service);
+export const runWorkflow = service.runWorkflow.bind(service);
