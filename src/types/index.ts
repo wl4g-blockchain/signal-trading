@@ -75,6 +75,10 @@ export interface ExecutorConfig {
   customRpc?: string;
   vaultAddress: string;
   customVaultAddress?: string;
+  targetDex: 'uniswap' | 'uniswap-v2' | 'uniswap-v3' | 'sushiswap' | '1inch' | 'quickswap' | 'pancakeswap' | 'bakeryswap' | 'custom';
+  dexAddress: string;
+  customDexAddress?: string;
+  allowedTradingPairs: string[];
   maxAmount: number;
   minAmount: number;
   slippagePercent: number;

@@ -81,6 +81,9 @@ export const WorkflowPage: React.FC = () => {
         return { 
           rpcEndpoint: 'mainnet',
           vaultAddress: '0x742d35Cc6634C0532925a3b8D401d2EdC8d4a5b1',
+          targetDex: 'uniswap',
+          dexAddress: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
+          allowedTradingPairs: ['WETH/USDC', 'WETH/USDT'],
           maxAmount: 0.1,
           minAmount: 0.01,
           slippagePercent: 1.0,

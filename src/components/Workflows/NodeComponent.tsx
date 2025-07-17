@@ -82,7 +82,30 @@ const getDisplayType = (node: ComponentNode): string => {
     case 'evaluator':
       return node.data?.model || 'deepseek-v3';
     case 'executor':
-      return node.data?.rpcEndpoint || 'mainnet';
+      // 显示 DEX 名称，如果没有则显示链名称
+      const dexName = node.data?.targetDex || '';
+      switch (dexName) {
+        case 'uniswap':
+          return 'Uniswap';
+        case 'uniswap-v2':
+          return 'Uniswap V2';
+        case 'uniswap-v3':
+          return 'Uniswap V3';
+        case 'sushiswap':
+          return 'SushiSwap';
+        case '1inch':
+          return '1inch';
+        case 'quickswap':
+          return 'QuickSwap';
+        case 'pancakeswap':
+          return 'PancakeSwap';
+        case 'bakeryswap':
+          return 'BakerySwap';
+        case 'custom':
+          return 'Custom DEX';
+        default:
+          return node.data?.rpcEndpoint || 'mainnet';
+      }
     case 'collector':
       return `${node.data?.monitorDuration || 30}min`;
     default:
