@@ -112,7 +112,7 @@ export const Settings: React.FC = () => {
                   </label>
                   <input
                     type="number"
-                    step="0.1"
+                    step="0.01"
                     value={settings.trading.defaultSlippage}
                     onChange={(e) => updateSetting('trading', 'defaultSlippage', Number(e.target.value))}
                     className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"

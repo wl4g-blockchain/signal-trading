@@ -75,6 +75,21 @@ const getSubIcon = (nodeType: string, dataType: string) => {
   return null;
 };
 
+const getDisplayType = (node: ComponentNode): string => {
+  switch (node.type) {
+    case 'listener':
+      return node.data?.type || 'twitter';
+    case 'evaluator':
+      return node.data?.model || 'deepseek-v3';
+    case 'executor':
+      return node.data?.rpcEndpoint || 'mainnet';
+    case 'collector':
+      return `${node.data?.monitorDuration || 30}min`;
+    default:
+      return node.data?.type || 'default';
+  }
+};
+
 export const NodeComponent: React.FC<NodeComponentProps> = ({
   node,
   onDragStart,
@@ -86,6 +101,7 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
   const Icon = getNodeIcon(node.type);
   const SubIcon = getSubIcon(node.type, node.data?.type);
   const colorClass = getNodeColor(node.type);
+  const displayType = getDisplayType(node);
 
   // Special rendering for start/end nodes
   if (node.type === 'start' || node.type === 'end') {
@@ -245,10 +261,10 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
 
         {/* Content */}
         <div className="p-3 text-sm text-gray-300">
-          {node.data?.type && (
+          {displayType && (
             <div className="mb-2">
               <span className="text-gray-400">Type: </span>
-              <span className="text-blue-400">{node.data.type}</span>
+              <span className="text-blue-400">{displayType}</span>
             </div>
           )}
           {node.data?.status && (

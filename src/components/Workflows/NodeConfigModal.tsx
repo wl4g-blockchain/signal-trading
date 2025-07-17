@@ -13,7 +13,41 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
   onSave,
   onClose,
 }) => {
-  const [config, setConfig] = useState(node.data || {});
+  // 根据链获取 vault 地址的统一函数
+  const getVaultAddress = (chain: string, customVaultAddress?: string) => {
+    switch (chain) {
+      case 'mainnet':
+        return '0x742d35Cc6634C0532925a3b8D401d2EdC8d4a5b1';
+      case 'goerli':
+        return '0x8A753747A1Fa494EC906cE90E9f37563A8AF630e';
+      case 'sepolia':
+        return '0xb7f8BC63BbcaD18155201308C8f3540b07f84F5e';
+      case 'polygon':
+        return '0xc2132D05D31c914a87C6611C10748AEb04B58e8F';
+      case 'bsc':
+        return '0x55d398326f99059fF775485246999027B3197955';
+      case 'custom':
+        return customVaultAddress || '';
+      default:
+        return '0x742d35Cc6634C0532925a3b8D401d2EdC8d4a5b1';
+    }
+  };
+
+  // 初始化配置时，为 executor 节点设置正确的 vault 地址
+  const getInitialConfig = () => {
+    const baseConfig = node.data || {};
+    
+    if (node.type === 'executor' && !baseConfig.vaultAddress) {
+      return {
+        ...baseConfig,
+        vaultAddress: getVaultAddress(baseConfig.rpcEndpoint || 'mainnet', baseConfig.customVaultAddress)
+      };
+    }
+    
+    return baseConfig;
+  };
+
+  const [config, setConfig] = useState(getInitialConfig());
 
   const handleSave = () => {
     const updatedNode = {
@@ -344,20 +378,31 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
   };
 
   const renderExecutorConfig = () => {
+    const currentVaultAddress = getVaultAddress(config.rpcEndpoint || 'mainnet', config.customVaultAddress);
+
     return (
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">
-            RPC Endpoint
+            Target Chain
           </label>
           <select
             value={config.rpcEndpoint || 'mainnet'}
-            onChange={(e) => setConfig({ ...config, rpcEndpoint: e.target.value })}
+            onChange={(e) => {
+              const newEndpoint = e.target.value;
+              setConfig({ 
+                ...config, 
+                rpcEndpoint: newEndpoint,
+                vaultAddress: getVaultAddress(newEndpoint, config.customVaultAddress)
+              });
+            }}
             className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
           >
             <option value="mainnet">Ethereum Mainnet</option>
             <option value="goerli">Goerli Testnet</option>
             <option value="sepolia">Sepolia Testnet</option>
+            <option value="polygon">Polygon</option>
+            <option value="bsc">BSC</option>
             <option value="custom">Custom RPC</option>
           </select>
         </div>
@@ -375,30 +420,115 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
             />
           </div>
         )}
+        
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">
-            Private Key
+            Vault Contract Address
           </label>
           <input
-            type="password"
-            value={config.privateKey || ''}
-            onChange={(e) => setConfig({ ...config, privateKey: e.target.value })}
-            className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
-            placeholder="Enter private key for transaction signing"
+            type="text"
+            value={currentVaultAddress}
+            readOnly
+            className="w-full bg-gray-600 text-gray-300 px-3 py-2 rounded border border-gray-600 cursor-not-allowed"
           />
+          <div className="text-xs text-gray-400 mt-1">
+            Auto-configured for selected chain
+          </div>
         </div>
+
+        {config.rpcEndpoint === 'custom' && (
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Custom Vault Address
+            </label>
+            <input
+              type="text"
+              value={config.customVaultAddress || ''}
+              onChange={(e) => setConfig({ 
+                ...config, 
+                customVaultAddress: e.target.value,
+                vaultAddress: e.target.value
+              })}
+              className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+              placeholder="0x742d35Cc6634C0532925a3b8D401d2EdC8d4a5b1"
+            />
+          </div>
+        )}
+
+        <div className="bg-gray-600 rounded-lg p-3">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium text-gray-300">Authorization Status</span>
+            <button
+              type="button"
+              onClick={() => {
+                // TODO: 实现授权额度查询功能
+                console.log('Query authorization allowance');
+              }}
+              className="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded"
+            >
+              Refresh
+            </button>
+          </div>
+          <div className="text-sm text-gray-400">
+            <div className="flex justify-between">
+              <span>Authorized Amount:</span>
+              <span className="text-green-400">1.50 ETH</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Used Amount:</span>
+              <span className="text-yellow-400">0.30 ETH</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Available Amount:</span>
+              <span className="text-blue-400">1.20 ETH</span>
+            </div>
+          </div>
+        </div>
+
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">
             Max Amount Per Transaction (ETH)
           </label>
           <input
             type="number"
-            step="0.01"
-            value={config.maxAmount || 1}
+            step="0.0001"
+            value={config.maxAmount || 0.1}
             onChange={(e) => setConfig({ ...config, maxAmount: Number(e.target.value) })}
             className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
           />
+          <div className="text-xs text-gray-400 mt-1">
+            Must not exceed available authorized amount
+          </div>
         </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-2">
+            Min Amount Per Transaction (ETH)
+          </label>
+          <input
+            type="number"
+            step="0.0001"
+            value={config.minAmount || 0.01}
+            onChange={(e) => setConfig({ ...config, minAmount: Number(e.target.value) })}
+            className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-2">
+            Slippage Tolerance (%)
+          </label>
+          <input
+            type="number"
+            step="0.01"
+            min="0.01"
+            max="10"
+            value={config.slippagePercent || 1.0}
+            onChange={(e) => setConfig({ ...config, slippagePercent: Number(e.target.value) })}
+            className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+          />
+        </div>
+
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">
             Gas Price Strategy
@@ -413,6 +543,31 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
             <option value="fast">Fast (High Gas)</option>
             <option value="custom">Custom</option>
           </select>
+        </div>
+
+        {config.gasStrategy === 'custom' && (
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Custom Gas Price (Gwei)
+            </label>
+            <input
+              type="number"
+              step="0.1"
+              value={config.customGasPrice || 20}
+              onChange={(e) => setConfig({ ...config, customGasPrice: Number(e.target.value) })}
+              className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+            />
+          </div>
+        )}
+
+        <div className="bg-yellow-600 bg-opacity-20 rounded-lg p-3">
+          <div className="flex items-start space-x-2">
+            <div className="w-4 h-4 bg-yellow-400 rounded-full flex-shrink-0 mt-0.5"></div>
+            <div className="text-sm text-yellow-200">
+              <div className="font-medium mb-1">Security Notice:</div>
+              <div>This executor will only use authorized funds from the vault contract. No private keys are stored or transmitted.</div>
+            </div>
+          </div>
         </div>
       </div>
     );

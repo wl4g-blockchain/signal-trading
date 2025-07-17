@@ -62,8 +62,8 @@ export const WorkflowPage: React.FC = () => {
       position: { x: 100 + Math.random() * 300, y: 100 + Math.random() * 200 },
       data: {
         name: `${type.charAt(0).toUpperCase() + type.slice(1)} Component`,
-        type: getDefaultSubtype(type),
         status: 'idle',
+        ...getDefaultNodeData(type),
       },
       inputs: getInputs(type),
       outputs: getOutputs(type),
@@ -71,13 +71,25 @@ export const WorkflowPage: React.FC = () => {
     setNodes([...nodes, newNode]);
   };
 
-  const getDefaultSubtype = (type: string) => {
+  const getDefaultNodeData = (type: string) => {
     switch (type) {
-      case 'listener': return 'twitter';
-      case 'evaluator': return 'default';
-      case 'executor': return 'swap';
-      case 'collector': return 'async';
-      default: return 'default';
+      case 'listener': 
+        return { type: 'twitter' };
+      case 'evaluator': 
+        return { model: 'deepseek-v3' };
+      case 'executor': 
+        return { 
+          rpcEndpoint: 'mainnet',
+          vaultAddress: '0x742d35Cc6634C0532925a3b8D401d2EdC8d4a5b1',
+          maxAmount: 0.1,
+          minAmount: 0.01,
+          slippagePercent: 1.0,
+          gasStrategy: 'standard'
+        };
+      case 'collector': 
+        return { monitorDuration: 30 };
+      default: 
+        return { type: 'default' };
     }
   };
 

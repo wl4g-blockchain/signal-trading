@@ -71,11 +71,15 @@ export interface EvaluatorConfig {
 }
 
 export interface ExecutorConfig {
-  maxAmountPerTx: number;
-  minAmountPerTx: number;
-  slippagePercent: number;
+  rpcEndpoint: 'mainnet' | 'goerli' | 'sepolia' | 'polygon' | 'bsc' | 'custom';
+  customRpc?: string;
   vaultAddress: string;
-  targetChain: 'ethereum' | 'bsc' | 'polygon';
+  customVaultAddress?: string;
+  maxAmount: number;
+  minAmount: number;
+  slippagePercent: number;
+  gasStrategy: 'slow' | 'standard' | 'fast' | 'custom';
+  customGasPrice?: number;
 }
 
 export interface CollectorConfig {
