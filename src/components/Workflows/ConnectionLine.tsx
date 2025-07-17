@@ -7,6 +7,8 @@ interface ConnectionLineProps {
   sourceNodeType: string;
   targetNodeType: string;
   onDelete: () => void;
+  scale?: number;
+  panOffset?: { x: number; y: number };
 }
 
 export const ConnectionLine: React.FC<ConnectionLineProps> = ({
@@ -15,6 +17,8 @@ export const ConnectionLine: React.FC<ConnectionLineProps> = ({
   sourceNodeType,
   targetNodeType,
   onDelete,
+  scale = 1,
+  panOffset = { x: 0, y: 0 },
 }) => {
   // 计算源节点输出端口位置（右侧中间）
   let startX, startY;
@@ -46,7 +50,12 @@ export const ConnectionLine: React.FC<ConnectionLineProps> = ({
   const path = `M ${startX} ${startY} C ${startX + controlPointOffset} ${startY}, ${endX - controlPointOffset} ${endY}, ${endX} ${endY}`;
 
   return (
-    <svg className="absolute pointer-events-none" style={{ left: 0, top: 0, width: '100%', height: '100%' }}>
+    <svg className="absolute pointer-events-none" style={{ 
+      left: `${-panOffset.x / scale}px`, 
+      top: `${-panOffset.y / scale}px`, 
+      width: `${100 / scale}%`, 
+      height: `${100 / scale}%` 
+    }}>
       <path
         d={path}
         fill="none"

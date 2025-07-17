@@ -171,7 +171,7 @@ export const Canvas: React.FC<CanvasProps> = ({
   const handleTouchStart = useCallback((event: React.TouchEvent) => {
     if (event.touches.length === 3) {
       setIsThreeFingerPanning(true);
-      setTouchStartPositions(event.touches);
+      setTouchStartPositions(event.touches as any);
       event.preventDefault();
     }
   }, []);
@@ -203,7 +203,7 @@ export const Canvas: React.FC<CanvasProps> = ({
       }));
       
       onNodesChange(updatedNodes);
-      setTouchStartPositions(event.touches);
+      setTouchStartPositions(event.touches as any);
     }
   }, [isThreeFingerPanning, touchStartPositions, nodes, onNodesChange, scale]);
 
@@ -322,7 +322,12 @@ export const Canvas: React.FC<CanvasProps> = ({
           }}
         >
           {/* Grid Background */}
-          <div className="absolute inset-0 opacity-10" style={{ width: '200%', height: '200%' }}>
+          <div className="absolute inset-0 opacity-10" style={{ 
+            width: `${100 / scale}%`, 
+            height: `${100 / scale}%`,
+            left: `${-panOffset.x / scale}px`,
+            top: `${-panOffset.y / scale}px`
+          }}>
             <svg width="100%" height="100%">
               <defs>
                 <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
@@ -345,6 +350,8 @@ export const Canvas: React.FC<CanvasProps> = ({
                 targetPosition={targetNode.position}
                 sourceNodeType={sourceNode.type}
                 targetNodeType={targetNode.type}
+                scale={scale}
+                panOffset={panOffset}
                 onDelete={() => {
                   onConnectionsChange(connections.filter(c => c.id !== connection.id));
                 }}
@@ -368,7 +375,12 @@ export const Canvas: React.FC<CanvasProps> = ({
             }
             
             return (
-              <svg className="absolute pointer-events-none" style={{ left: 0, top: 0, width: '200%', height: '200%' }}>
+              <svg className="absolute pointer-events-none" style={{ 
+                left: `${-panOffset.x / scale}px`, 
+                top: `${-panOffset.y / scale}px`, 
+                width: `${100 / scale}%`, 
+                height: `${100 / scale}%` 
+              }}>
                 <line
                   x1={sourceX}
                   y1={sourceY}
