@@ -33,6 +33,8 @@ const getNodeIcon = (type: string) => {
       return Brain;
     case 'executor':
       return Zap;
+    case 'cex-executor':
+      return TrendingUp;
     case 'collector':
       return Database;
     default:
@@ -52,6 +54,8 @@ const getNodeColor = (type: string) => {
       return 'bg-purple-600 border-purple-500';
     case 'executor':
       return 'bg-green-600 border-green-500';
+    case 'cex-executor':
+      return 'bg-blue-600 border-blue-500';
     case 'collector':
       return 'bg-orange-600 border-orange-500';
     default:
@@ -91,6 +95,8 @@ const getDisplayType = (node: ComponentNode): string => {
           return 'Uniswap V2';
         case 'uniswap-v3':
           return 'Uniswap V3';
+        case 'uniswap-v4':
+          return 'Uniswap V4';
         case 'sushiswap':
           return 'SushiSwap';
         case '1inch':
@@ -105,6 +111,25 @@ const getDisplayType = (node: ComponentNode): string => {
           return 'Custom DEX';
         default:
           return node.data?.rpcEndpoint || 'mainnet';
+      }
+    case 'cex-executor':
+      // 显示 CEX 名称
+      const exchangeName = node.data?.exchange || '';
+      switch (exchangeName) {
+        case 'binance':
+          return 'Binance';
+        case 'okx':
+          return 'OKX';
+        case 'coinbase':
+          return 'Coinbase';
+        case 'kraken':
+          return 'Kraken';
+        case 'bybit':
+          return 'Bybit';
+        case 'kucoin':
+          return 'KuCoin';
+        default:
+          return 'Binance';
       }
     case 'collector':
       return `${node.data?.monitorDuration || 30}min`;

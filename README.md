@@ -76,6 +76,16 @@ npm run dev
 - **认证**：JWT + GitHub OAuth
 - **部署**：Vercel Platform
 
+### CEX vs DEX 的 Trade Executor 设计核心差异分析
+
+| 特性 | DEX | CEX |
+| - | - | - |
+| 认证方式 | Wallet 签名 | API Key/Secret |
+| 资金管理 | Vault 合约 | 交易所账户 |
+| 交易执行 | 智能合约调用 | REST API |
+| Gas 费用 | 需要 Gas 策略 | 无 Gas 费用 |
+| 安全模型 | 去中心化授权 | 集中式 API 权限 |
+
 ## 📁 项目结构
 
 ```

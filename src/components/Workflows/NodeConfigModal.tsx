@@ -43,15 +43,15 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
       const needsDexConfig = !baseConfig.targetDex || !baseConfig.dexAddress;
       
       if (needsVaultAddress || needsDexConfig) {
-        // 获取默认 DEX 配置
+        // 获取默认 DEX 配置 - 选择启用的主流 DEX
         const getDefaultDex = (chain: string) => {
           switch (chain) {
             case 'mainnet':
             case 'goerli':
             case 'sepolia':
               return {
-                targetDex: 'uniswap',
-                dexAddress: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D'
+                targetDex: 'uniswap-v4',
+                dexAddress: '0x0000000000000000000000000000000000000000'
               };
             case 'polygon':
               return {
@@ -65,8 +65,8 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
               };
             default:
               return {
-                targetDex: 'uniswap-v2',
-                dexAddress: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D'
+                targetDex: 'uniswap-v4',
+                dexAddress: '0x0000000000000000000000000000000000000000'
               };
           }
         };
@@ -423,34 +423,34 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
       switch (chain) {
         case 'mainnet':
           return [
-            { value: 'uniswap', label: 'Uniswap', address: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D' },
-            { value: 'uniswap-v2', label: 'Uniswap V2', address: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D' },
-            { value: 'uniswap-v3', label: 'Uniswap V3', address: '0xE592427A0AEce92De3Edee1F18E0157C05861564' },
-            { value: 'sushiswap', label: 'SushiSwap', address: '0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F' },
-            { value: '1inch', label: '1inch', address: '0x111111125421cA6dc452d289314280a0f8842A65' },
+            { value: 'uniswap-v4', label: 'Uniswap V4', address: '0x0000000000000000000000000000000000000000', enabled: true }, // V4 最新版本
+            { value: 'uniswap-v3', label: 'Uniswap V3', address: '0xE592427A0AEce92De3Edee1F18E0157C05861564', enabled: true },
+            { value: 'uniswap-v2', label: 'Uniswap V2', address: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D', enabled: true },
+            { value: 'sushiswap', label: 'SushiSwap (Coming Soon)', address: '0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F', enabled: false },
+            { value: '1inch', label: '1inch (Coming Soon)', address: '0x111111125421cA6dc452d289314280a0f8842A65', enabled: false },
           ];
         case 'goerli':
         case 'sepolia':
           return [
-            { value: 'uniswap', label: 'Uniswap (Testnet)', address: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D' },
-            { value: 'uniswap-v2', label: 'Uniswap V2 (Testnet)', address: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D' },
-            { value: 'uniswap-v3', label: 'Uniswap V3 (Testnet)', address: '0xE592427A0AEce92De3Edee1F18E0157C05861564' },
+            { value: 'uniswap-v4', label: 'Uniswap V4 (Testnet)', address: '0x0000000000000000000000000000000000000000', enabled: true }, // V4 测试网
+            { value: 'uniswap-v3', label: 'Uniswap V3 (Testnet)', address: '0xE592427A0AEce92De3Edee1F18E0157C05861564', enabled: true },
+            { value: 'uniswap-v2', label: 'Uniswap V2 (Testnet)', address: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D', enabled: true },
           ];
         case 'polygon':
           return [
-            { value: 'quickswap', label: 'QuickSwap', address: '0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff' },
-            { value: 'sushiswap', label: 'SushiSwap', address: '0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506' },
-            { value: '1inch', label: '1inch', address: '0x111111125421cA6dc452d289314280a0f8842A65' },
+            { value: 'quickswap', label: 'QuickSwap', address: '0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff', enabled: true },
+            { value: 'sushiswap', label: 'SushiSwap (Coming Soon)', address: '0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506', enabled: false },
+            { value: '1inch', label: '1inch (Coming Soon)', address: '0x111111125421cA6dc452d289314280a0f8842A65', enabled: false },
           ];
         case 'bsc':
           return [
-            { value: 'pancakeswap', label: 'PancakeSwap', address: '0x10ED43C718714eb63d5aA57B78B54704E256024E' },
-            { value: 'bakeryswap', label: 'BakerySwap', address: '0xCDe540d7eAFE93aC5fE6233Bee57E1270D3E330F' },
-            { value: '1inch', label: '1inch', address: '0x111111125421cA6dc452d289314280a0f8842A65' },
+            { value: 'pancakeswap', label: 'PancakeSwap', address: '0x10ED43C718714eb63d5aA57B78B54704E256024E', enabled: true },
+            { value: 'bakeryswap', label: 'BakerySwap (Coming Soon)', address: '0xCDe540d7eAFE93aC5fE6233Bee57E1270D3E330F', enabled: false },
+            { value: '1inch', label: '1inch (Coming Soon)', address: '0x111111125421cA6dc452d289314280a0f8842A65', enabled: false },
           ];
         case 'custom':
           return [
-            { value: 'custom', label: 'Custom DEX', address: config.customDexAddress || '' },
+            { value: 'custom', label: 'Custom DEX', address: config.customDexAddress || '', enabled: true },
           ];
         default:
           return [];
@@ -458,7 +458,7 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
     };
 
     const dexOptions = getDexOptions(config.rpcEndpoint || 'mainnet');
-    const selectedDex = dexOptions.find(dex => dex.value === config.targetDex) || dexOptions[0];
+    const selectedDex = dexOptions.find(dex => dex.value === config.targetDex) || dexOptions.find(dex => dex.enabled !== false) || dexOptions[0];
 
     return (
       <div className="space-y-4">
@@ -509,19 +509,26 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
             Target DEX
           </label>
           <select
-            value={config.targetDex || dexOptions[0]?.value || ''}
+            value={config.targetDex || dexOptions.find(dex => dex.enabled !== false)?.value || ''}
             onChange={(e) => {
               const selectedDexOption = dexOptions.find(dex => dex.value === e.target.value);
-              setConfig({ 
-                ...config, 
-                targetDex: e.target.value,
-                dexAddress: selectedDexOption?.address || ''
-              });
+              if (selectedDexOption && selectedDexOption.enabled !== false) {
+                setConfig({ 
+                  ...config, 
+                  targetDex: e.target.value,
+                  dexAddress: selectedDexOption?.address || ''
+                });
+              }
             }}
             className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
           >
             {dexOptions.map(dex => (
-              <option key={dex.value} value={dex.value}>
+              <option 
+                key={dex.value} 
+                value={dex.value}
+                disabled={dex.enabled === false}
+                className={dex.enabled !== false ? 'text-white' : 'text-gray-500'}
+              >
                 {dex.label}
               </option>
             ))}
@@ -607,14 +614,12 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
                 onClick={() => setConfig({ 
                   ...config, 
                   allowedTradingPairs: [
-                    'WETH/USDC', 'WETH/USDT', 'WETH/DAI', 'USDC/USDT', 'DAI/USDC',
-                    'WBTC/WETH', 'WBTC/USDC', 'LINK/WETH', 'UNI/WETH', 'AAVE/WETH',
-                    'COMP/WETH', 'SUSHI/WETH', 'CRV/WETH', 'SNX/WETH', 'MKR/WETH'
+                    'WETH/USDC', 'WETH/USDT', 'WETH/DAI', 'USDC/USDT', 'WBTC/WETH', 'WBTC/USDC'
                   ]
                 })}
                 className="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded"
               >
-                All
+                All Available
               </button>
               <button
                 type="button"
@@ -630,7 +635,7 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
                 type="button"
                 onClick={() => setConfig({ 
                   ...config, 
-                  allowedTradingPairs: ['USDC/USDT', 'DAI/USDC']
+                  allowedTradingPairs: ['USDC/USDT']
                 })}
                 className="px-2 py-1 bg-purple-600 hover:bg-purple-700 text-white text-xs rounded"
               >
@@ -657,15 +662,29 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
           </div>
           <div className="bg-gray-700 rounded border border-gray-600 p-3 max-h-48 overflow-y-auto">
             {[
-              'WETH/USDC', 'WETH/USDT', 'WETH/DAI', 'USDC/USDT', 'DAI/USDC',
-              'WBTC/WETH', 'WBTC/USDC', 'LINK/WETH', 'UNI/WETH', 'AAVE/WETH',
-              'COMP/WETH', 'SUSHI/WETH', 'CRV/WETH', 'SNX/WETH', 'MKR/WETH'
-            ].map((pair) => (
-              <label key={pair} className="flex items-center space-x-2 py-1 hover:bg-gray-600 rounded px-2">
+              { pair: 'WETH/USDC', enabled: true },
+              { pair: 'WETH/USDT', enabled: true },
+              { pair: 'WETH/DAI', enabled: true },
+              { pair: 'USDC/USDT', enabled: true },
+              { pair: 'WBTC/WETH', enabled: true },
+              { pair: 'WBTC/USDC', enabled: true },
+              { pair: 'DAI/USDC', enabled: false },
+              { pair: 'LINK/WETH', enabled: false },
+              { pair: 'UNI/WETH', enabled: false },
+              { pair: 'AAVE/WETH', enabled: false },
+              { pair: 'COMP/WETH', enabled: false },
+              { pair: 'SUSHI/WETH', enabled: false },
+              { pair: 'CRV/WETH', enabled: false },
+              { pair: 'SNX/WETH', enabled: false },
+              { pair: 'MKR/WETH', enabled: false }
+            ].map(({ pair, enabled }) => (
+              <label key={pair} className={`flex items-center space-x-2 py-1 hover:bg-gray-600 rounded px-2 ${!enabled ? 'opacity-50' : ''}`}>
                 <input
                   type="checkbox"
                   checked={config.allowedTradingPairs?.includes(pair) || false}
+                  disabled={!enabled}
                   onChange={(e) => {
+                    if (!enabled) return;
                     const currentPairs = config.allowedTradingPairs || [];
                     if (e.target.checked) {
                       setConfig({ 
@@ -681,7 +700,9 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
                   }}
                   className="rounded text-blue-500 focus:ring-blue-500"
                 />
-                <span className="text-sm text-gray-300">{pair}</span>
+                <span className={`text-sm ${enabled ? 'text-gray-300' : 'text-gray-500'}`}>
+                  {pair} {!enabled && '(Coming Soon)'}
+                </span>
               </label>
             ))}
           </div>
@@ -909,6 +930,230 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
     );
   };
 
+  const renderCexExecutorConfig = () => {
+    const exchangeOptions = [
+      { value: 'binance', label: 'Binance', enabled: true },
+      { value: 'okx', label: 'OKX', enabled: true },
+      { value: 'coinbase', label: 'Coinbase Pro', enabled: true },
+      { value: 'kraken', label: 'Kraken', enabled: false },
+      { value: 'bybit', label: 'Bybit (Coming Soon)', enabled: false },
+      { value: 'kucoin', label: 'KuCoin (Coming Soon)', enabled: false },
+    ];
+
+    const selectedExchange = exchangeOptions.find(ex => ex.value === config.exchange) || exchangeOptions[0];
+
+    return (
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-2">
+            Target Exchange
+          </label>
+          <select
+            value={config.exchange || exchangeOptions.find(ex => ex.enabled)?.value || ''}
+            onChange={(e) => setConfig({ ...config, exchange: e.target.value })}
+            className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+          >
+            {exchangeOptions.map(ex => (
+              <option 
+                key={ex.value} 
+                value={ex.value}
+                disabled={!ex.enabled}
+                className={ex.enabled ? 'text-white' : 'text-gray-500'}
+              >
+                {ex.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="bg-yellow-600 bg-opacity-20 rounded-lg p-3">
+          <div className="flex items-start space-x-2">
+            <div className="w-4 h-4 bg-yellow-400 rounded-full flex-shrink-0 mt-0.5"></div>
+            <div className="text-sm text-yellow-200">
+              <div className="font-medium mb-1">API Configuration Required:</div>
+              <div>Please configure your {selectedExchange.label} API keys in Settings → CEX Configuration before using this executor.</div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <label className="block text-sm font-medium text-gray-300">
+              Allowed Trading Pairs
+            </label>
+            <div className="flex flex-wrap gap-1">
+              <button
+                type="button"
+                onClick={() => setConfig({ 
+                  ...config, 
+                  allowedTradingPairs: [
+                    'BTC/USDT', 'ETH/USDT', 'BNB/USDT', 'SOL/USDT', 'ADA/USDT', 'DOT/USDT'
+                  ]
+                })}
+                className="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded"
+              >
+                All Available
+              </button>
+              <button
+                type="button"
+                onClick={() => setConfig({ 
+                  ...config, 
+                  allowedTradingPairs: ['BTC/USDT', 'ETH/USDT']
+                })}
+                className="px-2 py-1 bg-green-600 hover:bg-green-700 text-white text-xs rounded"
+              >
+                Major Pairs
+              </button>
+              <button
+                type="button"
+                onClick={() => setConfig({ 
+                  ...config, 
+                  allowedTradingPairs: ['BTC/USDT', 'ETH/USDT', 'BNB/USDT', 'SOL/USDT']
+                })}
+                className="px-2 py-1 bg-purple-600 hover:bg-purple-700 text-white text-xs rounded"
+              >
+                Top 4
+              </button>
+              <button
+                type="button"
+                onClick={() => setConfig({ ...config, allowedTradingPairs: [] })}
+                className="px-2 py-1 bg-gray-600 hover:bg-gray-700 text-white text-xs rounded"
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+          <div className="bg-gray-700 rounded border border-gray-600 p-3 max-h-48 overflow-y-auto">
+            {[
+              { pair: 'BTC/USDT', enabled: true },
+              { pair: 'ETH/USDT', enabled: true },
+              { pair: 'BNB/USDT', enabled: true },
+              { pair: 'SOL/USDT', enabled: true },
+              { pair: 'ADA/USDT', enabled: true },
+              { pair: 'DOT/USDT', enabled: true },
+              { pair: 'LINK/USDT', enabled: false },
+              { pair: 'AVAX/USDT', enabled: false },
+              { pair: 'MATIC/USDT', enabled: false },
+              { pair: 'UNI/USDT', enabled: false },
+              { pair: 'ATOM/USDT', enabled: false },
+              { pair: 'FIL/USDT', enabled: false }
+            ].map(({ pair, enabled }) => (
+              <label key={pair} className={`flex items-center space-x-2 py-1 hover:bg-gray-600 rounded px-2 ${!enabled ? 'opacity-50' : ''}`}>
+                <input
+                  type="checkbox"
+                  checked={config.allowedTradingPairs?.includes(pair) || false}
+                  disabled={!enabled}
+                  onChange={(e) => {
+                    if (!enabled) return;
+                    const currentPairs = config.allowedTradingPairs || [];
+                    if (e.target.checked) {
+                      setConfig({ 
+                        ...config, 
+                        allowedTradingPairs: [...currentPairs, pair]
+                      });
+                    } else {
+                      setConfig({ 
+                        ...config, 
+                        allowedTradingPairs: currentPairs.filter((p: string) => p !== pair)
+                      });
+                    }
+                  }}
+                  className="rounded text-blue-500 focus:ring-blue-500"
+                />
+                <span className={`text-sm ${enabled ? 'text-gray-300' : 'text-gray-500'}`}>
+                  {pair} {!enabled && '(Coming Soon)'}
+                </span>
+              </label>
+            ))}
+          </div>
+          <div className="text-xs text-gray-400 mt-2">
+            AI can autonomously choose from these pairs based on market analysis
+            <br />
+            Selected: {config.allowedTradingPairs?.length || 0} pairs
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-2">
+            Order Type
+          </label>
+          <select
+            value={config.orderType || 'market'}
+            onChange={(e) => setConfig({ ...config, orderType: e.target.value })}
+            className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+          >
+            <option value="market">Market Order</option>
+            <option value="limit">Limit Order</option>
+            <option value="stop">Stop Order</option>
+            <option value="stop-limit">Stop-Limit Order</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-2">
+            Max Position Size (USDT)
+          </label>
+          <input
+            type="number"
+            step="10"
+            value={config.maxPositionSize || 1000}
+            onChange={(e) => setConfig({ ...config, maxPositionSize: Number(e.target.value) })}
+            className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-2">
+            Min Position Size (USDT)
+          </label>
+          <input
+            type="number"
+            step="1"
+            value={config.minPositionSize || 10}
+            onChange={(e) => setConfig({ ...config, minPositionSize: Number(e.target.value) })}
+            className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-2">
+            Max Slippage Tolerance (%)
+          </label>
+          <input
+            type="number"
+            step="0.1"
+            value={config.maxSlippage || 0.5}
+            onChange={(e) => setConfig({ ...config, maxSlippage: Number(e.target.value) })}
+            className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+          />
+        </div>
+
+        <div className="bg-green-600 bg-opacity-20 rounded-lg p-3">
+          <div className="flex items-start space-x-2">
+            <div className="w-4 h-4 bg-green-400 rounded-full flex-shrink-0 mt-0.5"></div>
+            <div className="text-sm text-green-200">
+              <div className="font-medium mb-1">CEX Advantages:</div>
+              <div>• Higher liquidity and faster execution</div>
+              <div>• No gas fees</div>
+              <div>• More trading pairs available</div>
+              <div>• Advanced order types (stop-loss, OCO, etc.)</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-blue-600 bg-opacity-20 rounded-lg p-3">
+          <div className="flex items-start space-x-2">
+            <div className="w-4 h-4 bg-blue-400 rounded-full flex-shrink-0 mt-0.5"></div>
+            <div className="text-sm text-blue-200">
+              <div className="font-medium mb-1">Security Notice:</div>
+              <div>API keys are encrypted and stored locally. Never share your secret keys with anyone.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const renderConfigContent = () => {
     switch (node.type) {
       case 'listener':
@@ -917,6 +1162,8 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
         return renderEvaluatorConfig();
       case 'executor':
         return renderExecutorConfig();
+      case 'cex-executor':
+        return renderCexExecutorConfig();
       case 'collector':
         return renderCollectorConfig();
       default:

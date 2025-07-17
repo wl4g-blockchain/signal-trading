@@ -1,6 +1,6 @@
 export interface ComponentNode {
   id: string;
-  type: 'start' | 'end' | 'listener' | 'evaluator' | 'executor' | 'collector';
+  type: 'start' | 'end' | 'listener' | 'evaluator' | 'executor' | 'cex-executor' | 'collector';
   position: { x: number; y: number };
   data: any;
   inputs: string[];

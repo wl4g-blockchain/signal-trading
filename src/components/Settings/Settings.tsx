@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Settings as SettingsIcon, Shield, Wallet, Bell, Database } from 'lucide-react';
+import { Settings as SettingsIcon, Shield, Bell, Database, Zap } from 'lucide-react';
 
 export const Settings: React.FC = () => {
   const [activeTab, setActiveTab] = useState('trading');
+  const [exchangeSubTab, setExchangeSubTab] = useState('dex');
   const [settings, setSettings] = useState({
     trading: {
       maxAmountPerTx: 1000,
@@ -23,18 +24,49 @@ export const Settings: React.FC = () => {
       errorNotifications: true,
       emailReports: false,
     },
-    vault: {
-      address: '0x742d35Cc6639C0532fEb5003f13A1234567890ab',
-      autoRebalance: true,
-      emergencyPause: false,
+
+          exchanges: {
+        dex: {
+          vault: {
+            chain: 'mainnet',
+            address: '0x742d35Cc6639C0532fEb5003f13A1234567890ab',
+            connected: false,
+            walletAddress: '',
+            balance: '0.0000',
+            allowedPercentage: 50,
+            autoRebalance: true,
+            emergencyPause: false,
+          }
+        },
+      cex: {
+        binance: {
+          apiKey: '',
+          apiSecret: '',
+          testnet: false,
+          enabled: false
+        },
+        okx: {
+          apiKey: '',
+          apiSecret: '',
+          passphrase: '',
+          testnet: false,
+          enabled: false
+        },
+        coinbase: {
+          apiKey: '',
+          apiSecret: '',
+          testnet: false,
+          enabled: false
+        }
+      }
     },
   });
 
   const tabs = [
     { id: 'trading', label: 'Trading', icon: SettingsIcon },
+    { id: 'exchanges', label: 'Exchanges', icon: Zap },
     { id: 'security', label: 'Security', icon: Shield },
     { id: 'notifications', label: 'Notifications', icon: Bell },
-    { id: 'vault', label: 'Vault', icon: Wallet },
   ];
 
   const updateSetting = (category: string, key: string, value: any) => {
@@ -76,7 +108,7 @@ export const Settings: React.FC = () => {
         </div>
 
         {/* Content */}
-        <div className="lg:col-span-3 bg-gray-800 rounded-lg p-6">
+        <div className="lg:col-span-3 bg-gray-800 rounded-lg p-6 min-h-[600px] max-h-[80vh] overflow-y-auto">
           {activeTab === 'trading' && (
             <div className="space-y-6">
               <h3 className="text-lg font-semibold text-white">Trading Configuration</h3>
@@ -229,58 +261,421 @@ export const Settings: React.FC = () => {
             </div>
           )}
 
-          {activeTab === 'vault' && (
-            <div className="space-y-6">
-              <h3 className="text-lg font-semibold text-white">Vault Configuration</h3>
+
+
+          {activeTab === 'exchanges' && (
+            <div className="space-y-6 pb-6">
+              <h3 className="text-lg font-semibold text-white">Exchange Configuration</h3>
               
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Vault Contract Address
-                  </label>
-                  <input
-                    type="text"
-                    value={settings.vault.address}
-                    onChange={(e) => updateSetting('vault', 'address', e.target.value)}
-                    className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none font-mono"
-                  />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="text-white font-medium">Auto Rebalance</h4>
-                    <p className="text-sm text-gray-400">Automatically rebalance portfolio allocations</p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={settings.vault.autoRebalance}
-                      onChange={(e) => updateSetting('vault', 'autoRebalance', e.target.checked)}
-                      className="sr-only peer"
-                    />
-                    <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                  </label>
-                </div>
-                
-                <div className="bg-red-900 border border-red-700 rounded-lg p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="text-red-300 font-medium">Emergency Pause</h4>
-                      <p className="text-sm text-red-400">Immediately halt all trading activities</p>
-                    </div>
-                    <button
-                      onClick={() => updateSetting('vault', 'emergencyPause', !settings.vault.emergencyPause)}
-                      className={`px-4 py-2 rounded font-medium transition-colors ${
-                        settings.vault.emergencyPause
-                          ? 'bg-red-600 hover:bg-red-700 text-white'
-                          : 'bg-gray-600 hover:bg-gray-500 text-white'
-                      }`}
-                    >
-                      {settings.vault.emergencyPause ? 'Resume Trading' : 'Emergency Pause'}
-                    </button>
-                  </div>
-                </div>
+              {/* DEX/CEX 子标签 */}
+              <div className="flex space-x-4 border-b border-gray-600">
+                <button
+                  onClick={() => setExchangeSubTab('dex')}
+                  className={`px-4 py-2 border-b-2 transition-colors ${
+                    exchangeSubTab === 'dex'
+                      ? 'border-blue-500 text-blue-400'
+                      : 'border-transparent text-gray-400 hover:text-gray-300'
+                  }`}
+                >
+                  DEX Configuration
+                </button>
+                <button
+                  onClick={() => setExchangeSubTab('cex')}
+                  className={`px-4 py-2 border-b-2 transition-colors ${
+                    exchangeSubTab === 'cex'
+                      ? 'border-blue-500 text-blue-400'
+                      : 'border-transparent text-gray-400 hover:text-gray-300'
+                  }`}
+                >
+                  CEX Configuration
+                </button>
               </div>
+
+              {/* DEX 配置 */}
+              {exchangeSubTab === 'dex' && (
+                <div className="space-y-6 min-h-[500px]">
+                  {/* Vault Configuration - 置于最前面 */}
+                  <div className="bg-gray-700 rounded-lg p-4 min-h-[400px]">
+                    <h4 className="text-white font-medium mb-4">Vault Configuration</h4>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                          Vault Chain
+                        </label>
+                        <select
+                          value={settings.exchanges.dex.vault.chain}
+                          onChange={(e) => updateSetting('exchanges', 'dex', { 
+                            ...settings.exchanges.dex, 
+                            vault: { ...settings.exchanges.dex.vault, chain: e.target.value }
+                          })}
+                          className="w-full bg-gray-600 text-white px-3 py-2 rounded border border-gray-500 focus:border-blue-500 focus:outline-none"
+                        >
+                          <option value="mainnet">Ethereum Mainnet</option>
+                          <option value="polygon">Polygon</option>
+                          <option value="bsc">BNB Smart Chain</option>
+                          <option value="goerli">Goerli Testnet</option>
+                          <option value="sepolia">Sepolia Testnet</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                          Wallet Connection
+                        </label>
+                        <div className="flex items-center space-x-4">
+                          <button
+                            onClick={() => {
+                              if (settings.exchanges.dex.vault.connected) {
+                                // 断开连接
+                                updateSetting('exchanges', 'dex', { 
+                                  ...settings.exchanges.dex, 
+                                  vault: { 
+                                    ...settings.exchanges.dex.vault, 
+                                    connected: false,
+                                    walletAddress: '',
+                                    balance: '0.0000'
+                                  }
+                                });
+                              } else {
+                                // 模拟连接钱包
+                                updateSetting('exchanges', 'dex', { 
+                                  ...settings.exchanges.dex, 
+                                  vault: { 
+                                    ...settings.exchanges.dex.vault, 
+                                    connected: true,
+                                    walletAddress: '0x742d35Cc6634C0532925a3b8D401d2EdC8d4a5b1',
+                                    balance: '2.5734'
+                                  }
+                                });
+                              }
+                            }}
+                            className={`flex-1 px-4 py-2 rounded font-medium transition-colors ${
+                              settings.exchanges.dex.vault.connected
+                                ? 'bg-red-600 hover:bg-red-700 text-white'
+                                : 'bg-blue-600 hover:bg-blue-700 text-white'
+                            }`}
+                          >
+                            {settings.exchanges.dex.vault.connected ? 'Disconnect' : 'Connect Wallet'}
+                          </button>
+                          {settings.exchanges.dex.vault.connected && (
+                            <div className="flex items-center space-x-2">
+                              <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                              <span className="text-sm text-gray-400 font-mono">
+                                {settings.exchanges.dex.vault.walletAddress.slice(0, 6)}...{settings.exchanges.dex.vault.walletAddress.slice(-4)}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {settings.exchanges.dex.vault.connected ? (
+                        <>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-300 mb-2">
+                              Wallet Balance
+                            </label>
+                            <div className="bg-gray-600 rounded p-3">
+                              <div className="text-white font-mono text-lg">
+                                {settings.exchanges.dex.vault.balance} ETH
+                              </div>
+                              <div className="text-sm text-gray-400">
+                                Available for trading
+                              </div>
+                            </div>
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-300 mb-2">
+                              Allowed Usage Percentage
+                            </label>
+                            <div className="space-y-2">
+                              <div className="flex items-center space-x-4">
+                                <input
+                                  type="range"
+                                  min="0"
+                                  max="100"
+                                  value={settings.exchanges.dex.vault.allowedPercentage}
+                                  onChange={(e) => updateSetting('exchanges', 'dex', { 
+                                    ...settings.exchanges.dex, 
+                                    vault: { ...settings.exchanges.dex.vault, allowedPercentage: Number(e.target.value) }
+                                  })}
+                                  className="flex-1 h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer"
+                                />
+                                <div className="text-white font-medium w-16 text-center">
+                                  {settings.exchanges.dex.vault.allowedPercentage}%
+                                </div>
+                              </div>
+                              <div className="text-sm text-gray-400">
+                                Available for automated trading: {' '}
+                                <span className="text-blue-400 font-mono">
+                                  {(parseFloat(settings.exchanges.dex.vault.balance) * settings.exchanges.dex.vault.allowedPercentage / 100).toFixed(4)} ETH
+                                </span>
+                                {' '}(≈ ${(parseFloat(settings.exchanges.dex.vault.balance) * settings.exchanges.dex.vault.allowedPercentage / 100 * 3500).toFixed(2)})
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="bg-green-600 bg-opacity-20 rounded-lg p-3">
+                            <div className="flex items-start space-x-2">
+                              <div className="w-4 h-4 bg-green-400 rounded-full flex-shrink-0 mt-0.5"></div>
+                              <div className="text-sm text-green-200">
+                                <div className="font-medium mb-1">Vault Security:</div>
+                                <div>• Funds are secured in smart contracts</div>
+                                <div>• Only authorized amounts can be used for trading</div>
+                                <div>• You can withdraw at any time</div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="bg-red-900 border border-red-700 rounded-lg p-4">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <h5 className="text-red-300 font-medium">Emergency Pause</h5>
+                                <p className="text-sm text-red-400">Immediately halt all DEX trading activities</p>
+                              </div>
+                              <button
+                                onClick={() => updateSetting('exchanges', 'dex', { 
+                                  ...settings.exchanges.dex, 
+                                  vault: { ...settings.exchanges.dex.vault, emergencyPause: !settings.exchanges.dex.vault.emergencyPause }
+                                })}
+                                className={`px-4 py-2 rounded font-medium transition-colors ${
+                                  settings.exchanges.dex.vault.emergencyPause
+                                    ? 'bg-red-600 hover:bg-red-700 text-white'
+                                    : 'bg-gray-600 hover:bg-gray-500 text-white'
+                                }`}
+                              >
+                                {settings.exchanges.dex.vault.emergencyPause ? 'Resume Trading' : 'Emergency Pause'}
+                              </button>
+                            </div>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="bg-gray-600 bg-opacity-50 rounded-lg p-4 text-center">
+                          <div className="text-gray-400 text-sm">
+                            Connect your wallet to access vault configuration
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+
+                </div>
+              )}
+
+              {/* CEX 配置 */}
+              {exchangeSubTab === 'cex' && (
+                <div className="space-y-6">
+                  {/* Binance */}
+                  <div className="bg-gray-700 rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-4">
+                      <h4 className="text-white font-medium">Binance</h4>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={settings.exchanges.cex.binance.enabled}
+                          onChange={(e) => updateSetting('exchanges', 'cex', { 
+                            ...settings.exchanges.cex, 
+                            binance: { ...settings.exchanges.cex.binance, enabled: e.target.checked }
+                          })}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                          API Key
+                        </label>
+                        <input
+                          type="password"
+                          value={settings.exchanges.cex.binance.apiKey}
+                          onChange={(e) => updateSetting('exchanges', 'cex', { 
+                            ...settings.exchanges.cex, 
+                            binance: { ...settings.exchanges.cex.binance, apiKey: e.target.value }
+                          })}
+                          className="w-full bg-gray-600 text-white px-3 py-2 rounded border border-gray-500 focus:border-blue-500 focus:outline-none font-mono"
+                          placeholder="Enter your Binance API key"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                          API Secret
+                        </label>
+                        <input
+                          type="password"
+                          value={settings.exchanges.cex.binance.apiSecret}
+                          onChange={(e) => updateSetting('exchanges', 'cex', { 
+                            ...settings.exchanges.cex, 
+                            binance: { ...settings.exchanges.cex.binance, apiSecret: e.target.value }
+                          })}
+                          className="w-full bg-gray-600 text-white px-3 py-2 rounded border border-gray-500 focus:border-blue-500 focus:outline-none font-mono"
+                          placeholder="Enter your Binance API secret"
+                        />
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h5 className="text-white font-medium">Testnet Mode</h5>
+                          <p className="text-sm text-gray-400">Use Binance testnet for development</p>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={settings.exchanges.cex.binance.testnet}
+                            onChange={(e) => updateSetting('exchanges', 'cex', { 
+                              ...settings.exchanges.cex, 
+                              binance: { ...settings.exchanges.cex.binance, testnet: e.target.checked }
+                            })}
+                            className="sr-only peer"
+                          />
+                          <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* OKX */}
+                  <div className="bg-gray-700 rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-4">
+                      <h4 className="text-white font-medium">OKX</h4>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={settings.exchanges.cex.okx.enabled}
+                          onChange={(e) => updateSetting('exchanges', 'cex', { 
+                            ...settings.exchanges.cex, 
+                            okx: { ...settings.exchanges.cex.okx, enabled: e.target.checked }
+                          })}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                          API Key
+                        </label>
+                        <input
+                          type="password"
+                          value={settings.exchanges.cex.okx.apiKey}
+                          onChange={(e) => updateSetting('exchanges', 'cex', { 
+                            ...settings.exchanges.cex, 
+                            okx: { ...settings.exchanges.cex.okx, apiKey: e.target.value }
+                          })}
+                          className="w-full bg-gray-600 text-white px-3 py-2 rounded border border-gray-500 focus:border-blue-500 focus:outline-none font-mono"
+                          placeholder="Enter your OKX API key"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                          API Secret
+                        </label>
+                        <input
+                          type="password"
+                          value={settings.exchanges.cex.okx.apiSecret}
+                          onChange={(e) => updateSetting('exchanges', 'cex', { 
+                            ...settings.exchanges.cex, 
+                            okx: { ...settings.exchanges.cex.okx, apiSecret: e.target.value }
+                          })}
+                          className="w-full bg-gray-600 text-white px-3 py-2 rounded border border-gray-500 focus:border-blue-500 focus:outline-none font-mono"
+                          placeholder="Enter your OKX API secret"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                          Passphrase
+                        </label>
+                        <input
+                          type="password"
+                          value={settings.exchanges.cex.okx.passphrase}
+                          onChange={(e) => updateSetting('exchanges', 'cex', { 
+                            ...settings.exchanges.cex, 
+                            okx: { ...settings.exchanges.cex.okx, passphrase: e.target.value }
+                          })}
+                          className="w-full bg-gray-600 text-white px-3 py-2 rounded border border-gray-500 focus:border-blue-500 focus:outline-none font-mono"
+                          placeholder="Enter your OKX passphrase"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Coinbase */}
+                  <div className="bg-gray-700 rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-4">
+                      <h4 className="text-white font-medium">Coinbase Pro</h4>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={settings.exchanges.cex.coinbase.enabled}
+                          onChange={(e) => updateSetting('exchanges', 'cex', { 
+                            ...settings.exchanges.cex, 
+                            coinbase: { ...settings.exchanges.cex.coinbase, enabled: e.target.checked }
+                          })}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                          API Key
+                        </label>
+                        <input
+                          type="password"
+                          value={settings.exchanges.cex.coinbase.apiKey}
+                          onChange={(e) => updateSetting('exchanges', 'cex', { 
+                            ...settings.exchanges.cex, 
+                            coinbase: { ...settings.exchanges.cex.coinbase, apiKey: e.target.value }
+                          })}
+                          className="w-full bg-gray-600 text-white px-3 py-2 rounded border border-gray-500 focus:border-blue-500 focus:outline-none font-mono"
+                          placeholder="Enter your Coinbase Pro API key"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                          API Secret
+                        </label>
+                        <input
+                          type="password"
+                          value={settings.exchanges.cex.coinbase.apiSecret}
+                          onChange={(e) => updateSetting('exchanges', 'cex', { 
+                            ...settings.exchanges.cex, 
+                            coinbase: { ...settings.exchanges.cex.coinbase, apiSecret: e.target.value }
+                          })}
+                          className="w-full bg-gray-600 text-white px-3 py-2 rounded border border-gray-500 focus:border-blue-500 focus:outline-none font-mono"
+                          placeholder="Enter your Coinbase Pro API secret"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-yellow-600 bg-opacity-20 rounded-lg p-4">
+                    <div className="flex items-start space-x-2">
+                      <div className="w-4 h-4 bg-yellow-400 rounded-full flex-shrink-0 mt-0.5"></div>
+                      <div className="text-sm text-yellow-200">
+                        <div className="font-medium mb-1">Security Notice:</div>
+                        <div>• API keys are encrypted and stored locally</div>
+                        <div>• Never share your API keys with anyone</div>
+                        <div>• Use API keys with restricted permissions (trading only)</div>
+                        <div>• Enable IP restrictions on your exchange account</div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              )}
             </div>
           )}
           

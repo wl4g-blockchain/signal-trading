@@ -26,11 +26,19 @@ export const ComponentPalette: React.FC<ComponentPaletteProps> = ({ onAddNode })
     },
     {
       type: 'executor' as const,
-      title: 'Trade Executors',
+      title: 'DEX Trade Executor',
       icon: Zap,
-      description: 'Execute trades on various exchanges',
+      description: 'Execute trades on decentralized exchanges',
       color: 'bg-green-600 hover:bg-green-700',
-      subtypes: ['swap', 'arbitrage', 'limit'],
+      subtypes: ['Uniswap V4', 'Uniswap V3', 'QuickSwap', 'PancakeSwap'],
+    },
+    {
+      type: 'cex-executor' as const,
+      title: 'CEX Trade Executor',
+      icon: Zap,
+      description: 'Execute trades on centralized exchanges',
+      color: 'bg-blue-600 hover:bg-blue-700',
+      subtypes: ['Binance', 'OKX', 'Coinbase', 'Kraken'],
     },
     {
       type: 'collector' as const,
