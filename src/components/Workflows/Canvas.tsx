@@ -27,13 +27,12 @@ export const Canvas: React.FC<CanvasProps> = ({
     outputId: string;
   } | null>(null);
   const [mousePosition, setMousePosition] = useState<{ x: number; y: number } | null>(null);
-  const [scale, setScale] = useState(1);
+  const [scale, setScale] = useState(0.8);
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
   const [configNode, setConfigNode] = useState<ComponentNode | null>(null);
-  const [touchStartPositions, setTouchStartPositions] = useState<TouchList | null>(null);
+  const [touchStartPositions, setTouchStartPositions] = useState<React.TouchList | null>(null);
   const [isThreeFingerPanning, setIsThreeFingerPanning] = useState(false);
-  const [displayScale, setDisplayScale] = useState(100);
 
   // 连接规则验证
   const canConnect = (sourceNodeId: string, targetNodeId: string): boolean => {
@@ -131,21 +130,18 @@ export const Canvas: React.FC<CanvasProps> = ({
         case 'in':
           setScale(prev => {
             const newScale = Math.min(3, prev * 1.2);
-            setDisplayScale(Math.round(newScale * 100));
             return newScale;
           });
           break;
         case 'out':
           setScale(prev => {
             const newScale = Math.max(0.1, prev / 1.2);
-            setDisplayScale(Math.round(newScale * 100));
             return newScale;
           });
           break;
         case 'reset':
           setScale(1);
           setPanOffset({ x: 0, y: 0 });
-          setDisplayScale(100);
           break;
       }
     };
@@ -158,8 +154,6 @@ export const Canvas: React.FC<CanvasProps> = ({
 
   // 更新显示的缩放百分比
   useEffect(() => {
-    setDisplayScale(Math.round(scale * 100));
-    
     // 发送缩放更新事件给工具栏
     const event = new CustomEvent('canvas-scale-update', { 
       detail: { scale: Math.round(scale * 100) } 
@@ -171,8 +165,14 @@ export const Canvas: React.FC<CanvasProps> = ({
   const handleTouchStart = useCallback((event: React.TouchEvent) => {
     if (event.touches.length === 3) {
       setIsThreeFingerPanning(true);
-      setTouchStartPositions(event.touches as any);
+      setTouchStartPositions(event.touches);
       event.preventDefault();
+      // 阻止默认的触摸行为，确保三指滑动不会触发其他手势
+      event.stopPropagation();
+    } else if (event.touches.length < 3) {
+      // 如果不是三指，确保停止三指平移
+      setIsThreeFingerPanning(false);
+      setTouchStartPositions(null);
     }
   }, []);
 
@@ -180,6 +180,7 @@ export const Canvas: React.FC<CanvasProps> = ({
   const handleTouchMove = useCallback((event: React.TouchEvent) => {
     if (isThreeFingerPanning && event.touches.length === 3 && touchStartPositions) {
       event.preventDefault();
+      event.stopPropagation();
       
       // 计算三指的平均移动距离
       let deltaX = 0;
@@ -193,19 +194,32 @@ export const Canvas: React.FC<CanvasProps> = ({
       deltaX /= 3;
       deltaY /= 3;
       
-      // 移动所有节点
-      const updatedNodes = nodes.map(node => ({
-        ...node,
-        position: {
-          x: node.position.x + deltaX / scale,
-          y: node.position.y + deltaY / scale
-        }
-      }));
+      // 移动背景而不是节点（类似drawio的行为）
+      // 应用适当的缩放因子使拖动更自然
+      setPanOffset(prev => {
+        // 使用负值，这样拖动方向与组件移动方向相反
+        // 向右拖动时，组件向左移动，可以看到右边的组件
+        const newX = prev.x - deltaX * 1.2; // 注意这里是减号
+        const newY = prev.y - deltaY * 1.2; // 注意这里是减号
+        
+        // 可选：添加边界限制（防止移动过远）
+        const maxOffset = 2000; // 最大偏移量
+        const boundedX = Math.max(-maxOffset, Math.min(maxOffset, newX));
+        const boundedY = Math.max(-maxOffset, Math.min(maxOffset, newY));
+        
+        return {
+          x: boundedX,
+          y: boundedY
+        };
+      });
       
-      onNodesChange(updatedNodes);
-      setTouchStartPositions(event.touches as any);
+      setTouchStartPositions(event.touches);
+    } else if (event.touches.length < 3) {
+      // 如果手指数量不足3个，停止三指平移
+      setIsThreeFingerPanning(false);
+      setTouchStartPositions(null);
     }
-  }, [isThreeFingerPanning, touchStartPositions, nodes, onNodesChange, scale]);
+  }, [isThreeFingerPanning, touchStartPositions]);
 
   // 处理触摸结束
   const handleTouchEnd = useCallback((event: React.TouchEvent) => {
@@ -364,14 +378,57 @@ export const Canvas: React.FC<CanvasProps> = ({
             const sourceNode = nodes.find(n => n.id === isConnecting.nodeId);
             if (!sourceNode) return null;
             
-            // 根据节点类型计算源端口位置
+            // 智能计算源端口位置
+            const getNodeDimensions = (nodeType: string) => {
+              if (nodeType === 'start' || nodeType === 'end') {
+                return { width: 96, height: 96, centerX: 48, centerY: 48 - 8 }; // 圆形节点，调整8px
+              } else {
+                return { width: 192, height: 120, centerX: 96, centerY: 60 }; // 矩形节点
+              }
+            };
+
+            const sourceDim = getNodeDimensions(sourceNode.type);
+            
+            // 计算源节点中心点
+            const sourceCenterX = sourceNode.position.x + sourceDim.centerX;
+            const sourceCenterY = sourceNode.position.y + sourceDim.centerY;
+            
+            // 计算相对于鼠标位置的方向
+            const deltaX = mousePosition.x - sourceCenterX;
+            const deltaY = mousePosition.y - sourceCenterY;
+            
             let sourceX, sourceY;
-            if (sourceNode.type === 'start') {
-              sourceX = sourceNode.position.x + 48;
-              sourceY = sourceNode.position.y + 48;
+            
+            if (Math.abs(deltaX) > Math.abs(deltaY)) {
+              // 水平方向距离更大
+              if (deltaX > 0) {
+                // 鼠标在右侧，从右边连接
+                sourceX = sourceNode.position.x + sourceDim.width + 2;
+                sourceY = sourceNode.position.y + sourceDim.centerY;
+              } else {
+                // 鼠标在左侧，从左边连接
+                sourceX = sourceNode.position.x - 2;
+                sourceY = sourceNode.position.y + sourceDim.centerY;
+              }
             } else {
-              sourceX = sourceNode.position.x + 192;
-              sourceY = sourceNode.position.y + 40;
+              // 垂直方向距离更大
+              if (deltaY > 0) {
+                // 鼠标在下方，从下边连接
+                sourceX = sourceNode.position.x + sourceDim.centerX;
+                if (sourceNode.type === 'start' || sourceNode.type === 'end') {
+                  sourceY = sourceNode.position.y + 96; // 圆形节点的实际下边缘
+                } else {
+                  sourceY = sourceNode.position.y + sourceDim.height + 2;
+                }
+              } else {
+                // 鼠标在上方，从上边连接
+                sourceX = sourceNode.position.x + sourceDim.centerX;
+                if (sourceNode.type === 'start' || sourceNode.type === 'end') {
+                  sourceY = sourceNode.position.y - 2; // 圆形节点的实际上边缘
+                } else {
+                  sourceY = sourceNode.position.y - 2;
+                }
+              }
             }
             
             return (
@@ -410,7 +467,6 @@ export const Canvas: React.FC<CanvasProps> = ({
               onConnectionEnd={handleConnectionEnd}
               onDelete={onDeleteNode}
               onConfig={handleNodeConfig}
-              isConnecting={isConnecting?.nodeId === node.id}
             />
           ))}
         </div>

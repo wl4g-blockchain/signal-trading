@@ -7,7 +7,6 @@ import {
   Database,
   Twitter,
   TrendingUp,
-  DollarSign,
   BarChart3,
   Trash2,
   Settings,
@@ -20,7 +19,6 @@ interface NodeComponentProps {
   onConnectionEnd: (nodeId: string, inputId: string) => void;
   onDelete: (nodeId: string) => void;
   onConfig: (node: ComponentNode) => void;
-  isConnecting: boolean;
 }
 
 const getNodeIcon = (type: string) => {
@@ -84,7 +82,6 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
   onConnectionEnd,
   onDelete,
   onConfig,
-  isConnecting,
 }) => {
   const Icon = getNodeIcon(node.type);
   const SubIcon = getSubIcon(node.type, node.data?.type);
@@ -108,30 +105,96 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
           <span className="text-white font-medium text-sm">{node.data?.name}</span>
         </div>
 
-        {/* Output port for start node */}
+        {/* Output ports for start node - 四个方向 */}
         {node.type === 'start' && (
-          <div
-            className="absolute right-0 top-1/2 w-4 h-4 bg-green-500 rounded-full border-2 border-gray-700 cursor-pointer hover:bg-green-400 transform -translate-y-1/2 z-10"
-            style={{ right: '-8px' }}
-            onMouseDown={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onConnectionStart(node.id, 'output', e);
-            }}
-          />
+          <>
+            {/* 右侧输出端口 */}
+            <div
+              className="absolute right-0 w-1 h-1 bg-green-400 rounded-full cursor-pointer hover:bg-green-300 z-10"
+              style={{ right: '-2px', top: 'calc(50% - 8px)', transform: 'translateY(-50%)' }}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onConnectionStart(node.id, 'output', e);
+              }}
+            />
+            {/* 下侧输出端口 - 在圆形节点边缘 */}
+            <div
+              className="absolute left-1/2 w-1 h-1 bg-green-400 rounded-full cursor-pointer hover:bg-green-300 transform -translate-x-1/2 z-10"
+              style={{ top: '94px' }}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onConnectionStart(node.id, 'output', e);
+              }}
+            />
+            {/* 左侧输出端口 */}
+            <div
+              className="absolute left-0 w-1 h-1 bg-green-400 rounded-full cursor-pointer hover:bg-green-300 z-10"
+              style={{ left: '-2px', top: 'calc(50% - 8px)', transform: 'translateY(-50%)' }}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onConnectionStart(node.id, 'output', e);
+              }}
+            />
+            {/* 上侧输出端口 */}
+            <div
+              className="absolute top-0 left-1/2 w-1 h-1 bg-green-400 rounded-full cursor-pointer hover:bg-green-300 transform -translate-x-1/2 z-10"
+              style={{ top: '-2px' }}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onConnectionStart(node.id, 'output', e);
+              }}
+            />
+          </>
         )}
         
-        {/* Input port for end node */}
+        {/* Input ports for end node - 四个方向 */}
         {node.type === 'end' && (
-          <div
-            className="absolute left-0 top-1/2 w-4 h-4 bg-blue-500 rounded-full border-2 border-gray-700 cursor-pointer hover:bg-blue-400 transform -translate-y-1/2 z-10"
-            style={{ left: '-8px' }}
-            onMouseUp={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onConnectionEnd(node.id, 'input');
-            }}
-          />
+          <>
+            {/* 左侧输入端口 */}
+            <div
+              className="absolute left-0 w-1 h-1 bg-blue-400 rounded-full cursor-pointer hover:bg-blue-300 z-10"
+              style={{ left: '-2px', top: 'calc(50% - 8px)', transform: 'translateY(-50%)' }}
+              onMouseUp={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onConnectionEnd(node.id, 'input');
+              }}
+            />
+            {/* 上侧输入端口 - 在圆形节点边缘 */}
+            <div
+              className="absolute left-1/2 w-1 h-1 bg-blue-400 rounded-full cursor-pointer hover:bg-blue-300 transform -translate-x-1/2 z-10"
+              style={{ top: '-2px' }}
+              onMouseUp={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onConnectionEnd(node.id, 'input');
+              }}
+            />
+            {/* 右侧输入端口 */}
+            <div
+              className="absolute right-0 w-1 h-1 bg-blue-400 rounded-full cursor-pointer hover:bg-blue-300 z-10"
+              style={{ right: '-2px', top: 'calc(50% - 8px)', transform: 'translateY(-50%)' }}
+              onMouseUp={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onConnectionEnd(node.id, 'input');
+              }}
+            />
+            {/* 下侧输入端口 - 在圆形节点边缘 */}
+            <div
+              className="absolute left-1/2 w-1 h-1 bg-blue-400 rounded-full cursor-pointer hover:bg-blue-300 transform -translate-x-1/2 z-10"
+              style={{ top: '94px' }}
+              onMouseUp={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onConnectionEnd(node.id, 'input');
+              }}
+            />
+          </>
         )}
       </div>
     );
@@ -199,29 +262,55 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
           )}
         </div>
 
-        {/* Input/Output Ports */}
+        {/* Input/Output Ports - 四个方向的端口 */}
         {node.inputs.length > 0 && (
-          <div
-            className="absolute left-0 top-1/2 w-4 h-4 bg-blue-500 rounded-full border-2 border-gray-700 cursor-pointer hover:bg-blue-400 transform -translate-y-1/2 z-10"
-            style={{ left: '-8px' }}
-            onMouseUp={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onConnectionEnd(node.id, 'input');
-            }}
-          />
+          <>
+            {/* 左侧输入端口 */}
+            <div
+              className="absolute left-0 top-1/2 w-1 h-1 bg-blue-400 rounded-full cursor-pointer hover:bg-blue-300 transform -translate-y-1/2 z-10"
+              style={{ left: '-2px' }}
+              onMouseUp={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onConnectionEnd(node.id, 'input');
+              }}
+            />
+            {/* 上侧输入端口 */}
+            <div
+              className="absolute top-0 left-1/2 w-1 h-1 bg-blue-400 rounded-full cursor-pointer hover:bg-blue-300 transform -translate-x-1/2 z-10"
+              style={{ top: '-2px' }}
+              onMouseUp={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onConnectionEnd(node.id, 'input');
+              }}
+            />
+          </>
         )}
 
         {node.outputs.length > 0 && (
-          <div
-            className="absolute right-0 top-1/2 w-4 h-4 bg-green-500 rounded-full border-2 border-gray-700 cursor-pointer hover:bg-green-400 transform -translate-y-1/2 z-10"
-            style={{ right: '-8px' }}
-            onMouseDown={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onConnectionStart(node.id, 'output', e);
-            }}
-          />
+          <>
+            {/* 右侧输出端口 */}
+            <div
+              className="absolute right-0 top-1/2 w-1 h-1 bg-green-400 rounded-full cursor-pointer hover:bg-green-300 transform -translate-y-1/2 z-10"
+              style={{ right: '-2px' }}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onConnectionStart(node.id, 'output', e);
+              }}
+            />
+            {/* 下侧输出端口 */}
+            <div
+              className="absolute bottom-0 left-1/2 w-1 h-1 bg-green-400 rounded-full cursor-pointer hover:bg-green-300 transform -translate-x-1/2 z-10"
+              style={{ bottom: '-2px' }}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onConnectionStart(node.id, 'output', e);
+              }}
+            />
+          </>
         )}
       </div>
     </div>

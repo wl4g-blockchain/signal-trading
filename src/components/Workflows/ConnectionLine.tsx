@@ -20,34 +20,105 @@ export const ConnectionLine: React.FC<ConnectionLineProps> = ({
   scale = 1,
   panOffset = { x: 0, y: 0 },
 }) => {
-  // 计算源节点输出端口位置（右侧中间）
-  let startX, startY;
-  if (sourceNodeType === 'start' || sourceNodeType === 'end') {
-    // 圆形节点：右侧边缘中心
-    startX = sourcePosition.x + 48; // 圆形半径 48px
-    startY = sourcePosition.y + 48; // 圆形中心 + 半径
-  } else {
-    // 矩形节点：右侧边缘中心
-    startX = sourcePosition.x + 192; // 节点宽度 192px
-    startY = sourcePosition.y + 40; // 节点高度的一半
-  }
+  // 计算节点的尺寸和中心点
+  const getNodeDimensions = (nodeType: string) => {
+    if (nodeType === 'start' || nodeType === 'end') {
+      return { width: 96, height: 96, centerX: 48, centerY: 48 - 8 }; // 圆形节点，调整8px
+    } else {
+      return { width: 192, height: 120, centerX: 96, centerY: 60 }; // 矩形节点
+    }
+  };
+
+  const sourceDim = getNodeDimensions(sourceNodeType);
+  const targetDim = getNodeDimensions(targetNodeType);
   
-  // 计算目标节点输入端口位置（左侧中间）
-  let endX, endY;
-  if (targetNodeType === 'start' || targetNodeType === 'end') {
-    // 圆形节点：左侧边缘中心
-    endX = targetPosition.x; // 圆形左边缘
-    endY = targetPosition.y + 48; // 圆形中心
+  // 计算源节点和目标节点的中心点
+  const sourceCenterX = sourcePosition.x + sourceDim.centerX;
+  const sourceCenterY = sourcePosition.y + sourceDim.centerY;
+  const targetCenterX = targetPosition.x + targetDim.centerX;
+  const targetCenterY = targetPosition.y + targetDim.centerY;
+  
+  // 计算节点相对位置，决定连接方向
+  const deltaX = targetCenterX - sourceCenterX;
+  const deltaY = targetCenterY - sourceCenterY;
+  
+  // 选择最佳连接点
+  let startX, startY, endX, endY;
+  
+  if (Math.abs(deltaX) > Math.abs(deltaY)) {
+    // 水平方向距离更大，使用左右连接
+    if (deltaX > 0) {
+      // 目标在右侧，从源节点右边连接到目标节点左边
+      startX = sourcePosition.x + sourceDim.width + 2;
+      startY = sourcePosition.y + sourceDim.centerY;
+      endX = targetPosition.x - 2;
+      endY = targetPosition.y + targetDim.centerY;
+    } else {
+      // 目标在左侧，从源节点左边连接到目标节点右边
+      startX = sourcePosition.x - 2;
+      startY = sourcePosition.y + sourceDim.centerY;
+      endX = targetPosition.x + targetDim.width + 2;
+      endY = targetPosition.y + targetDim.centerY;
+    }
   } else {
-    // 矩形节点：左侧边缘中心
-    endX = targetPosition.x; // 节点左边缘
-    endY = targetPosition.y + 40; // 节点高度的一半
+    // 垂直方向距离更大，使用上下连接
+    if (deltaY > 0) {
+      // 目标在下方，从源节点下边连接到目标节点上边
+      startX = sourcePosition.x + sourceDim.centerX;
+      if (sourceNodeType === 'start' || sourceNodeType === 'end') {
+        startY = sourcePosition.y + 96; // 圆形节点的实际下边缘
+      } else {
+        startY = sourcePosition.y + sourceDim.height + 2;
+      }
+      endX = targetPosition.x + targetDim.centerX;
+      if (targetNodeType === 'start' || targetNodeType === 'end') {
+        endY = targetPosition.y - 2; // 圆形节点的实际上边缘
+      } else {
+        endY = targetPosition.y - 2;
+      }
+    } else {
+      // 目标在上方，从源节点上边连接到目标节点下边
+      startX = sourcePosition.x + sourceDim.centerX;
+      if (sourceNodeType === 'start' || sourceNodeType === 'end') {
+        startY = sourcePosition.y - 2; // 圆形节点的实际上边缘
+      } else {
+        startY = sourcePosition.y - 2;
+      }
+      endX = targetPosition.x + targetDim.centerX;
+      if (targetNodeType === 'start' || targetNodeType === 'end') {
+        endY = targetPosition.y + 96; // 圆形节点的实际下边缘
+      } else {
+        endY = targetPosition.y + targetDim.height + 2;
+      }
+    }
   }
 
   const midX = (startX + endX) / 2;
-  const controlPointOffset = Math.abs(endX - startX) * 0.3;
-
-  const path = `M ${startX} ${startY} C ${startX + controlPointOffset} ${startY}, ${endX - controlPointOffset} ${endY}, ${endX} ${endY}`;
+  const midY = (startY + endY) / 2;
+  
+  // 根据连接方向选择合适的贝塞尔曲线控制点
+  let path;
+  if (Math.abs(deltaX) > Math.abs(deltaY)) {
+    // 水平连接
+    const controlPointOffset = Math.abs(endX - startX) * 0.3;
+    if (deltaX > 0) {
+      // 向右连接
+      path = `M ${startX} ${startY} C ${startX + controlPointOffset} ${startY}, ${endX - controlPointOffset} ${endY}, ${endX} ${endY}`;
+    } else {
+      // 向左连接
+      path = `M ${startX} ${startY} C ${startX - controlPointOffset} ${startY}, ${endX + controlPointOffset} ${endY}, ${endX} ${endY}`;
+    }
+  } else {
+    // 垂直连接
+    const controlPointOffset = Math.abs(endY - startY) * 0.3;
+    if (deltaY > 0) {
+      // 向下连接
+      path = `M ${startX} ${startY} C ${startX} ${startY + controlPointOffset}, ${endX} ${endY - controlPointOffset}, ${endX} ${endY}`;
+    } else {
+      // 向上连接
+      path = `M ${startX} ${startY} C ${startX} ${startY - controlPointOffset}, ${endX} ${endY + controlPointOffset}, ${endX} ${endY}`;
+    }
+  }
 
   return (
     <svg className="absolute pointer-events-none" style={{ 
@@ -74,7 +145,7 @@ export const ConnectionLine: React.FC<ConnectionLineProps> = ({
       {/* Delete button */}
       <foreignObject
         x={midX - 10}
-        y={(startY + endY) / 2 - 10}
+        y={midY - 10}
         width="20"
         height="20"
         className="pointer-events-auto"
