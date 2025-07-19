@@ -34,14 +34,14 @@ export const Canvas: React.FC<CanvasProps> = ({
   const [touchStartPositions, setTouchStartPositions] = useState<React.TouchList | null>(null);
   const [isThreeFingerPanning, setIsThreeFingerPanning] = useState(false);
 
-  // 连接规则验证
+  // Connection rule validation
   const canConnect = (sourceNodeId: string, targetNodeId: string): boolean => {
     const sourceNode = nodes.find(n => n.id === sourceNodeId);
     const targetNode = nodes.find(n => n.id === targetNodeId);
     
     if (!sourceNode || !targetNode) return false;
     
-    // 检查连接规则
+    // Check connection rules
     switch (targetNode.type) {
       case 'listener':
         return sourceNode.type === 'start';
@@ -58,7 +58,7 @@ export const Canvas: React.FC<CanvasProps> = ({
     }
   };
   const handleDragStart = useCallback((nodeId: string, event: React.MouseEvent) => {
-    // 检查是否是右键点击（用于平移）
+    // Check if it's a right-click (for panning)
     if (event.button === 2) {
       setIsPanning(true);
       return;
@@ -77,7 +77,7 @@ export const Canvas: React.FC<CanvasProps> = ({
 
   const handleDragMove = useCallback((event: React.MouseEvent) => {
     if (isPanning) {
-      // 处理画布平移
+      // Handle canvas panning
       const deltaX = event.movementX;
       const deltaY = event.movementY;
       setPanOffset(prev => ({
@@ -107,22 +107,22 @@ export const Canvas: React.FC<CanvasProps> = ({
     setIsPanning(false);
   }, []);
 
-  // 处理缩放
+      // Handle zooming
   const handleWheel = useCallback((event: React.WheelEvent) => {
     event.preventDefault();
     
-    // 检查是否是触控板的双指缩放
+          // Check if it's trackpad two-finger zoom
     if (event.ctrlKey) {
       const delta = event.deltaY > 0 ? 0.9 : 1.1;
       setScale(prev => Math.max(0.1, Math.min(3, prev * delta)));
     } else {
-      // 普通滚轮缩放
+      // Regular wheel zoom
       const delta = event.deltaY > 0 ? 0.9 : 1.1;
       setScale(prev => Math.max(0.1, Math.min(3, prev * delta)));
     }
   }, []);
 
-  // 监听来自工具栏的缩放事件
+      // Listen for zoom events from toolbar
   useEffect(() => {
     const handleCanvasZoom = (event: CustomEvent) => {
       const { action } = event.detail;
@@ -152,37 +152,37 @@ export const Canvas: React.FC<CanvasProps> = ({
     };
   }, []);
 
-  // 更新显示的缩放百分比
+          // Update displayed zoom percentage
   useEffect(() => {
-    // 发送缩放更新事件给工具栏
+          // Send zoom update event to toolbar
     const event = new CustomEvent('canvas-scale-update', { 
       detail: { scale: Math.round(scale * 100) } 
     });
     window.dispatchEvent(event);
   }, [scale]);
 
-  // 处理触摸开始
+      // Handle touch start
   const handleTouchStart = useCallback((event: React.TouchEvent) => {
     if (event.touches.length === 3) {
       setIsThreeFingerPanning(true);
       setTouchStartPositions(event.touches);
       event.preventDefault();
-      // 阻止默认的触摸行为，确保三指滑动不会触发其他手势
+              // Prevent default touch behavior, ensure three-finger swipe doesn't trigger other gestures
       event.stopPropagation();
     } else if (event.touches.length < 3) {
-      // 如果不是三指，确保停止三指平移
+              // If not three fingers, ensure stop three-finger panning
       setIsThreeFingerPanning(false);
       setTouchStartPositions(null);
     }
   }, []);
 
-  // 处理触摸移动
+      // Handle touch move
   const handleTouchMove = useCallback((event: React.TouchEvent) => {
     if (isThreeFingerPanning && event.touches.length === 3 && touchStartPositions) {
       event.preventDefault();
       event.stopPropagation();
       
-      // 计算三指的平均移动距离
+              // Calculate average movement distance of three fingers
       let deltaX = 0;
       let deltaY = 0;
       
@@ -194,16 +194,16 @@ export const Canvas: React.FC<CanvasProps> = ({
       deltaX /= 3;
       deltaY /= 3;
       
-      // 移动背景而不是节点（类似drawio的行为）
-      // 应用适当的缩放因子使拖动更自然
+              // Move background instead of nodes (similar to drawio behavior)
+              // Apply appropriate scaling factor to make dragging more natural
       setPanOffset(prev => {
-        // 使用负值，这样拖动方向与组件移动方向相反
-        // 向右拖动时，组件向左移动，可以看到右边的组件
-        const newX = prev.x - deltaX * 1.2; // 注意这里是减号
-        const newY = prev.y - deltaY * 1.2; // 注意这里是减号
+                  // Use negative values so drag direction is opposite to component movement direction
+                  // When dragging right, components move left, so you can see components on the right
+                  const newX = prev.x - deltaX * 1.2; // Note: using minus sign here
+                  const newY = prev.y - deltaY * 1.2; // Note: using minus sign here
         
-        // 可选：添加边界限制（防止移动过远）
-        const maxOffset = 2000; // 最大偏移量
+                  // Optional: Add boundary limits (prevent moving too far)
+                  const maxOffset = 2000; // Maximum offset
         const boundedX = Math.max(-maxOffset, Math.min(maxOffset, newX));
         const boundedY = Math.max(-maxOffset, Math.min(maxOffset, newY));
         
@@ -215,13 +215,13 @@ export const Canvas: React.FC<CanvasProps> = ({
       
       setTouchStartPositions(event.touches);
     } else if (event.touches.length < 3) {
-      // 如果手指数量不足3个，停止三指平移
+              // If finger count is less than 3, stop three-finger panning
       setIsThreeFingerPanning(false);
       setTouchStartPositions(null);
     }
   }, [isThreeFingerPanning, touchStartPositions]);
 
-  // 处理触摸结束
+      // Handle touch end
   const handleTouchEnd = useCallback((event: React.TouchEvent) => {
     if (event.touches.length < 3) {
       setIsThreeFingerPanning(false);

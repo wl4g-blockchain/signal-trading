@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { BarChart3, Settings, Activity, FileText, LogOut, User, Globe, ChevronLeft, ChevronRight } from 'lucide-react';
+import { BarChart3, Settings, Activity, FileText, LogOut, User, Globe, ChevronLeft, ChevronRight, Palette } from 'lucide-react';
 import { serviceManager, ApiType } from '../services';
 import { User as UserType } from '../types';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '../contexts/ThemeContext';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -24,8 +26,12 @@ export const Layout: React.FC<LayoutProps> = ({
   onSidebarCollapsedChange
 }) => {
   const { t } = useTranslation();
+  const { theme, setTheme } = useTheme();
+  const { language, setLanguage } = useLanguage();
   const [apiType, setApiType] = useState<ApiType>(serviceManager.getCurrentApiType());
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showThemeMenu, setShowThemeMenu] = useState(false);
+  const [showLanguageMenu, setShowLanguageMenu] = useState(false);
   const [internalSidebarCollapsed, setInternalSidebarCollapsed] = useState(false);
   
   // Use external state or internal state
@@ -48,6 +54,24 @@ export const Layout: React.FC<LayoutProps> = ({
     serviceManager.switchService(type);
     setApiType(type);
   };
+
+  // Close menus when clicking outside
+  const handleClickOutside = (event: MouseEvent) => {
+    const target = event.target as Element;
+    if (!target.closest('.menu-container')) {
+      setShowUserMenu(false);
+      setShowThemeMenu(false);
+      setShowLanguageMenu(false);
+    }
+  };
+
+  // Add click outside listener
+  React.useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className="h-screen bg-gray-900 text-white flex">
@@ -107,8 +131,8 @@ export const Layout: React.FC<LayoutProps> = ({
       {/* Main Content */}
       <div className="flex-1 overflow-hidden flex flex-col">
         {/* Top Bar */}
-        <div className="bg-gray-800 border-b border-gray-700 px-6 py-4 flex items-center justify-end space-x-8">
-          {/* API Mode & Vault Balance to Top Bar */}
+        <div className="bg-gray-800 border-b border-gray-700 px-6 py-4 flex items-center justify-between">
+          {/* Left side - API Mode & Vault Balance */}
           <div className="flex items-center space-x-6">
             {/* API Switcher */}
             <div className="flex items-center space-x-2 bg-gray-700 rounded-lg px-3 py-1">
@@ -142,34 +166,104 @@ export const Layout: React.FC<LayoutProps> = ({
               <span className="text-blue-400 font-medium">3</span>
             </div>
           </div>
-          {/* User Info */}
-          <div className="relative">
-            <button
-              onClick={() => setShowUserMenu(!showUserMenu)}
-              className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"
-            >
-              {user.avatar ? (
-                <img src={user.avatar} alt={user.name} className="w-8 h-8 rounded-full" />
-              ) : (
-                <User className="w-8 h-8 text-gray-400" />
-              )}
-              <div className="text-left">
-                <p className="text-sm font-medium text-white">{user.name}</p>
-                <p className="text-xs text-gray-400">{user.email}</p>
-              </div>
-            </button>
 
-            {showUserMenu && (
-              <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg border border-gray-700 py-2 z-50">
-                <button
-                  onClick={onLogout}
-                  className="w-full flex items-center space-x-2 px-4 py-2 text-left text-gray-300 hover:bg-gray-700 transition-colors"
-                >
-                  <LogOut className="w-4 h-4" />
-                  <span>{t('auth.logout')}</span>
-                </button>
-              </div>
-            )}
+          {/* Right side - Theme, Language & User */}
+          <div className="flex items-center space-x-4">
+            {/* Theme Switcher */}
+            <div className="relative menu-container">
+              <button
+                onClick={() => setShowThemeMenu(!showThemeMenu)}
+                className="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+                title={t('settings.theme')}
+              >
+                <Palette className="w-5 h-5 text-gray-400" />
+                <span className="text-sm text-gray-300">{t(`theme.${theme}`)}</span>
+              </button>
+
+              {showThemeMenu && (
+                <div className="absolute right-0 mt-2 w-32 bg-gray-800 rounded-lg shadow-lg border border-gray-700 py-2 z-50">
+                  {(['system', 'light', 'dark'] as const).map((themeOption) => (
+                    <button
+                      key={themeOption}
+                      onClick={() => {
+                        setTheme(themeOption);
+                        setShowThemeMenu(false);
+                      }}
+                      className={`w-full flex items-center space-x-2 px-3 py-2 text-left transition-colors ${
+                        theme === themeOption
+                          ? 'text-blue-400 bg-blue-600 bg-opacity-20'
+                          : 'text-gray-300 hover:bg-gray-700'
+                      }`}
+                    >
+                      <span className="text-sm">{t(`theme.${themeOption}`)}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Language Switcher */}
+            <div className="relative menu-container">
+              <button
+                onClick={() => setShowLanguageMenu(!showLanguageMenu)}
+                className="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+                title={t('settings.language')}
+              >
+                <Globe className="w-5 h-5 text-gray-400" />
+                <span className="text-sm text-gray-300">{t(`language.${language === 'en' ? 'english' : 'chinese'}`)}</span>
+              </button>
+
+              {showLanguageMenu && (
+                <div className="absolute right-0 mt-2 w-32 bg-gray-800 rounded-lg shadow-lg border border-gray-700 py-2 z-50">
+                  {(['en', 'zh'] as const).map((langOption) => (
+                    <button
+                      key={langOption}
+                      onClick={() => {
+                        setLanguage(langOption);
+                        setShowLanguageMenu(false);
+                      }}
+                      className={`w-full flex items-center space-x-2 px-3 py-2 text-left transition-colors ${
+                        language === langOption
+                          ? 'text-blue-400 bg-blue-600 bg-opacity-20'
+                          : 'text-gray-300 hover:bg-gray-700'
+                      }`}
+                    >
+                      <span className="text-sm">{t(`language.${langOption === 'en' ? 'english' : 'chinese'}`)}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* User Info */}
+            <div className="relative menu-container">
+              <button
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+              >
+                {user.avatar ? (
+                  <img src={user.avatar} alt={user.name} className="w-8 h-8 rounded-full" />
+                ) : (
+                  <User className="w-8 h-8 text-gray-400" />
+                )}
+                <div className="text-left">
+                  <p className="text-sm font-medium text-white">{user.name}</p>
+                  <p className="text-xs text-gray-400">{user.email}</p>
+                </div>
+              </button>
+
+              {showUserMenu && (
+                <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg border border-gray-700 py-2 z-50">
+                  <button
+                    onClick={onLogout}
+                    className="w-full flex items-center space-x-2 px-4 py-2 text-left text-gray-300 hover:bg-gray-700 transition-colors"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>{t('auth.logout')}</span>
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
         {/* Content */}
