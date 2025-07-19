@@ -1,26 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import { Workflow, WorkflowRun } from '../../types';
 import { serviceManager } from '../../services';
-import { Play, History, ArrowLeft, Calendar, DollarSign, FileText } from 'lucide-react';
+import { Play, History, ArrowLeft, Calendar, DollarSign } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
 
 interface WorkflowListProps {
   onLoadWorkflow: (workflow: Workflow) => void;
+  initialWorkflowId?: string;  // If provided, directly show runs for this workflow
+  readOnlyMode?: boolean;      // Whether we're in read-only mode
 }
 
-export const WorkflowList: React.FC<WorkflowListProps> = ({ onLoadWorkflow }) => {
+export const WorkflowList: React.FC<WorkflowListProps> = ({ 
+  onLoadWorkflow, 
+  initialWorkflowId, 
+  readOnlyMode 
+}) => {
   const { isDark } = useTheme();
   const { t } = useTranslation();
   const [workflows, setWorkflowPage] = useState<Workflow[]>([]);
   const [workflowRuns, setWorkflowRuns] = useState<WorkflowRun[]>([]);
-  const [selectedWorkflowId, setSelectedWorkflowId] = useState<string | null>(null);
-  const [view, setView] = useState<'workflows' | 'runs'>('workflows');
+  const [selectedWorkflowId, setSelectedWorkflowId] = useState<string | null>(initialWorkflowId || null);
+  const [view, setView] = useState<'workflows' | 'runs'>(initialWorkflowId ? 'runs' : 'workflows');
   const [loading, setLoading] = useState(false);
+  const [currentWorkflowName, setCurrentWorkflowName] = useState<string>('');
 
   useEffect(() => {
-    loadWorkflowPage();
-  }, []);
+    if (initialWorkflowId) {
+      // If we have an initial workflow ID, load runs directly
+      loadWorkflowRuns(initialWorkflowId);
+    } else {
+      // Otherwise load workflows list
+      loadWorkflowPage();
+    }
+  }, [initialWorkflowId]);
 
   const loadWorkflowPage = async () => {
     setLoading(true);
@@ -38,8 +51,11 @@ export const WorkflowList: React.FC<WorkflowListProps> = ({ onLoadWorkflow }) =>
     setLoading(true);
     try {
       const runs = await serviceManager.getService().getWorkflowRuns(workflowId);
+      // Also get workflow name for display
+      const workflow = await serviceManager.getService().getWorkflow(workflowId);
       setWorkflowRuns(runs);
       setSelectedWorkflowId(workflowId);
+      setCurrentWorkflowName(workflow.name);
       setView('runs');
     } catch (error) {
       console.error('Failed to load workflow runs:', error);
@@ -71,15 +87,7 @@ export const WorkflowList: React.FC<WorkflowListProps> = ({ onLoadWorkflow }) =>
     }
   };
 
-  const getStatusColor = (state: string) => {
-    switch (state) {
-      case 'success': return 'text-green-400';
-      case 'failed': return 'text-red-400';
-      case 'running': return 'text-blue-400';
-      case 'queued': return 'text-yellow-400';
-      default: return 'text-gray-400';
-    }
-  };
+
 
   const getStatusBg = (state: string) => {
     switch (state) {
@@ -127,7 +135,7 @@ export const WorkflowList: React.FC<WorkflowListProps> = ({ onLoadWorkflow }) =>
                         </div>
                       </div>
                       
-                      {/* 运行状态统计 - 与按钮垂直对齐 */}
+                      {/* Run status statistics - vertically aligned with buttons */}
                       <div className="flex items-center space-x-3 mr-3">
                         <div className="flex items-center space-x-1" title="Success">
                           <span className="w-2 h-2 bg-green-400 rounded-full"></span>
@@ -151,7 +159,7 @@ export const WorkflowList: React.FC<WorkflowListProps> = ({ onLoadWorkflow }) =>
                         <button
                           onClick={() => handleRedesign(workflow.id)}
                           className="flex items-center space-x-1 px-2 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-xs transition-colors"
-                          title={t('workflow.redesign', '重新设计')}
+                          title={t('workflow.redesign')}
                         >
                           <Play className="w-3 h-3" />
                           <span>{t('workflow.design')}</span>
@@ -162,7 +170,7 @@ export const WorkflowList: React.FC<WorkflowListProps> = ({ onLoadWorkflow }) =>
                         <button
                           onClick={() => loadWorkflowRuns(workflow.id)}
                           className={`flex items-center space-x-1 px-2 py-1 ${isDark ? 'bg-gray-600 hover:bg-gray-500 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'} rounded text-xs transition-colors`}
-                          title={t('workflow.runHistory', '运行记录')}
+                          title={t('workflow.runHistory')}
                         >
                           <History className="w-3 h-3" />
                           <span>{t('workflow.runs')}</span>
@@ -174,8 +182,8 @@ export const WorkflowList: React.FC<WorkflowListProps> = ({ onLoadWorkflow }) =>
                 
                 {workflows.length === 0 && (
                   <div className={`text-center py-8 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-                    <p className="text-sm">暂无工作流</p>
-                    <p className="text-xs mt-1">创建您的第一个工作流开始使用</p>
+                    <p className="text-sm">{t('workflow.noWorkflows')}</p>
+                    <p className="text-xs mt-1">{t('workflow.createFirstWorkflow')}</p>
                   </div>
                 )}
               </div>
@@ -185,15 +193,21 @@ export const WorkflowList: React.FC<WorkflowListProps> = ({ onLoadWorkflow }) =>
       ) : (
         <>
           <div className={`p-3 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'} flex items-center space-x-3`}>
-            <button
-              onClick={() => setView('workflows')}
-              className="flex items-center space-x-2 text-blue-400 hover:text-blue-300 transition-colors text-sm"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>{t('workflow.title')}</span>
-            </button>
-            <span className={`${isDark ? 'text-gray-400' : 'text-gray-600'}`}>/</span>
-            <h3 className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('workflow.runHistory')}</h3>
+            {!readOnlyMode && (
+              <>
+                <button
+                  onClick={() => setView('workflows')}
+                  className="flex items-center space-x-2 text-blue-400 hover:text-blue-300 transition-colors text-sm"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  <span>{t('workflow.title')}</span>
+                </button>
+                <span className={`${isDark ? 'text-gray-400' : 'text-gray-600'}`}>/</span>
+              </>
+            )}
+            <h3 className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+              {currentWorkflowName ? `${currentWorkflowName} - ${t('workflow.runHistory')}` : t('workflow.runHistory')}
+            </h3>
           </div>
           
           <div className="flex-1 overflow-y-auto">
@@ -236,9 +250,9 @@ export const WorkflowList: React.FC<WorkflowListProps> = ({ onLoadWorkflow }) =>
                         <button
                           onClick={() => handleViewRunDetails(run.id)}
                           className={`px-2 py-1 ${isDark ? 'bg-gray-600 hover:bg-gray-500 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'} rounded text-xs transition-colors`}
-                          title={t('workflow.viewDetails', '查看详情')}
+                          title={t('workflow.viewDetails')}
                         >
-                          {t('workflow.details', '详情')}
+                          {t('workflow.details')}
                         </button>
                       </div>
                     </div>

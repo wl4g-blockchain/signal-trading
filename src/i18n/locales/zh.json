@@ -86,7 +86,9 @@
     "viewingRunDetails": "查看运行详情",
     "exitReadOnlyMode": "退出只读模式",
     "readOnlyMode": "只读模式",
-    "multiLevel": "多级"
+    "multiLevel": "多级",
+    "noWorkflows": "暂无工作流",
+    "createFirstWorkflow": "创建您的第一个工作流开始使用"
   },
   "node": {
     "start": "开始",

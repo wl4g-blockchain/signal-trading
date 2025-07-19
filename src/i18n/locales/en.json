@@ -84,7 +84,9 @@
     "viewingRunDetails": "Viewing Run Details",
     "exitReadOnlyMode": "Exit Read-Only Mode",
     "readOnlyMode": "Read-Only Mode",
-    "multiLevel": "multi-level"
+    "multiLevel": "multi-level",
+    "noWorkflows": "No workflows available",
+    "createFirstWorkflow": "Create your first workflow to get started"
   },
   "node": {
     "start": "Start",

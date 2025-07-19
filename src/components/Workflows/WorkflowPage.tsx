@@ -445,7 +445,11 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({
         <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-t transition-all duration-300 overflow-hidden ${
           showWorkflowList ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
         }`} style={{ height: showWorkflowList ? '40vh' : '0' }}>
-          <WorkflowList onLoadWorkflow={handleLoadWorkflow} />
+          <WorkflowList 
+            onLoadWorkflow={handleLoadWorkflow} 
+            initialWorkflowId={readOnlyWorkflow?.id}
+            readOnlyMode={!!readOnlyMode}
+          />
         </div>
       </div>
     </div>
