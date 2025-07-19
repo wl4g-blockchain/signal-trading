@@ -49,15 +49,15 @@ export const ConnectionLine: React.FC<ConnectionLineProps> = ({
     // 水平方向距离更大，使用左右连接
     if (deltaX > 0) {
       // 目标在右侧，从源节点右边连接到目标节点左边
-      startX = sourcePosition.x + sourceDim.width + 2;
+      startX = sourcePosition.x + sourceDim.width + 6;
       startY = sourcePosition.y + sourceDim.centerY;
-      endX = targetPosition.x - 2;
+      endX = targetPosition.x - 6;
       endY = targetPosition.y + targetDim.centerY;
     } else {
       // 目标在左侧，从源节点左边连接到目标节点右边
-      startX = sourcePosition.x - 2;
+      startX = sourcePosition.x - 6;
       startY = sourcePosition.y + sourceDim.centerY;
-      endX = targetPosition.x + targetDim.width + 2;
+      endX = targetPosition.x + targetDim.width + 6;
       endY = targetPosition.y + targetDim.centerY;
     }
   } else {
@@ -66,29 +66,29 @@ export const ConnectionLine: React.FC<ConnectionLineProps> = ({
       // 目标在下方，从源节点下边连接到目标节点上边
       startX = sourcePosition.x + sourceDim.centerX;
       if (sourceNodeType === 'start' || sourceNodeType === 'end') {
-        startY = sourcePosition.y + 96; // 圆形节点的实际下边缘
+        startY = sourcePosition.y + 96 + 6; // 圆形节点的实际下边缘 + 端口偏移
       } else {
-        startY = sourcePosition.y + sourceDim.height + 2;
+        startY = sourcePosition.y + sourceDim.height + 6;
       }
       endX = targetPosition.x + targetDim.centerX;
       if (targetNodeType === 'start' || targetNodeType === 'end') {
-        endY = targetPosition.y - 2; // 圆形节点的实际上边缘
+        endY = targetPosition.y - 6; // 圆形节点的实际上边缘 - 端口偏移
       } else {
-        endY = targetPosition.y - 2;
+        endY = targetPosition.y - 6;
       }
     } else {
       // 目标在上方，从源节点上边连接到目标节点下边
       startX = sourcePosition.x + sourceDim.centerX;
       if (sourceNodeType === 'start' || sourceNodeType === 'end') {
-        startY = sourcePosition.y - 2; // 圆形节点的实际上边缘
+        startY = sourcePosition.y - 6; // 圆形节点的实际上边缘 - 端口偏移
       } else {
-        startY = sourcePosition.y - 2;
+        startY = sourcePosition.y - 6;
       }
       endX = targetPosition.x + targetDim.centerX;
       if (targetNodeType === 'start' || targetNodeType === 'end') {
-        endY = targetPosition.y + 96; // 圆形节点的实际下边缘
+        endY = targetPosition.y + 96 + 6; // 圆形节点的实际下边缘 + 端口偏移
       } else {
-        endY = targetPosition.y + targetDim.height + 2;
+        endY = targetPosition.y + targetDim.height + 6;
       }
     }
   }

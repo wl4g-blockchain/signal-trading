@@ -174,8 +174,8 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
           <>
             {/* 右侧输出端口 */}
             <div
-              className="absolute right-0 w-1 h-1 bg-green-400 rounded-full cursor-pointer hover:bg-green-300 z-10"
-              style={{ right: '-2px', top: 'calc(50% - 8px)', transform: 'translateY(-50%)' }}
+              className="absolute right-0 w-3 h-3 bg-green-400 rounded-full cursor-pointer hover:bg-green-300 z-10 border-2 border-gray-800"
+              style={{ right: '-6px', top: 'calc(50% - 8px)', transform: 'translateY(-50%)' }}
               onMouseDown={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -184,7 +184,7 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
             />
             {/* 下侧输出端口 - 在圆形节点边缘 */}
             <div
-              className="absolute left-1/2 w-1 h-1 bg-green-400 rounded-full cursor-pointer hover:bg-green-300 transform -translate-x-1/2 z-10"
+              className="absolute left-1/2 w-3 h-3 bg-green-400 rounded-full cursor-pointer hover:bg-green-300 transform -translate-x-1/2 z-10 border-2 border-gray-800"
               style={{ top: '94px' }}
               onMouseDown={(e) => {
                 e.preventDefault();
@@ -194,8 +194,8 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
             />
             {/* 左侧输出端口 */}
             <div
-              className="absolute left-0 w-1 h-1 bg-green-400 rounded-full cursor-pointer hover:bg-green-300 z-10"
-              style={{ left: '-2px', top: 'calc(50% - 8px)', transform: 'translateY(-50%)' }}
+              className="absolute left-0 w-3 h-3 bg-green-400 rounded-full cursor-pointer hover:bg-green-300 z-10 border-2 border-gray-800"
+              style={{ left: '-6px', top: 'calc(50% - 8px)', transform: 'translateY(-50%)' }}
               onMouseDown={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -204,8 +204,8 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
             />
             {/* 上侧输出端口 */}
             <div
-              className="absolute top-0 left-1/2 w-1 h-1 bg-green-400 rounded-full cursor-pointer hover:bg-green-300 transform -translate-x-1/2 z-10"
-              style={{ top: '-2px' }}
+              className="absolute top-0 left-1/2 w-3 h-3 bg-green-400 rounded-full cursor-pointer hover:bg-green-300 transform -translate-x-1/2 z-10 border-2 border-gray-800"
+              style={{ top: '-6px' }}
               onMouseDown={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -220,42 +220,83 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
           <>
             {/* 左侧输入端口 */}
             <div
-              className="absolute left-0 w-1 h-1 bg-blue-400 rounded-full cursor-pointer hover:bg-blue-300 z-10"
-              style={{ left: '-2px', top: 'calc(50% - 8px)', transform: 'translateY(-50%)' }}
+              className="absolute left-0 w-3 h-3 bg-blue-400 rounded-full cursor-pointer hover:bg-blue-300 z-10 border-2 border-gray-800"
+              style={{ left: '-6px', top: 'calc(50% - 8px)', transform: 'translateY(-50%)' }}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
               onMouseUp={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 onConnectionEnd(node.id, 'input');
+              }}
+              onMouseEnter={(e) => {
+                // 当鼠标进入输入端口时，如果正在连接，则自动连接
+                const event = e as any;
+                if (event.buttons === 1) { // 左键按下状态
+                  onConnectionEnd(node.id, 'input');
+                }
               }}
             />
             {/* 上侧输入端口 - 在圆形节点边缘 */}
             <div
-              className="absolute left-1/2 w-1 h-1 bg-blue-400 rounded-full cursor-pointer hover:bg-blue-300 transform -translate-x-1/2 z-10"
-              style={{ top: '-2px' }}
+              className="absolute left-1/2 w-3 h-3 bg-blue-400 rounded-full cursor-pointer hover:bg-blue-300 transform -translate-x-1/2 z-10 border-2 border-gray-800"
+              style={{ top: '-6px' }}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
               onMouseUp={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 onConnectionEnd(node.id, 'input');
+              }}
+              onMouseEnter={(e) => {
+                const event = e as any;
+                if (event.buttons === 1) {
+                  onConnectionEnd(node.id, 'input');
+                }
               }}
             />
             {/* 右侧输入端口 */}
             <div
-              className="absolute right-0 w-1 h-1 bg-blue-400 rounded-full cursor-pointer hover:bg-blue-300 z-10"
-              style={{ right: '-2px', top: 'calc(50% - 8px)', transform: 'translateY(-50%)' }}
+              className="absolute right-0 w-3 h-3 bg-blue-400 rounded-full cursor-pointer hover:bg-blue-300 z-10 border-2 border-gray-800"
+              style={{ right: '-6px', top: 'calc(50% - 8px)', transform: 'translateY(-50%)' }}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
               onMouseUp={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 onConnectionEnd(node.id, 'input');
               }}
+              onMouseEnter={(e) => {
+                const event = e as any;
+                if (event.buttons === 1) {
+                  onConnectionEnd(node.id, 'input');
+                }
+              }}
             />
             {/* 下侧输入端口 - 在圆形节点边缘 */}
             <div
-              className="absolute left-1/2 w-1 h-1 bg-blue-400 rounded-full cursor-pointer hover:bg-blue-300 transform -translate-x-1/2 z-10"
+              className="absolute left-1/2 w-3 h-3 bg-blue-400 rounded-full cursor-pointer hover:bg-blue-300 transform -translate-x-1/2 z-10 border-2 border-gray-800"
               style={{ top: '94px' }}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
               onMouseUp={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 onConnectionEnd(node.id, 'input');
+              }}
+              onMouseEnter={(e) => {
+                const event = e as any;
+                if (event.buttons === 1) {
+                  onConnectionEnd(node.id, 'input');
+                }
               }}
             />
           </>
@@ -331,22 +372,42 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
           <>
             {/* 左侧输入端口 */}
             <div
-              className="absolute left-0 top-1/2 w-1 h-1 bg-blue-400 rounded-full cursor-pointer hover:bg-blue-300 transform -translate-y-1/2 z-10"
-              style={{ left: '-2px' }}
+              className="absolute left-0 top-1/2 w-3 h-3 bg-blue-400 rounded-full cursor-pointer hover:bg-blue-300 transform -translate-y-1/2 z-10 border-2 border-gray-800"
+              style={{ left: '-6px' }}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
               onMouseUp={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 onConnectionEnd(node.id, 'input');
               }}
+              onMouseEnter={(e) => {
+                const event = e as any;
+                if (event.buttons === 1) {
+                  onConnectionEnd(node.id, 'input');
+                }
+              }}
             />
             {/* 上侧输入端口 */}
             <div
-              className="absolute top-0 left-1/2 w-1 h-1 bg-blue-400 rounded-full cursor-pointer hover:bg-blue-300 transform -translate-x-1/2 z-10"
-              style={{ top: '-2px' }}
+              className="absolute top-0 left-1/2 w-3 h-3 bg-blue-400 rounded-full cursor-pointer hover:bg-blue-300 transform -translate-x-1/2 z-10 border-2 border-gray-800"
+              style={{ top: '-6px' }}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
               onMouseUp={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 onConnectionEnd(node.id, 'input');
+              }}
+              onMouseEnter={(e) => {
+                const event = e as any;
+                if (event.buttons === 1) {
+                  onConnectionEnd(node.id, 'input');
+                }
               }}
             />
           </>
@@ -356,8 +417,8 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
           <>
             {/* 右侧输出端口 */}
             <div
-              className="absolute right-0 top-1/2 w-1 h-1 bg-green-400 rounded-full cursor-pointer hover:bg-green-300 transform -translate-y-1/2 z-10"
-              style={{ right: '-2px' }}
+              className="absolute right-0 top-1/2 w-3 h-3 bg-green-400 rounded-full cursor-pointer hover:bg-green-300 transform -translate-y-1/2 z-10 border-2 border-gray-800"
+              style={{ right: '-6px' }}
               onMouseDown={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -366,8 +427,8 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
             />
             {/* 下侧输出端口 */}
             <div
-              className="absolute bottom-0 left-1/2 w-1 h-1 bg-green-400 rounded-full cursor-pointer hover:bg-green-300 transform -translate-x-1/2 z-10"
-              style={{ bottom: '-2px' }}
+              className="absolute bottom-0 left-1/2 w-3 h-3 bg-green-400 rounded-full cursor-pointer hover:bg-green-300 transform -translate-x-1/2 z-10 border-2 border-gray-800"
+              style={{ bottom: '-6px' }}
               onMouseDown={(e) => {
                 e.preventDefault();
                 e.stopPropagation();

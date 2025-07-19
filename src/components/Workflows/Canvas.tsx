@@ -254,10 +254,13 @@ export const Canvas: React.FC<CanvasProps> = ({
   }, [scale, panOffset]);
 
   const handleMouseUpWhileConnecting = useCallback(() => {
-    setIsConnecting(null);
-    setMousePosition(null);
-    window.removeEventListener('mousemove', handleMouseMoveWhileConnecting);
-    window.removeEventListener('mouseup', handleMouseUpWhileConnecting);
+    // 延迟清除连接状态，给节点的mouseup事件一些时间来处理
+    setTimeout(() => {
+      setIsConnecting(null);
+      setMousePosition(null);
+      window.removeEventListener('mousemove', handleMouseMoveWhileConnecting);
+      window.removeEventListener('mouseup', handleMouseUpWhileConnecting);
+    }, 10);
   }, [handleMouseMoveWhileConnecting]);
 
   const handleConnectionEnd = useCallback((targetNodeId: string, inputId: string) => {
@@ -267,6 +270,8 @@ export const Canvas: React.FC<CanvasProps> = ({
     if (isConnecting.nodeId === targetNodeId) {
       setIsConnecting(null);
       setMousePosition(null);
+      window.removeEventListener('mousemove', handleMouseMoveWhileConnecting);
+      window.removeEventListener('mouseup', handleMouseUpWhileConnecting);
       return;
     }
     
@@ -274,6 +279,8 @@ export const Canvas: React.FC<CanvasProps> = ({
     if (!canConnect(isConnecting.nodeId, targetNodeId)) {
       setIsConnecting(null);
       setMousePosition(null);
+      window.removeEventListener('mousemove', handleMouseMoveWhileConnecting);
+      window.removeEventListener('mouseup', handleMouseUpWhileConnecting);
       return;
     }
     
@@ -284,6 +291,8 @@ export const Canvas: React.FC<CanvasProps> = ({
     if (existingConnection) {
       setIsConnecting(null);
       setMousePosition(null);
+      window.removeEventListener('mousemove', handleMouseMoveWhileConnecting);
+      window.removeEventListener('mouseup', handleMouseUpWhileConnecting);
       return;
     }
     
@@ -295,6 +304,8 @@ export const Canvas: React.FC<CanvasProps> = ({
       targetInput: inputId,
     };
     onConnectionsChange([...connections, newConnection]);
+    
+    // 清理连接状态
     setIsConnecting(null);
     setMousePosition(null);
     window.removeEventListener('mousemove', handleMouseMoveWhileConnecting);
@@ -403,11 +414,11 @@ export const Canvas: React.FC<CanvasProps> = ({
               // 水平方向距离更大
               if (deltaX > 0) {
                 // 鼠标在右侧，从右边连接
-                sourceX = sourceNode.position.x + sourceDim.width + 2;
+                sourceX = sourceNode.position.x + sourceDim.width + 6;
                 sourceY = sourceNode.position.y + sourceDim.centerY;
               } else {
                 // 鼠标在左侧，从左边连接
-                sourceX = sourceNode.position.x - 2;
+                sourceX = sourceNode.position.x - 6;
                 sourceY = sourceNode.position.y + sourceDim.centerY;
               }
             } else {
@@ -416,17 +427,17 @@ export const Canvas: React.FC<CanvasProps> = ({
                 // 鼠标在下方，从下边连接
                 sourceX = sourceNode.position.x + sourceDim.centerX;
                 if (sourceNode.type === 'start' || sourceNode.type === 'end') {
-                  sourceY = sourceNode.position.y + 96; // 圆形节点的实际下边缘
+                  sourceY = sourceNode.position.y + 96 + 6; // 圆形节点的实际下边缘 + 端口偏移
                 } else {
-                  sourceY = sourceNode.position.y + sourceDim.height + 2;
+                  sourceY = sourceNode.position.y + sourceDim.height + 6;
                 }
               } else {
                 // 鼠标在上方，从上边连接
                 sourceX = sourceNode.position.x + sourceDim.centerX;
                 if (sourceNode.type === 'start' || sourceNode.type === 'end') {
-                  sourceY = sourceNode.position.y - 2; // 圆形节点的实际上边缘
+                  sourceY = sourceNode.position.y - 6; // 圆形节点的实际上边缘 - 端口偏移
                 } else {
-                  sourceY = sourceNode.position.y - 2;
+                  sourceY = sourceNode.position.y - 6;
                 }
               }
             }
