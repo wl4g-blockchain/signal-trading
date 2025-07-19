@@ -480,6 +480,7 @@ export const Canvas: React.FC<CanvasProps> = ({
               onConnectionEnd={handleConnectionEnd}
               onDelete={onDeleteNode}
               onConfig={handleNodeConfig}
+              onNodeClick={() => {}} // Add empty callback for consistency
             />
           ))}
         </div>

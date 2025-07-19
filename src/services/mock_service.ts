@@ -381,6 +381,11 @@ export class MockApiService implements ApiService {
     return run.nodeStates[nodeId].logs || ["No logs available"];
   }
 
+  async readWorkflowLogByNodeId(runId: string, nodeId: string) {
+    // Alias for getWorkflowRunLogs to match user expectations  
+    return this.getWorkflowRunLogs(runId, nodeId);
+  }
+
   async getTradeHistory(params?: any) {
     await new Promise((resolve) => setTimeout(resolve, 600));
     // Return mock trade data

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { ComponentNode, Connection, Workflow } from '../../types';
 import { Canvas } from './WorkflowCanvas';
 import { WorkflowRunCanvas } from './WorkflowRunCanvas';
@@ -32,6 +32,16 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({
   const [running, setRunning] = useState(false);
   const [canvasScale, setCanvasScale] = useState(100);
   const [rightPanelCollapsed, setRightPanelCollapsed] = useState(false);
+
+  // Log panel state for adjusting bottom panel layout
+  const [logPanelVisible, setLogPanelVisible] = useState(false);
+  const [logPanelWidth, setLogPanelWidth] = useState(480);
+
+  // Callback to handle log panel state changes
+  const handleLogPanelStateChange = useCallback((visible: boolean, panelWidth: number) => {
+    setLogPanelVisible(visible);
+    setLogPanelWidth(panelWidth);
+  }, []);
 
   // Load read-only workflow data if provided
   useEffect(() => {
@@ -370,6 +380,7 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({
             <WorkflowRunCanvas
               nodes={nodes}
               connections={connections}
+              onLogPanelStateChange={handleLogPanelStateChange}
             />
           ) : (
             <Canvas
@@ -430,7 +441,11 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({
       )}
 
       {/* Workflow List Panel - Absolute positioned at bottom */}
-      <div className={`absolute bottom-0 left-0 ${readOnlyMode ? 'right-0' : (rightPanelCollapsed ? 'right-12' : 'right-80')} z-10 transition-all duration-300`}>
+      <div className={`absolute bottom-0 left-0 z-10 transition-all duration-300`} style={{
+        right: readOnlyMode 
+          ? (logPanelVisible ? `${logPanelWidth}px` : '0px') // Adjust for log panel in readonly mode
+          : (rightPanelCollapsed ? '48px' : '320px') // Normal right panel handling
+      }}>
         {/* Toggle Button - Always Visible */}
         <div className={`flex items-center justify-center py-2 ${isDark ? 'bg-gray-800 border-gray-700 hover:bg-gray-700' : 'bg-white border-gray-200 hover:bg-gray-50'} border-t cursor-pointer transition-colors`}
              onClick={() => setShowWorkflowList(!showWorkflowList)}>

@@ -26,6 +26,7 @@ interface NodeComponentProps {
   onConnectionEnd: (nodeId: string, inputId: string) => void;
   onDelete: (nodeId: string) => void;
   onConfig: (node: ComponentNode) => void;
+  onNodeClick?: (nodeId: string) => void; // Add callback for node clicks in readonly mode
 }
 
 const getNodeIcon = (type: string) => {
@@ -152,6 +153,7 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
   onConnectionEnd,
   onDelete,
   onConfig,
+  onNodeClick,
 }) => {
   const { isDark } = useTheme();
   const [showLogModal, setShowLogModal] = useState(false);
@@ -197,7 +199,8 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
   const handleNodeClick = (e: React.MouseEvent) => {
     if (isReadonly && runLogs.length > 0) {
       e.stopPropagation();
-      setShowLogModal(true);
+      // Use the new callback instead of showing modal
+      onNodeClick?.(node.id);
     }
   };
 
@@ -518,8 +521,8 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
       </div>
     </div>
 
-    {/* Run Log Modal */}
-    {showLogModal && (
+    {/* Run Log Modal - Only show if not readonly mode (backward compatibility) */}
+    {showLogModal && !isReadonly && (
       <NodeRunLogModal
         node={node}
         onClose={() => setShowLogModal(false)}

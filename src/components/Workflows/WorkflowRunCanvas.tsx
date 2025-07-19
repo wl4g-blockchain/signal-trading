@@ -4,16 +4,19 @@ import { NodeComponent } from './NodeComponent';
 import { ConnectionLine } from './ConnectionLine';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
-import { Edit } from 'lucide-react';
+import { Edit, X } from 'lucide-react';
+import { serviceManager } from '../../services';
 
 interface WorkflowRunCanvasProps {
   nodes: ComponentNode[];
   connections: Connection[];
+  onLogPanelStateChange?: (visible: boolean, panelWidth: number) => void; // Callback to notify parent
 }
 
 export const WorkflowRunCanvas: React.FC<WorkflowRunCanvasProps> = ({
   nodes,
   connections,
+  onLogPanelStateChange,
 }) => {
   const { isDark } = useTheme();
   const { t } = useTranslation();
@@ -23,6 +26,21 @@ export const WorkflowRunCanvas: React.FC<WorkflowRunCanvasProps> = ({
   const [isPanning, setIsPanning] = useState(false);
   const [touchStartPositions, setTouchStartPositions] = useState<React.TouchList | null>(null);
   const [isThreeFingerPanning, setIsThreeFingerPanning] = useState(false);
+  
+  // Log panel state - increased default width to 480px
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [logPanelVisible, setLogPanelVisible] = useState(false);
+  const [logPanelWidth, setLogPanelWidth] = useState(480); // Increased from 384px to 480px
+  const [nodeLogs, setNodeLogs] = useState<string[]>([]);
+  const [loadingLogs, setLoadingLogs] = useState(false);
+  
+  // Drag resize state - Fixed initial values to prevent jumpy behavior
+  const [isDragging, setIsDragging] = useState(false);
+
+  // Notify parent component about log panel state changes
+  useEffect(() => {
+    onLogPanelStateChange?.(logPanelVisible, logPanelWidth);
+  }, [logPanelVisible, logPanelWidth, onLogPanelStateChange]);
 
   // Handle navigation back to design editor
   const handleBackToDesign = useCallback(() => {
@@ -34,6 +52,97 @@ export const WorkflowRunCanvas: React.FC<WorkflowRunCanvasProps> = ({
     const navEvent = new CustomEvent('navigate-to-workflows');
     window.dispatchEvent(navEvent);
   }, []);
+
+  // Handle node click to show logs in side panel
+  const handleNodeClick = useCallback(async (nodeId: string) => {
+    const node = nodes.find(n => n.id === nodeId);
+    if (!node || !node.data?.readonly || !node.data?.runLogs?.length) return;
+    
+    setSelectedNodeId(nodeId);
+    setLoadingLogs(true);
+    setLogPanelVisible(true);
+    
+    try {
+      // Get run ID from node or use mock data for now
+      const runId = 'run-1'; // In real implementation, this would come from context
+      const logs = await serviceManager.getService().readWorkflowLogByNodeId(runId, nodeId);
+      setNodeLogs(logs);
+    } catch (error) {
+      console.error('Failed to load node logs:', error);
+      setNodeLogs(['Failed to load logs']);
+    } finally {
+      setLoadingLogs(false);
+    }
+  }, [nodes]);
+
+  // Auto-open the last node with logs on initialization
+  useEffect(() => {
+    const findLastNodeWithLogs = () => {
+      // Filter nodes that have logs
+      const nodesWithLogs = nodes.filter(node => 
+        node.data?.runLogs && node.data.runLogs.length > 0
+      );
+      
+      if (nodesWithLogs.length === 0) return null;
+      
+      // First, try to find a failed node (highest priority)
+      const failedNode = nodesWithLogs.find(node => node.data?.runStatus === 'failed');
+      if (failedNode) return failedNode;
+      
+      // If no failed node, return the last node with logs (by position or order)
+      // Assuming nodes are processed in order, the last one would be the one with highest position
+      return nodesWithLogs.reduce((lastNode, currentNode) => {
+        // Compare by y position, then by x position as tiebreaker
+        if (currentNode.position.y > lastNode.position.y) return currentNode;
+        if (currentNode.position.y === lastNode.position.y && currentNode.position.x > lastNode.position.x) {
+          return currentNode;
+        }
+        return lastNode;
+      });
+    };
+    
+    // Only auto-open once when component first renders and nodes are available
+    if (nodes.length > 0 && !selectedNodeId && !logPanelVisible) {
+      const targetNode = findLastNodeWithLogs();
+      if (targetNode) {
+        handleNodeClick(targetNode.id);
+      }
+    }
+  }, [nodes, selectedNodeId, logPanelVisible, handleNodeClick]);
+
+  // Close log panel
+  const closeLogPanel = useCallback(() => {
+    setLogPanelVisible(false);
+    setSelectedNodeId(null);
+    setNodeLogs([]);
+  }, []);
+
+  // Handle resize drag start - Fixed to prevent initial width jumping
+  const handleResizeDragStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+    
+    // Capture initial values at the moment of drag start
+    const initialX = e.clientX;
+    const initialWidth = logPanelWidth;
+    
+    // Add global mouse event listeners
+    const handleMouseMove = (e: MouseEvent) => {
+      const deltaX = initialX - e.clientX; // Inverted because we're dragging left border
+      const newWidth = Math.max(320, Math.min(800, initialWidth + deltaX)); // Min 320px, max 800px
+      setLogPanelWidth(newWidth);
+    };
+    
+    const handleMouseUp = () => {
+      setIsDragging(false);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+    
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  }, [logPanelWidth]);
 
   // Handle mouse down for panning only
   const handleMouseDown = useCallback((event: React.MouseEvent) => {
@@ -191,7 +300,7 @@ export const WorkflowRunCanvas: React.FC<WorkflowRunCanvasProps> = ({
           </svg>
         </div>
 
-        {/* Connections */}
+        {/* Connections - read-only mode: display only, no deletion allowed */}
         {connections.map(connection => {
           const sourceNode = nodes.find(n => n.id === connection.source);
           const targetNode = nodes.find(n => n.id === connection.target);
@@ -211,23 +320,26 @@ export const WorkflowRunCanvas: React.FC<WorkflowRunCanvasProps> = ({
           );
         })}
 
-        {/* Nodes - read-only mode */}
+        {/* Nodes - read-only mode: only allow clicking to view logs */}
         {nodes.map(node => (
           <NodeComponent
             key={node.id}
             node={node}
-            // Read-only mode: disable all interactions
+            // Read-only mode: disable all interactions except node clicks for logs
             onDragStart={() => {}}
             onConnectionStart={() => {}}
             onConnectionEnd={() => {}}
             onDelete={() => {}}
             onConfig={() => {}}
+            onNodeClick={handleNodeClick} // Enable clicking to open log panel
           />
         ))}
       </div>
       
-      {/* Floating Action Button - Return to Design Editor */}
-      <div className="absolute top-4 right-4 z-10">
+      {/* Floating Action Button - Return to Design Editor (position adjusts when log panel opens) */}
+      <div className={`absolute top-4 z-10 transition-all duration-300`} style={{ 
+        right: logPanelVisible ? `${logPanelWidth + 20}px` : '16px' 
+      }}>
         <button
           onClick={handleBackToDesign}
           className={`flex items-center space-x-2 px-4 py-2 ${isDark ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-600 hover:bg-blue-700'} text-white rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95`}
@@ -236,6 +348,87 @@ export const WorkflowRunCanvas: React.FC<WorkflowRunCanvasProps> = ({
           <Edit className="w-4 h-4" />
           <span className="text-sm font-medium">{t('workflow.redesign')}</span>
         </button>
+      </div>
+
+      {/* Sliding Log Panel - Displays execution logs for selected node */}
+      <div 
+        className={`absolute top-0 right-0 h-full ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-l shadow-2xl transform transition-transform duration-300 ease-in-out z-20 ${
+          logPanelVisible ? 'translate-x-0' : 'translate-x-full'
+        }`}
+        style={{ width: `${logPanelWidth}px` }}
+      >
+        {/* Resize Handle - Drag left border to adjust panel width */}
+        <div
+          className={`absolute left-0 top-0 bottom-0 w-1 cursor-col-resize ${isDark ? 'bg-gray-600 hover:bg-gray-500' : 'bg-gray-300 hover:bg-gray-400'} transition-colors ${isDragging ? 'bg-blue-500' : ''}`}
+          onMouseDown={handleResizeDragStart}
+          title="Drag to resize panel"
+        >
+          <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-1 h-8 bg-current opacity-60 rounded-full"></div>
+        </div>
+        
+        {/* Panel Header */}
+        <div className={`flex items-center justify-between p-4 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
+          <div className="flex items-center space-x-3">
+            <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+              Node Execution Log
+            </h3>
+            {selectedNodeId && (
+              <span className={`px-2 py-1 rounded text-xs font-medium ${isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'}`}>
+                {selectedNodeId}
+              </span>
+            )}
+          </div>
+          <button
+            onClick={closeLogPanel}
+            className={`p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors`}
+          >
+            <X className={`w-5 h-5 ${isDark ? 'text-gray-400' : 'text-gray-600'}`} />
+          </button>
+        </div>
+
+        {/* Log Content */}
+        <div className="flex-1 overflow-hidden">
+          <div className="h-full bg-black text-green-400 font-mono text-sm">
+            {/* Terminal Header */}
+            <div className="px-4 py-2 bg-gray-900 border-b border-gray-800 flex items-center space-x-2">
+              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+              <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+              <div className="ml-4 text-gray-400 text-xs">
+                Node Execution Log - {selectedNodeId}
+              </div>
+            </div>
+
+            {/* Log Content */}
+            <div className="h-full overflow-y-auto p-4 pb-20">
+              {loadingLogs ? (
+                <div className="text-yellow-400 animate-pulse">Loading logs...</div>
+              ) : nodeLogs.length > 0 ? (
+                nodeLogs.map((log, index) => (
+                  <div key={index} className="mb-1 flex">
+                    <span className="text-gray-500 mr-2 select-none">
+                      [{new Date().toISOString().substring(11, 23)}]
+                    </span>
+                    <span className="text-green-400">{log}</span>
+                  </div>
+                ))
+              ) : (
+                <div className="text-gray-500">
+                  No logs available for this node execution.
+                </div>
+              )}
+
+              {/* Cursor Blink */}
+              <div className="mt-2 flex items-center">
+                <span className="text-gray-500 mr-2">
+                  [{new Date().toISOString().substring(11, 23)}]
+                </span>
+                <span className="text-green-400">$</span>
+                <span className="ml-1 bg-green-400 w-2 h-4 animate-pulse"></span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

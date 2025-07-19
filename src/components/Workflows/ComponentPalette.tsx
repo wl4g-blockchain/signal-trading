@@ -1,11 +1,11 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
 import { ComponentNode } from '../../types';
 import { Radio, Brain, Zap, Database, Plus } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
 
 // Component configuration data - extracted for reuse
-export const getComponentsConfig = (t: any) => [
+export const getComponentsConfig = (t: (key: string) => string) => [
   {
     type: 'listener' as const,
     title: t('node.listener'),
@@ -129,7 +129,7 @@ interface ComponentPaletteCollapsedProps {
   onAddNode: (type: ComponentNode['type']) => void;
   readOnlyMode?: boolean;
   isDark: boolean;
-  t: any;
+  t: (key: string) => string;
 }
 
 export const ComponentPaletteCollapsed: React.FC<ComponentPaletteCollapsedProps> = ({ 
@@ -150,7 +150,7 @@ export const ComponentPaletteCollapsed: React.FC<ComponentPaletteCollapsedProps>
               onClick={() => !readOnlyMode && onAddNode(component.type)}
               disabled={!!readOnlyMode}
               className={`w-8 h-8 ${readOnlyMode ? 'bg-gray-500 cursor-not-allowed' : component.color} rounded-lg flex items-center justify-center transition-all duration-150 shadow-sm hover:shadow-lg hover:scale-110 active:scale-95 ${readOnlyMode ? 'opacity-50' : ''}`}
-              title={readOnlyMode ? t('workflow.readOnlyMode') : `${component.title} - ${component.description}`}
+              // Remove native title attribute to prevent 3-second delay, use only custom tooltip
             >
               <Icon className="w-4 h-4 text-white" />
             </button>

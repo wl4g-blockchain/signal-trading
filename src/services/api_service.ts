@@ -19,6 +19,7 @@ export interface ApiService {
   getWorkflowRuns(workflowId: string): Promise<WorkflowRun[]>;
   getWorkflowRun(id: string): Promise<WorkflowRun>;
   getWorkflowRunLogs(runId: string, nodeId: string): Promise<string[]>;
+  readWorkflowLogByNodeId(runId: string, nodeId: string): Promise<string[]>; // Alias for getWorkflowRunLogs
 
   // Trading
   getTradeHistory(params?: Record<string, unknown>): Promise<TradeRecord[]>;
@@ -116,6 +117,11 @@ export class HttpApiService implements ApiService {
 
   async getWorkflowRunLogs(runId: string, nodeId: string) {
     return this.request(`/workflow-runs/${runId}/nodes/${nodeId}/logs`);
+  }
+
+  async readWorkflowLogByNodeId(runId: string, nodeId: string) {
+    // Alias for getWorkflowRunLogs to match user expectations
+    return this.getWorkflowRunLogs(runId, nodeId);
   }
 
   async getTradeHistory(params?: Record<string, unknown>) {
