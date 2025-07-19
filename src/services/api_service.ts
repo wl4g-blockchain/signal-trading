@@ -23,6 +23,11 @@ export interface ApiService {
   // Trading
   getTradeHistory(params?: Record<string, unknown>): Promise<TradeRecord[]>;
   getReports(params?: Record<string, unknown>): Promise<unknown[]>;
+
+  // Notifications
+  getNotifications(): Promise<unknown[]>;
+  markNotificationAsRead(notificationId: string): Promise<void>;
+  markAllNotificationsAsRead(): Promise<void>;
 }
 
 export class HttpApiService implements ApiService {
@@ -121,6 +126,18 @@ export class HttpApiService implements ApiService {
   async getReports(params?: Record<string, unknown>): Promise<unknown[]> {
     const query = params ? `?${new URLSearchParams(params as Record<string, string>).toString()}` : '';
     return this.request(`/reports${query}`);
+  }
+
+  async getNotifications(): Promise<unknown[]> {
+    return this.request('/notifications');
+  }
+
+  async markNotificationAsRead(notificationId: string): Promise<void> {
+    return this.request(`/notifications/${notificationId}/read`, { method: 'POST' });
+  }
+
+  async markAllNotificationsAsRead(): Promise<void> {
+    return this.request('/notifications/read-all', { method: 'POST' });
   }
 }
 

@@ -15,6 +15,7 @@ interface LayoutProps {
   onLogout: () => void;
   sidebarCollapsed?: boolean;
   onSidebarCollapsedChange?: (collapsed: boolean) => void;
+  onNavigateToWorkflowRun?: (workflowId: string, runId: string) => void;
 }
 
 export const Layout: React.FC<LayoutProps> = ({ 
@@ -24,7 +25,8 @@ export const Layout: React.FC<LayoutProps> = ({
   user, 
   onLogout,
   sidebarCollapsed: externalSidebarCollapsed,
-  onSidebarCollapsedChange
+  onSidebarCollapsedChange,
+  onNavigateToWorkflowRun
 }) => {
   const { t } = useTranslation();
   const { theme, setTheme, isDark } = useTheme();
@@ -33,41 +35,67 @@ export const Layout: React.FC<LayoutProps> = ({
   const [internalSidebarCollapsed, setInternalSidebarCollapsed] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   
-  // 模拟通知数据
-  const [notifications] = useState([
-    {
-      id: 'notif-1',
-      type: 'success',
-      title: '交易成功',
-      message: 'ETH/USDC 套利交易成功完成，收益 +$125.50',
-      timestamp: new Date('2024-01-16T10:05:00Z'),
-      read: false
-    },
-    {
-      id: 'notif-2', 
-      type: 'warning',
-      title: '滑点警告',
-      message: 'BTC/USDT 交易滑点较高 (2.5%)，建议调整策略',
-      timestamp: new Date('2024-01-16T09:30:00Z'),
-      read: false
-    },
-    {
-      id: 'notif-3',
-      type: 'info',
-      title: '策略启动',
-      message: '套利策略 "Arbitrage ETH/USDC" 已成功启动',
-      timestamp: new Date('2024-01-16T08:00:00Z'),
-      read: true
-    },
-    {
-      id: 'notif-4',
-      type: 'error',
-      title: '交易失败',
-      message: '由于流动性不足，SOL/USDC 交易执行失败',
-      timestamp: new Date('2024-01-15T16:45:00Z'),
-      read: true
+  // Use API service to fetch notification data
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [notificationsLoading, setNotificationsLoading] = useState(false);
+
+  // Fetch notification data
+  const fetchNotifications = async () => {
+    if (notificationsLoading) return;
+    setNotificationsLoading(true);
+    try {
+      const data = await serviceManager.getService().getNotifications();
+      setNotifications(data);
+    } catch (error) {
+      console.error('Failed to fetch notifications:', error);
+    } finally {
+      setNotificationsLoading(false);
     }
-  ]);
+  };
+
+  // Mark notification as read
+  const handleMarkAsRead = async (notificationId: string) => {
+    try {
+      await serviceManager.getService().markNotificationAsRead(notificationId);
+      setNotifications(prev => 
+        prev.map(notif => 
+          notif.id === notificationId ? { ...notif, read: true } : notif
+        )
+      );
+    } catch (error) {
+      console.error('Failed to mark notification as read:', error);
+    }
+  };
+
+  // Mark all notifications as read
+  const handleMarkAllAsRead = async () => {
+    try {
+      await serviceManager.getService().markAllNotificationsAsRead();
+      setNotifications(prev => prev.map(notif => ({ ...notif, read: true })));
+    } catch (error) {
+      console.error('Failed to mark all notifications as read:', error);
+    }
+  };
+
+  // Handle notification click
+  const handleNotificationClick = (notification: any) => {
+    // If it's a transaction type notification with workflowRunId, navigate to editor
+    if (notification.type === 'Transaction' && notification.workflowRunId && onNavigateToWorkflowRun) {
+      onNavigateToWorkflowRun(notification.workflowId, notification.workflowRunId);
+      setShowNotifications(false);
+      // Mark as read
+      if (!notification.read) {
+        handleMarkAsRead(notification.id);
+      }
+    }
+  };
+
+  // Fetch data when notifications are shown
+  React.useEffect(() => {
+    if (showNotifications) {
+      fetchNotifications();
+    }
+  }, [showNotifications]);
   
   const unreadCount = notifications.filter(n => !n.read).length;
 
@@ -103,8 +131,8 @@ export const Layout: React.FC<LayoutProps> = ({
     };
   }, []);
 
-  const getNotificationIcon = (type: string) => {
-    switch (type) {
+  const getNotificationIcon = (level: string) => {
+    switch (level) {
       case 'success': return '✅';
       case 'warning': return '⚠️';
       case 'error': return '❌';
@@ -120,10 +148,27 @@ export const Layout: React.FC<LayoutProps> = ({
     const hours = Math.floor(diff / 3600000);
     const days = Math.floor(diff / 86400000);
     
-    if (days > 0) return `${days}天前`;
-    if (hours > 0) return `${hours}小时前`;
-    if (minutes > 0) return `${minutes}分钟前`;
-    return '刚刚';
+    let timeAgo = '';
+    if (days > 0) timeAgo = `${days}d ago`;
+    else if (hours > 0) timeAgo = `${hours}h ago`;
+    else if (minutes > 0) timeAgo = `${minutes}m ago`;
+    else timeAgo = 'now';
+    
+    // Compact time format: 3d ago | 25/03/21 01:11:44 UTC | 25/03/21 09:11:44
+    const utcTime = timestamp.toISOString().replace('T', ' ').replace(/\.\d{3}Z/, '');
+    const utcFormatted = utcTime.substring(2).replace('-', '/').replace('-', '/'); // Remove first 2 digits of year
+    
+    const localTime = timestamp.toLocaleString('en-GB', { 
+      year: '2-digit', 
+      month: '2-digit', 
+      day: '2-digit',
+      hour: '2-digit', 
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    }).replace(/\//g, '/');
+    
+    return `${timeAgo} | ${utcFormatted} UTC | ${localTime}`;
   };
 
   return (
@@ -157,6 +202,22 @@ export const Layout: React.FC<LayoutProps> = ({
               <SigTradingIcon size="small" className="hover:scale-110 transition-transform" />
             </div>
           )}
+          
+          {/* API Mode display - moved to top */}
+          {!sidebarCollapsed && (
+            <div className="mt-4 pt-4 border-t border-gray-600">
+              <div className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'} flex items-center justify-between`}>
+                <span>API Mode:</span>
+                <span className={`px-2 py-1 rounded text-xs font-medium ${
+                  serviceManager.getCurrentApiType() === 'MOCK' 
+                    ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300'
+                    : 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
+                }`}>
+                  {serviceManager.getCurrentApiType()}
+                </span>
+              </div>
+            </div>
+          )}
         </div>
         
         <nav className="mt-8">
@@ -179,7 +240,8 @@ export const Layout: React.FC<LayoutProps> = ({
             );
           })}
         </nav>
-        {/* Footer API Mode & Vault Balance */}
+        
+        {/* Footer area - 为了占位符可以保留空区域或移除 */}
       </div>
 
       {/* Main Content */}
@@ -222,7 +284,7 @@ export const Layout: React.FC<LayoutProps> = ({
                 className={`p-2 rounded-lg ${isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} transition-colors`}
                 onClick={() => {
                   setShowNotifications(!showNotifications);
-                  setShowUserMenu(false); // 关闭用户菜单
+                  setShowUserMenu(false); // Close user menu
                 }}
                 title={t('navigation.notifications')}
               >
@@ -247,54 +309,89 @@ export const Layout: React.FC<LayoutProps> = ({
                     <div className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('navigation.notifications')}</div>
                     {unreadCount > 0 && (
                       <div className={`text-xs px-2 py-1 rounded-full ${isDark ? 'bg-blue-600 text-blue-100' : 'bg-blue-100 text-blue-700'}`}>
-                        {unreadCount} 条未读
+                        {unreadCount} unread notifications
                       </div>
                     )}
                   </div>
                   
                   {/* Notification List */}
                   <div className="max-h-80 overflow-y-auto">
-                    {notifications.map((notification) => (
-                      <div
-                        key={notification.id}
-                        className={`px-4 py-3 border-b ${isDark ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-100 hover:bg-gray-50'} transition-colors ${!notification.read ? (isDark ? 'bg-blue-900 bg-opacity-20' : 'bg-blue-50') : ''}`}
-                      >
-                        <div className="flex items-start space-x-3">
-                          <div className="flex-shrink-0 text-lg">
-                            {getNotificationIcon(notification.type)}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between">
-                              <p className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'} ${!notification.read ? 'font-semibold' : ''}`}>
-                                {notification.title}
-                              </p>
-                              {!notification.read && (
-                                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                              )}
+                    {notificationsLoading ? (
+                      <div className={`px-4 py-8 text-center ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                        <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                        <p className="text-sm">Loading notifications...</p>
+                      </div>
+                    ) : notifications.length > 0 ? (
+                      notifications.map((notification) => (
+                        <div
+                          key={notification.id}
+                          onClick={() => handleNotificationClick(notification)}
+                          className={`px-4 py-3 border-b ${isDark ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-100 hover:bg-gray-50'} transition-colors ${!notification.read ? (isDark ? 'bg-blue-900 bg-opacity-20' : 'bg-blue-50') : ''} ${notification.type === 'Transaction' && notification.workflowRunId ? 'cursor-pointer' : 'cursor-default'}`}
+                        >
+                          <div className="flex items-start space-x-3">
+                            <div className="flex-shrink-0 text-lg">
+                              {getNotificationIcon(notification.level)}
                             </div>
-                            <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
-                              {notification.message}
-                            </p>
-                            <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'} mt-2`}>
-                              {formatTimeAgo(notification.timestamp)}
-                            </p>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-2">
+                                  <p className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'} ${!notification.read ? 'font-semibold' : ''}`}>
+                                    {notification.title}
+                                  </p>
+                                  {/* Show notification type */}
+                                  <span className={`px-2 py-0.5 text-xs rounded-full ${
+                                    notification.type === 'Transaction' 
+                                      ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
+                                      : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
+                                  }`}>
+                                    {notification.type}
+                                  </span>
+                                </div>
+                                {!notification.read && (
+                                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                )}
+                              </div>
+                              <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
+                                {notification.message}
+                              </p>
+                              {/* 可点击提示 */}
+                              {notification.type === 'Transaction' && notification.workflowRunId && (
+                                <p className={`text-xs ${isDark ? 'text-blue-400' : 'text-blue-600'} mt-1 italic`}>
+                                  {t('dashboard.viewDetails')} →
+                                </p>
+                              )}
+                              <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'} mt-2`}>
+                                {formatTimeAgo(notification.timestamp)}
+                              </p>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
-                    
-                    {notifications.length === 0 && (
+                      ))
+                    ) : (
                       <div className={`px-4 py-8 text-center ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                         <div className="text-3xl mb-2">🔔</div>
-                        <p className="text-sm">暂无通知</p>
+                        <p className="text-sm">No notifications</p>
                       </div>
                     )}
                   </div>
                   
                   {/* Footer */}
-                  <div className={`px-4 py-3 border-t ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
-                    <button className={`text-sm ${isDark ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-500'} transition-colors`}>
-                      查看全部通知
+                  <div className={`px-4 py-3 border-t ${isDark ? 'border-gray-700' : 'border-gray-200'} flex items-center justify-between`}>
+                    <button 
+                      onClick={handleMarkAllAsRead}
+                      disabled={unreadCount === 0 || notificationsLoading}
+                      className={`text-sm ${unreadCount > 0 && !notificationsLoading 
+                        ? (isDark ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-500') 
+                        : 'text-gray-400 cursor-not-allowed'
+                      } transition-colors`}
+                    >
+                      Mark all as read
+                    </button>
+                    <button 
+                      onClick={() => setShowNotifications(false)}
+                      className={`text-sm ${isDark ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-500'} transition-colors`}
+                    >
+                      Close
                     </button>
                   </div>
                 </div>

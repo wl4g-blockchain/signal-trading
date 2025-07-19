@@ -176,14 +176,20 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
       default: return colorClass;
     }
   };
+
+  // Get text color based on run status for better readability
+  const getRunStatusTextColor = () => {
+    // Use consistent white text to ensure color-blind friendly
+    return 'text-white';
+  };
   
   const getRunStatusIcon = () => {
     if (!runStatus) return null;
     switch (runStatus) {
-      case 'success': return <Check className="w-3 h-3 text-white" />;
+      case 'success': return <Check className="w-3 h-3 text-white" />; // Use consistent white
       case 'failed': return <X className="w-3 h-3 text-white" />;
       case 'running': return <Clock className="w-3 h-3 text-white animate-spin" />;
-      case 'queued': return <Pause className="w-3 h-3 text-white" />;
+      case 'queued': return <Pause className="w-3 h-3 text-white" />; // Use consistent white
       default: return null;
     }
   };
@@ -361,9 +367,9 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
         <div className={`w-48 ${isDark ? 'bg-gray-700' : 'bg-white border border-gray-200'} border-2 ${runStatus ? getRunStatusColor() : colorClass} rounded-lg shadow-lg hover:shadow-xl transition-all ${isReadonly && runLogs.length > 0 ? 'cursor-pointer' : ''}`}>
           {/* Header */}
           <div className={`p-3 ${runStatus ? getRunStatusColor() : colorClass} rounded-t-lg flex items-center space-x-2 relative`}>
-            <Icon className="w-5 h-5 text-white" />
-            {SubIcon && <SubIcon className="w-4 h-4 text-white opacity-80" />}
-            <span className="text-white font-medium text-sm flex-1">
+            <Icon className={`w-5 h-5 ${runStatus ? getRunStatusTextColor() : 'text-white'}`} />
+            {SubIcon && <SubIcon className={`w-4 h-4 ${runStatus ? getRunStatusTextColor() : 'text-white'} opacity-80`} />}
+            <span className={`${runStatus ? getRunStatusTextColor() : 'text-white'} font-medium text-sm flex-1`}>
               {node.data?.name || `${node.type.charAt(0).toUpperCase() + node.type.slice(1)}`}
             </span>
             
@@ -386,7 +392,7 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
                   className="p-1 hover:bg-white hover:bg-opacity-20 rounded transition-colors"
                   title="Configure"
                 >
-                  <Settings className="w-3 h-3 text-white" />
+                  <Settings className={`w-3 h-3 ${runStatus ? getRunStatusTextColor() : 'text-white'}`} />
                 </button>
                 <button
                   onClick={(e) => {
@@ -397,7 +403,7 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
                   className="p-1 hover:bg-red-500 hover:bg-opacity-50 rounded transition-colors"
                   title="Delete"
                 >
-                  <Trash2 className="w-3 h-3 text-white" />
+                  <Trash2 className={`w-3 h-3 ${runStatus ? getRunStatusTextColor() : 'text-white'}`} />
                 </button>
               </div>
             )}
@@ -405,7 +411,7 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
             {/* 只读模式下的日志查看提示 */}
             {isReadonly && runLogs.length > 0 && (
               <div className="flex items-center space-x-1">
-                <FileText className="w-3 h-3 text-white opacity-80" />
+                <FileText className={`w-3 h-3 ${runStatus ? getRunStatusTextColor() : 'text-white'} opacity-80`} />
               </div>
             )}
           </div>
@@ -415,7 +421,7 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
           {displayType && (
             <div className="mb-2">
               <span className={`${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Type: </span>
-              <span className={`${isDark ? 'text-blue-400' : 'text-blue-600'} font-medium`}>{displayType}</span>
+              <span className={`${isDark ? 'text-white' : 'text-gray-900'} font-medium`}>{displayType}</span>
             </div>
           )}
           {node.data?.status && (
@@ -432,13 +438,7 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
           {isReadonly && runStatus && (
             <div className="mt-2 text-xs">
               <span className={`${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Status: </span>
-              <span className={`capitalize font-medium ${
-                runStatus === 'success' ? 'text-green-400' :
-                runStatus === 'failed' ? 'text-red-400' :
-                runStatus === 'running' ? 'text-blue-400' :
-                runStatus === 'queued' ? 'text-yellow-400' :
-                'text-gray-400'
-              }`}>
+              <span className={`capitalize font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
                 {runStatus}
               </span>
             </div>

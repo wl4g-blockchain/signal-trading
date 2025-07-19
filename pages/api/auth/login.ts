@@ -20,7 +20,7 @@ export default async function handler(
         id: 'user-github-123',
         name: 'John Developer',
         email: 'john@example.com',
-        avatar: 'https://github.com/johndoe.png',
+        avatar: 'https://avatars.githubusercontent.com/u/172174472?v=4',
         provider: 'github'
       };
 

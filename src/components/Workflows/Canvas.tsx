@@ -256,7 +256,7 @@ export const Canvas: React.FC<CanvasProps> = ({
   }, [scale, panOffset]);
 
   const handleMouseUpWhileConnecting = useCallback(() => {
-    // 延迟清除连接状态，给节点的mouseup事件一些时间来处理
+    // Delay clearing connection state, giving node mouseup events some time to process
     setTimeout(() => {
       setIsConnecting(null);
       setMousePosition(null);
@@ -268,7 +268,7 @@ export const Canvas: React.FC<CanvasProps> = ({
   const handleConnectionEnd = useCallback((targetNodeId: string, inputId: string) => {
     if (!isConnecting) return;
     
-    // 防止连接到自己
+    // Prevent connecting to itself
     if (isConnecting.nodeId === targetNodeId) {
       setIsConnecting(null);
       setMousePosition(null);
@@ -277,7 +277,7 @@ export const Canvas: React.FC<CanvasProps> = ({
       return;
     }
     
-    // 验证连接规则
+    // Validate connection rules
     if (!canConnect(isConnecting.nodeId, targetNodeId)) {
       setIsConnecting(null);
       setMousePosition(null);
@@ -286,7 +286,7 @@ export const Canvas: React.FC<CanvasProps> = ({
       return;
     }
     
-    // 检查是否已经存在连接
+    // Check if connection already exists
     const existingConnection = connections.find(
       conn => conn.source === isConnecting.nodeId && conn.target === targetNodeId
     );
@@ -307,7 +307,7 @@ export const Canvas: React.FC<CanvasProps> = ({
     };
     onConnectionsChange([...connections, newConnection]);
     
-    // 清理连接状态
+    // Clean up connection state
     setIsConnecting(null);
     setMousePosition(null);
     window.removeEventListener('mousemove', handleMouseMoveWhileConnecting);
@@ -391,53 +391,53 @@ export const Canvas: React.FC<CanvasProps> = ({
             const sourceNode = nodes.find(n => n.id === isConnecting.nodeId);
             if (!sourceNode) return null;
             
-            // 智能计算源端口位置
+            // Smart calculation of source port position
             const getNodeDimensions = (nodeType: string) => {
               if (nodeType === 'start' || nodeType === 'end') {
-                return { width: 96, height: 96, centerX: 48, centerY: 48 - 8 }; // 圆形节点，调整8px
+                return { width: 96, height: 96, centerX: 48, centerY: 48 - 8 }; // Circle node, adjust 8px
               } else {
-                return { width: 192, height: 120, centerX: 96, centerY: 60 }; // 矩形节点
+                return { width: 192, height: 120, centerX: 96, centerY: 60 }; // Rectangle node
               }
             };
 
             const sourceDim = getNodeDimensions(sourceNode.type);
             
-            // 计算源节点中心点
+            // Calculate source node center point
             const sourceCenterX = sourceNode.position.x + sourceDim.centerX;
             const sourceCenterY = sourceNode.position.y + sourceDim.centerY;
             
-            // 计算相对于鼠标位置的方向
+            // Calculate direction relative to mouse position
             const deltaX = mousePosition.x - sourceCenterX;
             const deltaY = mousePosition.y - sourceCenterY;
             
             let sourceX, sourceY;
             
             if (Math.abs(deltaX) > Math.abs(deltaY)) {
-              // 水平方向距离更大
+              // Horizontal distance is greater
               if (deltaX > 0) {
-                // 鼠标在右侧，从右边连接
+                // Mouse is on the right side, connect from right
                 sourceX = sourceNode.position.x + sourceDim.width + 6;
                 sourceY = sourceNode.position.y + sourceDim.centerY;
               } else {
-                // 鼠标在左侧，从左边连接
+                // Mouse is on the left side, connect from left
                 sourceX = sourceNode.position.x - 6;
                 sourceY = sourceNode.position.y + sourceDim.centerY;
               }
             } else {
-              // 垂直方向距离更大
+              // Vertical distance is greater
               if (deltaY > 0) {
-                // 鼠标在下方，从下边连接
+                // Mouse is below, connect from bottom
                 sourceX = sourceNode.position.x + sourceDim.centerX;
                 if (sourceNode.type === 'start' || sourceNode.type === 'end') {
-                  sourceY = sourceNode.position.y + 96 + 6; // 圆形节点的实际下边缘 + 端口偏移
+                  sourceY = sourceNode.position.y + 96 + 6; // Actual bottom edge of circle node + port offset
                 } else {
                   sourceY = sourceNode.position.y + sourceDim.height + 6;
                 }
               } else {
-                // 鼠标在上方，从上边连接
+                // Mouse is above, connect from top
                 sourceX = sourceNode.position.x + sourceDim.centerX;
                 if (sourceNode.type === 'start' || sourceNode.type === 'end') {
-                  sourceY = sourceNode.position.y - 6; // 圆形节点的实际上边缘 - 端口偏移
+                  sourceY = sourceNode.position.y - 6; // Actual top edge of circle node - port offset
                 } else {
                   sourceY = sourceNode.position.y - 6;
                 }

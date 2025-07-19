@@ -40,7 +40,7 @@ export const NodeRunLogModal: React.FC<NodeRunLogModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-gray-900 bg-opacity-40 flex items-center justify-center z-50">
       <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-lg w-full max-w-4xl max-h-[80vh] overflow-hidden flex flex-col`}>
         {/* Header */}
         <div className={`px-6 py-4 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'} flex items-center justify-between`}>

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { ComponentNode, Connection, Workflow } from '../../types';
 import { Canvas } from './Canvas';
+import { WorkflowRunCanvas } from './WorkflowRunCanvas';
 import { ComponentPalette } from './ComponentPalette';
 import { WorkflowList } from './WorkflowList';
-import { Play, Pause, Save, Settings, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Radio, Brain, Zap, Database } from 'lucide-react';
+import { Play, Pause, Save, Settings, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Radio, Brain, Zap, Database, X } from 'lucide-react';
 import { serviceManager } from '../../services';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
@@ -60,11 +61,14 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({
     const newRightPanelState = !rightPanelCollapsed;
     setRightPanelCollapsed(newRightPanelState);
     
-    // If right panel is collapsed, auto-collapse left menu
+    // If right panel is collapsed, auto-collapse left menu and workflow list
     if (newRightPanelState) {
       // Notify App component to collapse left menu via custom event
       const event = new CustomEvent('collapse-sidebar', { detail: { collapsed: true } });
       window.dispatchEvent(event);
+      
+      // Also collapse workflow list
+      setShowWorkflowList(false);
     }
   };
 
@@ -104,7 +108,7 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({
 
   // Initialize with start and end nodes
   useEffect(() => {
-    // 只在没有只读模式且没有现有节点时初始化默认节点
+    // Only initialize default nodes when not in read-only mode and no existing nodes
     if (nodes.length === 0 && !readOnlyMode) {
       console.log('🚀 Initializing default start/end nodes');
       
@@ -128,7 +132,7 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({
 
       setNodes([startNode, endNode]);
     }
-  }, [readOnlyMode]); // 添加 readOnlyMode 作为依赖项
+  }, [readOnlyMode]); // Add readOnlyMode as dependency
   
   const addNode = (type: ComponentNode['type']) => {
     if (type === 'start' || type === 'end') return; // Prevent adding multiple start/end nodes
@@ -362,118 +366,127 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({
 
         {/* Canvas */}
         <div className="flex-1">
-          <Canvas
-            nodes={nodes}
-            connections={connections}
-            onNodesChange={setNodes}
-            onConnectionsChange={setConnections}
-            onDeleteNode={(nodeId) => {
-              // Delete node and its related connections
-              setNodes(nodes.filter(n => n.id !== nodeId));
-              setConnections(connections.filter(c => c.source !== nodeId && c.target !== nodeId));
-            }}
-          />
+          {readOnlyMode ? (
+            <WorkflowRunCanvas
+              nodes={nodes}
+              connections={connections}
+            />
+          ) : (
+            <Canvas
+              nodes={nodes}
+              connections={connections}
+              onNodesChange={setNodes}
+              onConnectionsChange={setConnections}
+              onDeleteNode={(nodeId) => {
+                // Delete node and its related connections
+                setNodes(nodes.filter(n => n.id !== nodeId));
+                setConnections(connections.filter(c => c.source !== nodeId && c.target !== nodeId));
+              }}
+            />
+          )}
         </div>
       </div>
 
-      {/* Right Panel - Component Palette */}
-      <div className={`${rightPanelCollapsed ? 'w-12' : 'w-80'} ${isDark ? 'bg-gray-800' : 'bg-gray-50'} border-l ${isDark ? 'border-gray-700' : 'border-gray-200'} transition-all duration-300 relative flex flex-col`}>
-        {/* Right Panel Toggle Button */}
-        <button
-          onClick={handleRightPanelToggle}
-          className={`absolute -left-3 top-6 z-10 ${isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'} rounded-full p-1 border ${isDark ? 'border-gray-600' : 'border-gray-300'} transition-colors`}
-          title={rightPanelCollapsed ? t('common.expand') : t('common.collapse')}
-        >
-          {rightPanelCollapsed ? (
-            <ChevronLeft className={`w-4 h-4 ${isDark ? 'text-gray-300' : 'text-gray-600'}`} />
-          ) : (
-            <ChevronRight className={`w-4 h-4 ${isDark ? 'text-gray-300' : 'text-gray-600'}`} />
-          )}
-        </button>
+      {/* Right Panel - Component Palette (仅在非只读模式下显示) */}
+      {!readOnlyMode && (
+        <div className={`${rightPanelCollapsed ? 'w-12' : 'w-80'} ${isDark ? 'bg-gray-800' : 'bg-gray-50'} border-l ${isDark ? 'border-gray-700' : 'border-gray-200'} transition-all duration-300 relative flex flex-col`}>
+          {/* Right Panel Toggle Button */}
+          <button
+            onClick={handleRightPanelToggle}
+            className={`absolute -left-3 top-6 z-10 ${isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'} rounded-full p-1 border ${isDark ? 'border-gray-600' : 'border-gray-300'} transition-colors`}
+            title={rightPanelCollapsed ? t('common.expand') : t('common.collapse')}
+          >
+            {rightPanelCollapsed ? (
+              <ChevronLeft className={`w-4 h-4 ${isDark ? 'text-gray-300' : 'text-gray-600'}`} />
+            ) : (
+              <ChevronRight className={`w-4 h-4 ${isDark ? 'text-gray-300' : 'text-gray-600'}`} />
+            )}
+          </button>
 
-        {rightPanelCollapsed ? (
-          /* Collapsed Right Panel - Component Icons */
-          <div className="p-2 flex flex-col items-center mt-16">
-            {/* Title */}
-            <div className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'} mb-3 writing-mode-vertical text-center`}>
-              COMs
-            </div>
-            <div className={`w-8 h-px ${isDark ? 'bg-gray-600' : 'bg-gray-300'} mb-3`}></div>
-            
-            {/* Component icons */}
-            <div className="space-y-2">
-              {[
-                { 
-                  type: 'listener', 
-                  icon: 'Radio', 
-                  color: 'bg-blue-600 hover:bg-blue-700', 
-                  title: t('node.listener'),
-                  description: t('workflow.listenerDescription')
-                },
-                { 
-                  type: 'evaluator', 
-                  icon: 'Brain', 
-                  color: 'bg-purple-600 hover:bg-purple-700', 
-                  title: t('node.evaluator'),
-                  description: t('workflow.evaluatorDescription')
-                },
-                { 
-                  type: 'executor', 
-                  icon: 'Zap', 
-                  color: 'bg-green-600 hover:bg-green-700', 
-                  title: t('node.executor'),
-                  description: t('workflow.executorDescription')
-                },
-                { 
-                  type: 'cex-executor', 
-                  icon: 'Zap', 
-                  color: 'bg-blue-600 hover:bg-blue-700', 
-                  title: t('node.cexExecutor'),
-                  description: t('workflow.cexExecutorDescription')
-                },
-                { 
-                  type: 'collector', 
-                  icon: 'Database', 
-                  color: 'bg-orange-600 hover:bg-orange-700', 
-                  title: t('node.collector'),
-                  description: t('workflow.collectorDescription')
-                },
-              ].map((component) => {
-                const IconComponent = component.icon === 'Radio' ? Radio : 
-                                    component.icon === 'Brain' ? Brain :
-                                    component.icon === 'Zap' ? Zap : Database;
-                return (
-                  <div key={component.type} className="group relative">
-                    <button
-                      onClick={() => !readOnlyMode && addNode(component.type as ComponentNode['type'])}
-                      disabled={!!readOnlyMode}
-                      className={`w-8 h-8 ${readOnlyMode ? 'bg-gray-500 cursor-not-allowed' : component.color} rounded-lg flex items-center justify-center transition-all duration-150 shadow-sm hover:shadow-lg hover:scale-110 active:scale-95 ${readOnlyMode ? 'opacity-50' : ''}`}
-                      title={readOnlyMode ? t('workflow.readOnlyMode') : `${component.title} - ${component.description}`}
-                    >
-                      <IconComponent className="w-4 h-4 text-white" />
-                    </button>
-                    {/* Enhanced Tooltip */}
-                    <div className={`absolute left-full ml-3 px-3 py-2 rounded-lg text-xs z-50 opacity-0 group-hover:opacity-100 transition-all duration-150 delay-100 pointer-events-none ${isDark ? 'bg-gray-900 text-white border border-gray-600' : 'bg-white text-gray-800 border border-gray-300'} shadow-xl min-w-[160px]`}>
-                      <div className="font-semibold text-xs mb-1">{component.title}</div>
-                      <div className={`text-xs leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-                        {component.description}
+          {rightPanelCollapsed ? (
+            /* Collapsed Right Panel - Component Icons */
+            <div className="p-2 flex flex-col items-center mt-16">
+              {/* Title */}
+              <div className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'} mb-3 writing-mode-vertical text-center`}>
+                COMs
+              </div>
+              <div className={`w-8 h-px ${isDark ? 'bg-gray-600' : 'bg-gray-300'} mb-3`}></div>
+              
+              {/* Component icons */}
+              <div className="space-y-2">
+                {[
+                  { 
+                    type: 'listener', 
+                    icon: 'Radio', 
+                    color: 'bg-blue-600 hover:bg-blue-700', 
+                    title: t('node.listener'),
+                    description: t('workflow.listenerDescription')
+                  },
+                  { 
+                    type: 'evaluator', 
+                    icon: 'Brain', 
+                    color: 'bg-purple-600 hover:bg-purple-700', 
+                    title: t('node.evaluator'),
+                    description: t('workflow.evaluatorDescription')
+                  },
+                  { 
+                    type: 'executor', 
+                    icon: 'Zap', 
+                    color: 'bg-green-600 hover:bg-green-700', 
+                    title: t('node.executor'),
+                    description: t('workflow.executorDescription')
+                  },
+                  { 
+                    type: 'cex-executor', 
+                    icon: 'Zap', 
+                    color: 'bg-blue-600 hover:bg-blue-700', 
+                    title: t('node.cexExecutor'),
+                    description: t('workflow.cexExecutorDescription')
+                  },
+                  { 
+                    type: 'collector', 
+                    icon: 'Database', 
+                    color: 'bg-orange-600 hover:bg-orange-700', 
+                    title: t('node.collector'),
+                    description: t('workflow.collectorDescription')
+                  },
+                ].map((component) => {
+                  const IconComponent = component.icon === 'Radio' ? Radio : 
+                                      component.icon === 'Brain' ? Brain :
+                                      component.icon === 'Zap' ? Zap : Database;
+                  return (
+                    <div key={component.type} className="group relative">
+                      <button
+                        onClick={() => !readOnlyMode && addNode(component.type as ComponentNode['type'])}
+                        disabled={!!readOnlyMode}
+                        className={`w-8 h-8 ${readOnlyMode ? 'bg-gray-500 cursor-not-allowed' : component.color} rounded-lg flex items-center justify-center transition-all duration-150 shadow-sm hover:shadow-lg hover:scale-110 active:scale-95 ${readOnlyMode ? 'opacity-50' : ''}`}
+                        title={readOnlyMode ? t('workflow.readOnlyMode') : `${component.title} - ${component.description}`}
+                      >
+                        <IconComponent className="w-4 h-4 text-white" />
+                      </button>
+                      {/* Enhanced Tooltip */}
+                      <div className={`absolute left-full ml-3 px-3 py-2 rounded-lg text-xs z-50 opacity-0 group-hover:opacity-100 transition-all duration-150 delay-100 pointer-events-none ${isDark ? 'bg-gray-900 text-white border border-gray-600' : 'bg-white text-gray-800 border border-gray-300'} shadow-xl min-w-[160px]`}>
+                        <div className="font-semibold text-xs mb-1">{component.title}</div>
+                        <div className={`text-xs leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                          {component.description}
+                        </div>
+                        {/* Arrow pointer */}
+                        <div className={`absolute right-full top-3 w-0 h-0 border-t-4 border-b-4 border-r-4 ${isDark ? 'border-r-gray-900' : 'border-r-white'} border-t-transparent border-b-transparent`}></div>
                       </div>
-                      {/* Arrow pointer */}
-                      <div className={`absolute right-full top-3 w-0 h-0 border-t-4 border-b-4 border-r-4 ${isDark ? 'border-r-gray-900' : 'border-r-white'} border-t-transparent border-b-transparent`}></div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        ) : (
-          /* Expanded Right Panel - Component Palette */
-          <ComponentPalette onAddNode={readOnlyMode ? () => {} : addNode} />
-        )}
-      </div>
+          ) : (
+            /* Expanded Right Panel - Component Palette */
+            <ComponentPalette onAddNode={readOnlyMode ? () => {} : addNode} />
+          )}
+        </div>
+      )}
 
       {/* Workflow List Panel - Absolute positioned at bottom */}
-      <div className={`absolute bottom-0 left-0 ${rightPanelCollapsed ? 'right-12' : 'right-80'} z-10 transition-all duration-300`}>
+      <div className={`absolute bottom-0 left-0 ${readOnlyMode ? 'right-0' : (rightPanelCollapsed ? 'right-12' : 'right-80')} z-10 transition-all duration-300`}>
         {/* Toggle Button - Always Visible */}
         <div className={`flex items-center justify-center py-2 ${isDark ? 'bg-gray-800 border-gray-700 hover:bg-gray-700' : 'bg-white border-gray-200 hover:bg-gray-50'} border-t cursor-pointer transition-colors`}
              onClick={() => setShowWorkflowList(!showWorkflowList)}>

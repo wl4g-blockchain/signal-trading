@@ -11,23 +11,21 @@ interface ComponentPaletteProps {
 export const ComponentPalette: React.FC<ComponentPaletteProps> = ({ onAddNode }) => {
   const { isDark } = useTheme();
   const { t } = useTranslation();
-  const [isCompact, setIsCompact] = useState(false);
+  const [isCompactMode, setIsCompactMode] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   
-  // 检测容器宽度
+  // Detect container width
   useEffect(() => {
-    const observer = new ResizeObserver((entries) => {
-      const entry = entries[0];
-      if (entry) {
-        setIsCompact(entry.contentRect.width < 200);
+    const updateCompactMode = () => {
+      if (containerRef.current) {
+        const width = containerRef.current.offsetWidth;
+        setIsCompactMode(width < 300);
       }
-    });
-    
-    if (containerRef.current) {
-      observer.observe(containerRef.current);
-    }
-    
-    return () => observer.disconnect();
+    };
+
+    updateCompactMode();
+    window.addEventListener('resize', updateCompactMode);
+    return () => window.removeEventListener('resize', updateCompactMode);
   }, []);
   
   const components = [
@@ -76,7 +74,7 @@ export const ComponentPalette: React.FC<ComponentPaletteProps> = ({ onAddNode })
   return (
     <div ref={containerRef} className="flex-1 p-4 overflow-y-auto">
       <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>
-        {isCompact ? t('workflow.components') : t('workflow.componentPalette')}
+        {isCompactMode ? t('workflow.components') : t('workflow.componentPalette')}
       </h3>
       
       <div className="space-y-4">
@@ -85,11 +83,11 @@ export const ComponentPalette: React.FC<ComponentPaletteProps> = ({ onAddNode })
           return (
             <div 
               key={component.type} 
-              className={`${isDark ? 'bg-gray-700' : 'bg-white border border-gray-200'} rounded-lg ${isCompact ? 'p-2' : 'p-4'} group relative`}
-              title={isCompact ? `${component.title}: ${component.description}` : ''}
+              className={`${isDark ? 'bg-gray-700' : 'bg-white border border-gray-200'} rounded-lg ${isCompactMode ? 'p-2' : 'p-4'} group relative`}
+              title={isCompactMode ? `${component.title}: ${component.description}` : ''}
             >
-              {isCompact ? (
-                // 紧凑模式
+              {isCompactMode ? (
+                // Compact mode
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <Icon className={`w-4 h-4 ${isDark ? 'text-gray-300' : 'text-gray-600'}`} />
@@ -106,7 +104,7 @@ export const ComponentPalette: React.FC<ComponentPaletteProps> = ({ onAddNode })
                   </button>
                 </div>
               ) : (
-                // 完整模式
+                // Full mode
                 <>
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center space-x-2">
@@ -135,8 +133,8 @@ export const ComponentPalette: React.FC<ComponentPaletteProps> = ({ onAddNode })
                 </>
               )}
               
-              {/* Hover 提示框（仅在紧凑模式显示）*/}
-              {isCompact && (
+              {/* Hover tooltip (only in compact mode)*/}
+              {isCompactMode && (
                 <div className={`absolute left-full top-0 ml-2 w-64 ${isDark ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'} border rounded-lg p-3 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-75 z-10`}>
                   <div className="flex items-center space-x-2 mb-2">
                     <Icon className={`w-4 h-4 ${isDark ? 'text-gray-300' : 'text-gray-600'}`} />
@@ -162,7 +160,7 @@ export const ComponentPalette: React.FC<ComponentPaletteProps> = ({ onAddNode })
 
       <div className={`mt-6 p-4 ${isDark ? 'bg-gray-700' : 'bg-white border border-gray-200'} rounded-lg`}>
         <h4 className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'} mb-2`}>{t('workflow.connectionRules')}</h4>
-        {!isCompact && (
+        {!isCompactMode && (
           <div className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'} space-y-1`}>
             <p>• {t('node.start')} → {t('node.listener')}</p>
             <p>• {t('node.listener')} → {t('node.evaluator')}</p>

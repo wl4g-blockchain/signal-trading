@@ -25,7 +25,7 @@ export default async function handler(
       id: decoded.userId,
       name: 'John Developer',
       email: decoded.email,
-      avatar: 'https://github.com/johndoe.png',
+      avatar: 'https://avatars.githubusercontent.com/u/172174472?v=4',
       provider: 'github'
     };
 

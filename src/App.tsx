@@ -46,6 +46,16 @@ function App() {
     };
   }, []);
 
+  // Handle view changes and clear read-only mode when user actively navigates to workflows
+  const handleViewChange = (view: string) => {
+    // If user clicks workflows menu, clear read-only mode to allow normal workflow design
+    if (view === 'workflow' && workflowReadOnlyMode) {
+      setWorkflowReadOnlyMode(null);
+      setReadOnlyWorkflow(null);
+    }
+    setCurrentView(view);
+  };
+
   const handleLogin = (userData: User) => {
     setUser(userData);
   };
@@ -88,7 +98,7 @@ function App() {
       
       setReadOnlyWorkflow(workflowWithRunStates);
       setWorkflowReadOnlyMode({ workflowId, tradeId: runId });
-      setCurrentView('workflow');
+      // Don't change currentView, keep user's current menu selection state
     } catch (error) {
       console.error('❌ Failed to load workflow run:', error);
     } finally {
@@ -99,11 +109,29 @@ function App() {
   const handleExitReadOnlyMode = () => {
     setWorkflowReadOnlyMode(null);
     setReadOnlyWorkflow(null);
-    // 返回到Dashboard页面，因为通常是从Dashboard的trade详情进入只读模式
-    setCurrentView('monitor');
+    // Don't change currentView, let user return to previous page
   };
 
   const renderCurrentView = () => {
+    // If there's a read-only workflow, prioritize showing WorkflowPage
+    if (workflowReadOnlyMode && readOnlyWorkflow) {
+      if (loadingReadOnlyWorkflow) {
+        return (
+          <div className="flex items-center justify-center h-full">
+            <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        );
+      }
+      return (
+        <WorkflowPage 
+          readOnlyMode={workflowReadOnlyMode} 
+          readOnlyWorkflow={readOnlyWorkflow}
+          onExitReadOnlyMode={handleExitReadOnlyMode} 
+        />
+      );
+    }
+
+    // Normal view rendering logic
     switch (currentView) {
       case 'monitor':
         return (
@@ -113,18 +141,11 @@ function App() {
           />
         );
       case 'workflow':
-        if (loadingReadOnlyWorkflow) {
-          return (
-            <div className="flex items-center justify-center h-full">
-              <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-            </div>
-          );
-        }
         return (
           <WorkflowPage 
-            readOnlyMode={workflowReadOnlyMode} 
-            readOnlyWorkflow={readOnlyWorkflow}
-            onExitReadOnlyMode={handleExitReadOnlyMode} 
+            readOnlyMode={null} 
+            readOnlyWorkflow={null}
+            onExitReadOnlyMode={undefined} 
           />
         );
       case 'settings':
@@ -154,11 +175,12 @@ function App() {
   return (
     <Layout 
       currentView={currentView} 
-      onViewChange={setCurrentView}
+      onViewChange={handleViewChange}
       user={user}
       onLogout={handleLogout}
       sidebarCollapsed={sidebarCollapsed}
       onSidebarCollapsedChange={setSidebarCollapsed}
+      onNavigateToWorkflowRun={handleNavigateToWorkflowRun}
     >
       {renderCurrentView()}
     </Layout>
