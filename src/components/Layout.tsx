@@ -216,7 +216,7 @@ export const Layout: React.FC<LayoutProps> = ({
                       
                       {/* Service Mode Toggle */}
                       <div className="flex items-center justify-between mb-2">
-                        <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{t('settings.serviceMode', 'Service Mode')}</span>
+                        <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Service Mode</span>
                         <div className="flex items-center space-x-1">
                           {(['MOCK', 'API'] as const).map((serviceOption) => (
                             <button
@@ -292,7 +292,7 @@ export const Layout: React.FC<LayoutProps> = ({
           </div>
         </div>
         {/* Content */}
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-y-auto">
         {children}
         </div>
       </div>

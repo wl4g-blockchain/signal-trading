@@ -15,7 +15,8 @@
     "expand": "Expand Menu",
     "collapse": "Collapse Menu",
     "untitled": "Untitled",
-    "reset": "Reset"
+    "reset": "Reset",
+    "total": "Total"
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -46,12 +47,7 @@
   },
   "workflow": {
     "title": "Workflows",
-    "untitledWorkflow": "Untitled Workflow",
-    "create": "Create Workflow",
-    "edit": "Edit Workflow",
     "run": "Run",
-    "pause": "Pause",
-    "stop": "Stop",
     "status": "Status",
     "draft": "Draft",
     "running": "Running",
@@ -92,18 +88,13 @@
   },
   "settings": {
     "title": "Settings",
-    "general": "General",
     "appearance": "Appearance",
     "language": "Language",
     "theme": "Theme",
-    "wallet": "Wallet",
-    "connect": "Connect Wallet",
-    "disconnect": "Disconnect Wallet",
     "trading": "Trading",
     "exchanges": "Exchanges",
     "security": "Security",
-    "notifications": "Notifications",
-    "serviceMode": "Service Mode"
+    "notifications": "Notifications"
   },
   "nodeConfig": {
     "systemPrompt": "System Prompt",
@@ -127,5 +118,31 @@
   },
   "nodeRunLog": {
     "noLogs": "No logs available for this node execution."
+  },
+  "dashboard": {
+    "title": "Live Trading Monitor",
+    "totalProfit": "Total Profit",
+    "todayProfit": "Today's Profit",
+    "successRate": "Success Rate",
+    "activeTrades": "Active Trades",
+    "profitTimeline": "Profit Timeline",
+    "tradePerformance": "Trade Performance",
+    "recentTrades": "Recent Trades",
+    "time": "Time",
+    "strategy": "Strategy",
+    "pair": "Pair",
+    "amount": "Amount",
+    "profit": "Profit",
+    "status": "Status",
+    "balance": {
+      "dexBalance": "DEX Balance",
+      "cexBalance": "CEX Balance",
+      "ethereum": "Ethereum",
+      "polygon": "Polygon",
+      "bsc": "BSC",
+      "binance": "Binance",
+      "okx": "OKX",
+      "coinbase": "Coinbase"
+    }
   }
 } 

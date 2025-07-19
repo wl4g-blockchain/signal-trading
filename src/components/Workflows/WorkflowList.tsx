@@ -133,29 +133,30 @@ export const WorkflowList: React.FC<WorkflowListProps> = ({ onLoadWorkflow }) =>
                           <div className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                             {t('workflow.created')}: {workflow.createdAt.toLocaleDateString()}
                           </div>
-                          {/* 运行状态统计 */}
-                          <div className="flex items-center space-x-3">
-                            <div className="flex items-center space-x-1">
-                              <span className="w-2 h-2 bg-green-400 rounded-full"></span>
-                              <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>12</span>
-                            </div>
-                            <div className="flex items-center space-x-1">
-                              <span className="w-2 h-2 bg-red-400 rounded-full"></span>
-                              <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>2</span>
-                            </div>
-                            <div className="flex items-center space-x-1">
-                              <span className="w-2 h-2 bg-yellow-400 rounded-full"></span>
-                              <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>1</span>
-                            </div>
-                            <div className="flex items-center space-x-1">
-                              <span className="w-2 h-2 bg-blue-400 rounded-full"></span>
-                              <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>0</span>
-                            </div>
-                          </div>
                         </div>
                       </div>
                       
-                      <div className="flex items-center space-x-1 ml-3 flex-shrink-0">
+                      {/* 运行状态统计 - 与按钮垂直对齐 */}
+                      <div className="flex items-center space-x-3 mr-3">
+                        <div className="flex items-center space-x-1" title="Success">
+                          <span className="w-2 h-2 bg-green-400 rounded-full"></span>
+                          <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>12</span>
+                        </div>
+                        <div className="flex items-center space-x-1" title="Failed">
+                          <span className="w-2 h-2 bg-red-400 rounded-full"></span>
+                          <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>2</span>
+                        </div>
+                        <div className="flex items-center space-x-1" title="Running">
+                          <span className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></span>
+                          <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>1</span>
+                        </div>
+                        <div className="flex items-center space-x-1" title="Queued">
+                          <span className="w-2 h-2 bg-yellow-400 rounded-full"></span>
+                          <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>0</span>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center space-x-1 flex-shrink-0">
                         <button
                           onClick={() => handleRedesign(workflow.id)}
                           className="flex items-center space-x-1 px-2 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-xs transition-colors"

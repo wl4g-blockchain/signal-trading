@@ -15,7 +15,8 @@
     "expand": "展开菜单",
     "collapse": "收起菜单",
     "untitled": "未命名",
-    "reset": "重置"
+    "reset": "重置",
+    "total": "总计"
   },
   "navigation": {
     "dashboard": "仪表盘",
@@ -46,12 +47,7 @@
   },
   "workflow": {
     "title": "工作流管理",
-    "untitledWorkflow": "未命名工作流",
-    "create": "创建工作流",
-    "edit": "编辑工作流",
     "run": "运行",
-    "pause": "暂停",
-    "stop": "停止",
     "status": "状态",
     "draft": "草稿",
     "running": "运行中",
@@ -92,18 +88,13 @@
   },
   "settings": {
     "title": "设置",
-    "general": "通用",
     "appearance": "外观",
     "language": "语言",
     "theme": "主题",
-    "wallet": "钱包",
-    "connect": "连接钱包",
-    "disconnect": "断开钱包",
     "trading": "交易",
     "exchanges": "交易所",
     "security": "安全",
-    "notifications": "通知",
-    "serviceMode": "服务模式"
+    "notifications": "通知"
   },
   "nodeConfig": {
     "systemPrompt": "系统提示词",
@@ -127,5 +118,31 @@
   },
   "nodeRunLog": {
     "noLogs": "此节点执行无可用日志。"
+  },
+  "dashboard": {
+    "title": "实时交易监控",
+    "totalProfit": "总收益",
+    "todayProfit": "今日收益",
+    "successRate": "成功率",
+    "activeTrades": "活跃交易",
+    "profitTimeline": "收益时间线",
+    "tradePerformance": "交易表现",
+    "recentTrades": "近期交易",
+    "time": "时间",
+    "strategy": "策略",
+    "pair": "交易对",
+    "amount": "金额",
+    "profit": "收益",
+    "status": "状态",
+    "balance": {
+      "dexBalance": "DEX 余额",
+      "cexBalance": "CEX 余额",
+      "ethereum": "以太坊",
+      "polygon": "Polygon", 
+      "bsc": "BSC",
+      "binance": "币安",
+      "okx": "OKX",
+      "coinbase": "Coinbase"
+    }
   }
 } 
