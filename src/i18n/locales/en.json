@@ -76,7 +76,10 @@
     "noRunHistory": "No run history",
     "hoverNodeTip": "Hover over nodes to see delete/config buttons",
     "rightClickDragTip": "Right-click + drag to pan canvas",
-    "mouseWheelZoomTip": "Mouse wheel to zoom in/out"
+    "mouseWheelZoomTip": "Mouse wheel to zoom in/out",
+    "redesign": "Redesign", 
+    "viewDetails": "View Details",
+    "details": "Details"
   },
   "node": {
     "start": "Start",
@@ -99,6 +102,30 @@
     "trading": "Trading",
     "exchanges": "Exchanges",
     "security": "Security",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "serviceMode": "Service Mode"
+  },
+  "nodeConfig": {
+    "systemPrompt": "System Prompt",
+    "assistantPrompt": "Assistant Prompt",
+    "vaultContractAddress": "Vault Contract Address",
+    "gasPriceStrategy": "Gas Price Strategy",
+    "gasPriceImplementation": "Gas Price Strategy Implementation:",
+    "gasStrategySlow": "Slow (Low Gas) - ~5-15 minutes",
+    "gasStrategyStandard": "Standard - ~1-3 minutes",
+    "gasStrategyFast": "Fast (High Gas) - ~30-60 seconds",
+    "gasStrategyCustom": "Custom Gas Price",
+    "gasStrategyDescription": "Gas strategy affects transaction confirmation time and cost",
+    "autoConfigured": "Auto-configured for selected chain",
+    "defaultSystemPrompt": "You are a professional trading analyst. Analyze the provided market data and provide trading recommendations.",
+    "defaultAssistantPrompt": "Based on the market data, I will provide a clear BUY, SELL, or HOLD recommendation with confidence score and reasoning.",
+    "slow": "Slow",
+    "standard": "Standard", 
+    "fast": "Fast",
+    "custom": "Custom",
+    "usageInTx": "Usage in tx.send()"
+  },
+  "nodeRunLog": {
+    "noLogs": "No logs available for this node execution."
   }
 } 

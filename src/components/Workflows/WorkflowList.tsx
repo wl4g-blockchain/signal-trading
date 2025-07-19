@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Workflow, WorkflowRun } from '../../types';
 import { serviceManager } from '../../services';
-import { Play, History, ArrowLeft, Calendar, DollarSign } from 'lucide-react';
+import { Play, History, ArrowLeft, Calendar, DollarSign, FileText } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
 
@@ -57,6 +57,29 @@ export const WorkflowList: React.FC<WorkflowListProps> = ({ onLoadWorkflow }) =>
     }
   };
 
+  const handleViewRunDetails = async (runId: string) => {
+    try {
+      const run = await serviceManager.getService().getWorkflowRun(runId);
+      const workflow = await serviceManager.getService().getWorkflow(run.workflowId);
+      // Create a read-only version of the workflow with run states
+      const workflowWithRunStates = {
+        ...workflow,
+        nodes: workflow.nodes.map(node => ({
+          ...node,
+          data: {
+            ...node.data,
+            runStatus: run.nodeStates[node.id]?.status || 'skipped',
+            runLogs: run.nodeStates[node.id]?.logs || [],
+            readonly: true
+          }
+        }))
+      };
+      onLoadWorkflow(workflowWithRunStates);
+    } catch (error) {
+      console.error('Failed to load workflow run details:', error);
+    }
+  };
+
   const getStatusColor = (state: string) => {
     switch (state) {
       case 'success': return 'text-green-400';
@@ -106,8 +129,29 @@ export const WorkflowList: React.FC<WorkflowListProps> = ({ onLoadWorkflow }) =>
                             {workflow.status}
                           </span>
                         </div>
-                        <div className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'} mt-1`}>
-                          {t('workflow.created')}: {workflow.createdAt.toLocaleDateString()}
+                        <div className="flex items-center justify-between mt-1">
+                          <div className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                            {t('workflow.created')}: {workflow.createdAt.toLocaleDateString()}
+                          </div>
+                          {/* 运行状态统计 */}
+                          <div className="flex items-center space-x-3">
+                            <div className="flex items-center space-x-1">
+                              <span className="w-2 h-2 bg-green-400 rounded-full"></span>
+                              <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>12</span>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              <span className="w-2 h-2 bg-red-400 rounded-full"></span>
+                              <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>2</span>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              <span className="w-2 h-2 bg-yellow-400 rounded-full"></span>
+                              <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>1</span>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              <span className="w-2 h-2 bg-blue-400 rounded-full"></span>
+                              <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>0</span>
+                            </div>
+                          </div>
                         </div>
                       </div>
                       
@@ -115,9 +159,10 @@ export const WorkflowList: React.FC<WorkflowListProps> = ({ onLoadWorkflow }) =>
                         <button
                           onClick={() => handleRedesign(workflow.id)}
                           className="flex items-center space-x-1 px-2 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-xs transition-colors"
+                          title={t('workflow.redesign', '重新设计')}
                         >
                           <Play className="w-3 h-3" />
-                          <span>Design</span>
+                          <span>{t('workflow.design')}</span>
                         </button>
                         
                         <span className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>|</span>
@@ -125,9 +170,10 @@ export const WorkflowList: React.FC<WorkflowListProps> = ({ onLoadWorkflow }) =>
                         <button
                           onClick={() => loadWorkflowRuns(workflow.id)}
                           className={`flex items-center space-x-1 px-2 py-1 ${isDark ? 'bg-gray-600 hover:bg-gray-500 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'} rounded text-xs transition-colors`}
+                          title={t('workflow.runHistory', '运行记录')}
                         >
                           <History className="w-3 h-3" />
-                          <span>Runs</span>
+                          <span>{t('workflow.runs')}</span>
                         </button>
                       </div>
                     </div>
@@ -192,6 +238,16 @@ export const WorkflowList: React.FC<WorkflowListProps> = ({ onLoadWorkflow }) =>
                           
                           <span className="capitalize text-xs">{run.runType}</span>
                         </div>
+                      </div>
+                      
+                      <div className="flex items-center space-x-1 ml-2 flex-shrink-0">
+                        <button
+                          onClick={() => handleViewRunDetails(run.id)}
+                          className={`px-2 py-1 ${isDark ? 'bg-gray-600 hover:bg-gray-500 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'} rounded text-xs transition-colors`}
+                          title={t('workflow.viewDetails', '查看详情')}
+                        >
+                          {t('workflow.details', '详情')}
+                        </button>
                       </div>
                     </div>
                   </div>

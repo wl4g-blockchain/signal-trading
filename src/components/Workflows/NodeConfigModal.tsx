@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ComponentNode } from '../../types';
 import { X, Save } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
+import { useTranslation } from 'react-i18next';
 
 interface NodeConfigModalProps {
   node: ComponentNode;
@@ -15,6 +16,7 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
   onClose,
 }) => {
   const { isDark } = useTheme();
+  const { t } = useTranslation();
   // Unified function to get vault address by chain
   const getVaultAddress = (chain: string, customVaultAddress?: string) => {
     switch (chain) {
@@ -375,24 +377,24 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            System Prompt
+          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
+            {t('nodeConfig.systemPrompt', 'System Prompt')}
           </label>
           <textarea
-            value={config.systemPrompt || 'You are a professional trading analyst. Analyze the provided market data and provide trading recommendations.'}
+            value={config.systemPrompt || t('nodeConfig.defaultSystemPrompt', 'You are a professional trading analyst. Analyze the provided market data and provide trading recommendations.')}
             onChange={(e) => setConfig({ ...config, systemPrompt: e.target.value })}
-            className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+            className={`w-full ${isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'} px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
             rows={4}
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Assistant Prompt
+          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
+            {t('nodeConfig.assistantPrompt', 'Assistant Prompt')}
           </label>
           <textarea
-            value={config.assistantPrompt || 'Based on the market data, I will provide a clear BUY, SELL, or HOLD recommendation with confidence score and reasoning.'}
+            value={config.assistantPrompt || t('nodeConfig.defaultAssistantPrompt', 'Based on the market data, I will provide a clear BUY, SELL, or HOLD recommendation with confidence score and reasoning.')}
             onChange={(e) => setConfig({ ...config, assistantPrompt: e.target.value })}
-            className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+            className={`w-full ${isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'} px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
             rows={3}
           />
         </div>
@@ -572,17 +574,17 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
         )}
         
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Vault Contract Address
+          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
+            {t('nodeConfig.vaultContractAddress', 'Vault Contract Address')}
           </label>
           <input
             type="text"
             value={currentVaultAddress}
             readOnly
-            className="w-full bg-gray-600 text-gray-300 px-3 py-2 rounded border border-gray-600 cursor-not-allowed"
+            className={`w-full ${isDark ? 'bg-gray-600 text-gray-300 border-gray-600' : 'bg-gray-100 text-gray-600 border-gray-300'} px-3 py-2 rounded border cursor-not-allowed`}
           />
-          <div className="text-xs text-gray-400 mt-1">
-            Auto-configured for selected chain
+          <div className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'} mt-1`}>
+            {t('nodeConfig.autoConfigured', 'Auto-configured for selected chain')}
           </div>
         </div>
 
@@ -790,21 +792,21 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Gas Price Strategy
+          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
+            {t('nodeConfig.gasPriceStrategy', 'Gas Price Strategy')}
           </label>
           <select
             value={config.gasStrategy || 'standard'}
             onChange={(e) => setConfig({ ...config, gasStrategy: e.target.value })}
-            className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+            className={`w-full ${isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'} px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
           >
-            <option value="slow">Slow (Low Gas) - ~5-15 minutes</option>
-            <option value="standard">Standard - ~1-3 minutes</option>
-            <option value="fast">Fast (High Gas) - ~30-60 seconds</option>
-            <option value="custom">Custom Gas Price</option>
+            <option value="slow">{t('nodeConfig.gasStrategySlow', 'Slow (Low Gas) - ~5-15 minutes')}</option>
+            <option value="standard">{t('nodeConfig.gasStrategyStandard', 'Standard - ~1-3 minutes')}</option>
+            <option value="fast">{t('nodeConfig.gasStrategyFast', 'Fast (High Gas) - ~30-60 seconds')}</option>
+            <option value="custom">{t('nodeConfig.gasStrategyCustom', 'Custom Gas Price')}</option>
           </select>
-          <div className="text-xs text-gray-400 mt-1">
-            Gas strategy affects transaction confirmation time and cost
+          <div className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'} mt-1`}>
+            {t('nodeConfig.gasStrategyDescription', 'Gas strategy affects transaction confirmation time and cost')}
           </div>
         </div>
 
@@ -823,19 +825,19 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
           </div>
         )}
 
-        <div className="bg-blue-600 bg-opacity-20 rounded-lg p-3 mb-4">
+        <div className={`${isDark ? 'bg-blue-600 bg-opacity-20' : 'bg-blue-50 border border-blue-200'} rounded-lg p-3 mb-4`}>
           <div className="flex items-start space-x-2">
             <div className="w-4 h-4 bg-blue-400 rounded-full flex-shrink-0 mt-0.5"></div>
-            <div className="text-sm text-blue-200">
-              <div className="font-medium mb-2">Gas Price Strategy Implementation:</div>
+            <div className={`text-sm ${isDark ? 'text-blue-200' : 'text-blue-800'}`}>
+              <div className="font-medium mb-2">{t('nodeConfig.gasPriceImplementation', 'Gas Price Strategy Implementation:')}</div>
               <div className="space-y-1 text-xs">
-                <div><strong>Slow:</strong> gasPrice = network.baseGasPrice * 0.8</div>
-                <div><strong>Standard:</strong> gasPrice = network.baseGasPrice * 1.0</div>
-                <div><strong>Fast:</strong> gasPrice = network.baseGasPrice * 1.5</div>
-                <div><strong>Custom:</strong> gasPrice = config.customGasPrice (in Gwei)</div>
+                <div><strong>{t('nodeConfig.slow', 'Slow')}:</strong> gasPrice = network.baseGasPrice * 0.8</div>
+                <div><strong>{t('nodeConfig.standard', 'Standard')}:</strong> gasPrice = network.baseGasPrice * 1.0</div>
+                <div><strong>{t('nodeConfig.fast', 'Fast')}:</strong> gasPrice = network.baseGasPrice * 1.5</div>
+                <div><strong>{t('nodeConfig.custom', 'Custom')}:</strong> gasPrice = config.customGasPrice (in Gwei)</div>
               </div>
               <div className="mt-2 text-xs">
-                <strong>Usage in tx.send():</strong> transaction.gasPrice = calculateGasPrice(strategy)
+                <strong>{t('nodeConfig.usageInTx', 'Usage in tx.send()')}:</strong> transaction.gasPrice = calculateGasPrice(strategy)
               </div>
             </div>
           </div>

@@ -76,7 +76,10 @@
     "noRunHistory": "暂无运行记录",
     "hoverNodeTip": "悬停节点查看删除/配置按钮",
     "rightClickDragTip": "右键+拖拽平移画布",
-    "mouseWheelZoomTip": "鼠标滚轮缩放"
+    "mouseWheelZoomTip": "鼠标滚轮缩放",
+    "redesign": "重新设计",
+    "viewDetails": "查看详情",
+    "details": "详情"
   },
   "node": {
     "start": "开始",
@@ -99,6 +102,30 @@
     "trading": "交易",
     "exchanges": "交易所",
     "security": "安全",
-    "notifications": "通知"
+    "notifications": "通知",
+    "serviceMode": "服务模式"
+  },
+  "nodeConfig": {
+    "systemPrompt": "系统提示词",
+    "assistantPrompt": "助手提示词",
+    "vaultContractAddress": "金库合约地址",
+    "gasPriceStrategy": "Gas价格策略",
+    "gasPriceImplementation": "Gas价格策略实现：",
+    "gasStrategySlow": "慢速（低Gas）- ~5-15分钟",
+    "gasStrategyStandard": "标准 - ~1-3分钟",
+    "gasStrategyFast": "快速（高Gas）- ~30-60秒",
+    "gasStrategyCustom": "自定义Gas价格",
+    "gasStrategyDescription": "Gas策略影响交易确认时间和成本",
+    "autoConfigured": "已自动配置为选中的链",
+    "defaultSystemPrompt": "您是一位专业的交易分析师。分析提供的市场数据并提供交易建议。",
+    "defaultAssistantPrompt": "基于市场数据，我将提供明确的买入、卖出或持有建议，包含置信度分数和推理。",
+    "slow": "慢速",
+    "standard": "标准",
+    "fast": "快速", 
+    "custom": "自定义",
+    "usageInTx": "在tx.send()中的使用"
+  },
+  "nodeRunLog": {
+    "noLogs": "此节点执行无可用日志。"
   }
 } 

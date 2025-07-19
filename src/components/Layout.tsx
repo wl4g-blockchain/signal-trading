@@ -5,6 +5,7 @@ import { User as UserType } from '../types';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { SigTradingIcon } from './SigTradingIcon';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -87,15 +88,16 @@ export const Layout: React.FC<LayoutProps> = ({
 
         <div className="p-6">
           {!sidebarCollapsed ? (
-            <>
-              <h1 className="text-xl font-bold text-blue-400">Signal Trading</h1>
-              <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'} mt-1`}>AI Trading</p>
-            </>
-          ) : (
-            <div className="flex justify-center">
-              <div className="w-14 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shadow-lg" title="Signal Trading">
-                <span className="text-white font-bold text-base tracking-tight">ST</span>
+            <div className="flex items-center space-x-3">
+              <SigTradingIcon size="large" />
+              <div>
+                <h1 className="text-xl font-bold text-blue-400">SigTrading</h1>
+                <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'} mt-1`}>Focus on AI Trading</p>
               </div>
+            </div>
+          ) : (
+            <div className="flex justify-center" title="SigTrading">
+              <SigTradingIcon size="small" className="hover:scale-110 transition-transform" />
             </div>
           )}
         </div>
@@ -127,38 +129,39 @@ export const Layout: React.FC<LayoutProps> = ({
       <div className="flex-1 overflow-hidden flex flex-col">
         {/* Top Bar */}
         <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-b px-6 py-4 flex items-center justify-between`}>
-          {/* Left side - API Mode & Vault Balance */}
-          <div className="flex items-center space-x-6">
-            {/* API Switcher */}
-            <div className={`flex items-center space-x-2 ${isDark ? 'bg-gray-700' : 'bg-gray-100'} rounded-lg px-3 py-1`}>
-              <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'} mr-2`}>Service Mode</span>
-              <button
-                onClick={() => handleAPISwitch('MOCK')}
-                className={`px-2 py-1 text-xs rounded transition-colors ${
-                  apiType === 'MOCK'
-                    ? 'bg-blue-600 text-white'
-                    : `${isDark ? 'bg-gray-600 text-gray-300 hover:bg-gray-500' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`
-                }`}
-              >
-                Mock
-              </button>
-              <button
-                onClick={() => handleAPISwitch('API')}
-                className={`px-2 py-1 text-xs rounded transition-colors ${
-                  apiType === 'API'
-                    ? 'bg-blue-600 text-white'
-                    : `${isDark ? 'bg-gray-600 text-gray-300 hover:bg-gray-500' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`
-                }`}
-              >
-                API
-              </button>
+          {/* Left side - Balance Information */}
+          <div className="flex items-center space-x-4">
+            {/* DEX Balance */}
+            <div className={`flex flex-col ${isDark ? 'bg-gray-700' : 'bg-gray-100'} rounded-lg px-3 py-2`}>
+              <div className={`${isDark ? 'text-gray-400' : 'text-gray-600'} text-xs mb-1`}>DEX Balance</div>
+              <div className="flex items-center space-x-2">
+                <span className="text-green-400 font-medium text-sm">$12,450.00</span>
+              </div>
+              <div className={`${isDark ? 'text-gray-500' : 'text-gray-500'} text-xs`}>
+                ETH: $8,200 | BSC: $4,250
+              </div>
             </div>
-            {/* Vault Balance */}
-            <div className={`flex items-center ${isDark ? 'bg-gray-700' : 'bg-gray-100'} rounded-lg px-3 py-1 space-x-3`}>
-              <span className={`${isDark ? 'text-gray-400' : 'text-gray-600'} text-sm`}>Vault Balance</span>
-              <span className="text-green-400 font-medium">$12,450.00</span>
-              <span className={`${isDark ? 'text-gray-400' : 'text-gray-600'} text-sm ml-4`}>Active Strategies</span>
-              <span className="text-blue-400 font-medium">3</span>
+            
+            {/* CEX Balance */}
+            <div className={`flex flex-col ${isDark ? 'bg-gray-700' : 'bg-gray-100'} rounded-lg px-3 py-2`}>
+              <div className={`${isDark ? 'text-gray-400' : 'text-gray-600'} text-xs mb-1`}>CEX Balance</div>
+              <div className="flex items-center space-x-2">
+                <span className="text-blue-400 font-medium text-sm">$8,325.50</span>
+              </div>
+              <div className={`${isDark ? 'text-gray-500' : 'text-gray-500'} text-xs`}>
+                Binance: $5,100 | OKX: $3,225.50
+              </div>
+            </div>
+            
+            {/* Active Strategies */}
+            <div className={`flex flex-col ${isDark ? 'bg-gray-700' : 'bg-gray-100'} rounded-lg px-3 py-2`}>
+              <div className={`${isDark ? 'text-gray-400' : 'text-gray-600'} text-xs mb-1`}>Active</div>
+              <div className="flex items-center space-x-2">
+                <span className="text-purple-400 font-medium text-sm">3 策略</span>
+              </div>
+              <div className={`${isDark ? 'text-gray-500' : 'text-gray-500'} text-xs`}>
+                运行中
+              </div>
             </div>
           </div>
 
@@ -207,13 +210,33 @@ export const Layout: React.FC<LayoutProps> = ({
                       </div>
                     </button>
 
-                    {/* Theme & Language */}
+                    {/* Theme & Language & Service Mode */}
                     <div className={`px-4 py-2 border-t ${isDark ? 'border-gray-700' : 'border-gray-200'} mt-2`}>
                       <div className={`text-xs font-medium ${isDark ? 'text-gray-400' : 'text-gray-500'} mb-2`}>PREFERENCES</div>
                       
+                      {/* Service Mode Toggle */}
+                      <div className="flex items-center justify-between mb-2">
+                        <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{t('settings.serviceMode', 'Service Mode')}</span>
+                        <div className="flex items-center space-x-1">
+                          {(['MOCK', 'API'] as const).map((serviceOption) => (
+                            <button
+                              key={serviceOption}
+                              onClick={() => handleAPISwitch(serviceOption)}
+                              className={`px-2 py-1 text-xs rounded transition-colors ${
+                                apiType === serviceOption
+                                  ? 'bg-blue-600 text-white'
+                                  : `${isDark ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`
+                              }`}
+                            >
+                              {serviceOption}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      
                       {/* Quick Theme Toggle */}
                       <div className="flex items-center justify-between mb-2">
-                        <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Theme</span>
+                        <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{t('settings.theme')}</span>
                         <div className="flex items-center space-x-1">
                           {(['light', 'dark'] as const).map((themeOption) => (
                             <button
@@ -233,7 +256,7 @@ export const Layout: React.FC<LayoutProps> = ({
 
                       {/* Quick Language Toggle */}
                       <div className="flex items-center justify-between">
-                        <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Language</span>
+                        <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{t('settings.language')}</span>
                         <div className="flex items-center space-x-1">
                           {(['en', 'zh'] as const).map((langOption) => (
                             <button

@@ -11,7 +11,7 @@ function App() {
   const [currentView, setCurrentView] = useState('monitor');
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
 
   useEffect(() => {
     // Check if user is already logged in

@@ -73,8 +73,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
 
       <div className="max-w-md w-full space-y-8 p-8">
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-blue-400 mb-2">Signal Trading</h1>
-          <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'} text-lg`}>AI Trading Platform</p>
+          <h1 className="text-4xl font-bold text-blue-400 mb-2">SigTrading</h1>
+          <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'} text-lg`}>Focus on AI Trading Platform</p>
           <p className={`${isDark ? 'text-gray-500' : 'text-gray-500'} text-sm mt-4`}>
             {t('auth.loginDescription')}
           </p>

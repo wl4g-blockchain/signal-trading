@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ComponentNode } from '../../types';
 import {
   Radio,
@@ -10,8 +10,14 @@ import {
   BarChart3,
   Trash2,
   Settings,
+  Check,
+  X,
+  Clock,
+  Pause,
+  FileText
 } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
+import { NodeRunLogModal } from './NodeRunLogModal';
 
 interface NodeComponentProps {
   node: ComponentNode;
@@ -148,10 +154,46 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
   onConfig,
 }) => {
   const { isDark } = useTheme();
+  const [showLogModal, setShowLogModal] = useState(false);
+  
+  const isReadonly = node.data?.readonly || false;
+  const runStatus = node.data?.runStatus;
+  const runLogs = node.data?.runLogs || [];
+  
   const Icon = getNodeIcon(node.type);
   const SubIcon = getSubIcon(node.type, node.data?.type);
   const colorClass = getNodeColor(node.type);
   const displayType = getDisplayType(node);
+  
+  // Get run status color and icon
+  const getRunStatusColor = () => {
+    if (!runStatus) return colorClass;
+    switch (runStatus) {
+      case 'success': return 'border-green-500 bg-green-500';
+      case 'failed': return 'border-red-500 bg-red-500';
+      case 'running': return 'border-blue-500 bg-blue-500';
+      case 'queued': return 'border-yellow-500 bg-yellow-500';
+      default: return colorClass;
+    }
+  };
+  
+  const getRunStatusIcon = () => {
+    if (!runStatus) return null;
+    switch (runStatus) {
+      case 'success': return <Check className="w-3 h-3 text-white" />;
+      case 'failed': return <X className="w-3 h-3 text-white" />;
+      case 'running': return <Clock className="w-3 h-3 text-white animate-spin" />;
+      case 'queued': return <Pause className="w-3 h-3 text-white" />;
+      default: return null;
+    }
+  };
+  
+  const handleNodeClick = (e: React.MouseEvent) => {
+    if (isReadonly && runLogs.length > 0) {
+      e.stopPropagation();
+      setShowLogModal(true);
+    }
+  };
 
   // Special rendering for start/end nodes
   if (node.type === 'start' || node.type === 'end') {
@@ -307,48 +349,66 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
     );
   }
   return (
-    <div
-      className={`absolute cursor-move select-none`}
-      style={{
-        transform: `translate(${node.position.x}px, ${node.position.y}px)`,
-      }}
-      onMouseDown={(e) => onDragStart(node.id, e)}
-    >
-      <div className={`w-48 ${isDark ? 'bg-gray-700' : 'bg-white border border-gray-200'} border-2 ${colorClass} rounded-lg shadow-lg hover:shadow-xl transition-shadow`}>
-        {/* Header */}
-        <div className={`p-3 ${colorClass} rounded-t-lg flex items-center space-x-2`}>
-          <Icon className="w-5 h-5 text-white" />
-          {SubIcon && <SubIcon className="w-4 h-4 text-white opacity-80" />}
-          <span className="text-white font-medium text-sm flex-1">
-            {node.data?.name || `${node.type.charAt(0).toUpperCase() + node.type.slice(1)}`}
-          </span>
-          
-          {/* 操作按钮 */}
-          <div className="flex items-center space-x-1">
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                onConfig(node);
-              }}
-              className="p-1 hover:bg-white hover:bg-opacity-20 rounded transition-colors"
-              title="Configure"
-            >
-              <Settings className="w-3 h-3 text-white" />
-            </button>
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                onDelete(node.id);
-              }}
-              className="p-1 hover:bg-red-500 hover:bg-opacity-50 rounded transition-colors"
-              title="Delete"
-            >
-              <Trash2 className="w-3 h-3 text-white" />
-            </button>
+    <>
+      <div
+        className={`absolute cursor-move select-none`}
+        style={{
+          transform: `translate(${node.position.x}px, ${node.position.y}px)`,
+        }}
+        onMouseDown={(e) => onDragStart(node.id, e)}
+        onClick={handleNodeClick}
+      >
+        <div className={`w-48 ${isDark ? 'bg-gray-700' : 'bg-white border border-gray-200'} border-2 ${runStatus ? getRunStatusColor() : colorClass} rounded-lg shadow-lg hover:shadow-xl transition-all ${isReadonly && runLogs.length > 0 ? 'cursor-pointer' : ''}`}>
+          {/* Header */}
+          <div className={`p-3 ${runStatus ? getRunStatusColor() : colorClass} rounded-t-lg flex items-center space-x-2 relative`}>
+            <Icon className="w-5 h-5 text-white" />
+            {SubIcon && <SubIcon className="w-4 h-4 text-white opacity-80" />}
+            <span className="text-white font-medium text-sm flex-1">
+              {node.data?.name || `${node.type.charAt(0).toUpperCase() + node.type.slice(1)}`}
+            </span>
+            
+            {/* 运行状态指示器 */}
+            {runStatus && (
+              <div className="absolute -top-1 -right-1 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-md">
+                {getRunStatusIcon()}
+              </div>
+            )}
+            
+            {/* 操作按钮 */}
+            {!isReadonly && (
+              <div className="flex items-center space-x-1">
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onConfig(node);
+                  }}
+                  className="p-1 hover:bg-white hover:bg-opacity-20 rounded transition-colors"
+                  title="Configure"
+                >
+                  <Settings className="w-3 h-3 text-white" />
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onDelete(node.id);
+                  }}
+                  className="p-1 hover:bg-red-500 hover:bg-opacity-50 rounded transition-colors"
+                  title="Delete"
+                >
+                  <Trash2 className="w-3 h-3 text-white" />
+                </button>
+              </div>
+            )}
+            
+            {/* 只读模式下的日志查看提示 */}
+            {isReadonly && runLogs.length > 0 && (
+              <div className="flex items-center space-x-1">
+                <FileText className="w-3 h-3 text-white opacity-80" />
+              </div>
+            )}
           </div>
-        </div>
 
         {/* Content */}
         <div className={`p-3 text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -441,5 +501,14 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
         )}
       </div>
     </div>
+
+    {/* Run Log Modal */}
+    {showLogModal && (
+      <NodeRunLogModal
+        node={node}
+        onClose={() => setShowLogModal(false)}
+      />
+    )}
+  </>
   );
 };
