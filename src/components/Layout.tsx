@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BarChart3, Settings, Activity, FileText, LogOut, User, Globe, ChevronLeft, ChevronRight, Palette } from 'lucide-react';
+import { BarChart3, Settings, Activity, FileText, LogOut, User, ChevronLeft, ChevronRight } from 'lucide-react';
 import { serviceManager, ApiType } from '../services';
 import { User as UserType } from '../types';
 import { useTranslation } from 'react-i18next';
@@ -30,8 +30,6 @@ export const Layout: React.FC<LayoutProps> = ({
   const { language, setLanguage } = useLanguage();
   const [apiType, setApiType] = useState<ApiType>(serviceManager.getCurrentApiType());
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [showThemeMenu, setShowThemeMenu] = useState(false);
-  const [showLanguageMenu, setShowLanguageMenu] = useState(false);
   const [internalSidebarCollapsed, setInternalSidebarCollapsed] = useState(false);
   
   // Use external state or internal state
@@ -47,7 +45,6 @@ export const Layout: React.FC<LayoutProps> = ({
   const navItems = [
     { id: 'monitor', label: t('navigation.dashboard'), icon: Activity },
     { id: 'workflow', label: t('navigation.workflows'), icon: BarChart3 },
-    { id: 'settings', label: t('navigation.settings'), icon: Settings },
   ];
 
   const handleAPISwitch = (type: ApiType) => {
@@ -60,8 +57,6 @@ export const Layout: React.FC<LayoutProps> = ({
     const target = event.target as Element;
     if (!target.closest('.menu-container')) {
       setShowUserMenu(false);
-      setShowThemeMenu(false);
-      setShowLanguageMenu(false);
     }
   };
 
@@ -167,73 +162,8 @@ export const Layout: React.FC<LayoutProps> = ({
             </div>
           </div>
 
-          {/* Right side - Theme, Language & User */}
+          {/* Right side - User Menu */}
           <div className="flex items-center space-x-4">
-            {/* Theme Switcher */}
-            <div className="relative menu-container">
-              <button
-                onClick={() => setShowThemeMenu(!showThemeMenu)}
-                className={`flex items-center space-x-2 px-3 py-2 rounded-lg ${isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} transition-colors`}
-                title={t('settings.theme')}
-              >
-                <Palette className={`w-5 h-5 ${isDark ? 'text-gray-400' : 'text-gray-600'}`} />
-                <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{t(`theme.${theme}`)}</span>
-              </button>
-
-              {showThemeMenu && (
-                <div className={`absolute right-0 mt-2 w-32 ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg shadow-lg border py-2 z-50`}>
-                  {(['system', 'light', 'dark'] as const).map((themeOption) => (
-                    <button
-                      key={themeOption}
-                      onClick={() => {
-                        setTheme(themeOption);
-                        setShowThemeMenu(false);
-                      }}
-                      className={`w-full flex items-center space-x-2 px-3 py-2 text-left transition-colors ${
-                        theme === themeOption
-                          ? 'text-blue-400 bg-blue-600 bg-opacity-20'
-                          : `${isDark ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'}`
-                      }`}
-                    >
-                      <span className="text-sm">{t(`theme.${themeOption}`)}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Language Switcher */}
-            <div className="relative menu-container">
-              <button
-                onClick={() => setShowLanguageMenu(!showLanguageMenu)}
-                className={`flex items-center space-x-2 px-3 py-2 rounded-lg ${isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} transition-colors`}
-                title={t('settings.language')}
-              >
-                <Globe className={`w-5 h-5 ${isDark ? 'text-gray-400' : 'text-gray-600'}`} />
-                <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{t(`language.${language === 'en' ? 'english' : 'chinese'}`)}</span>
-              </button>
-
-              {showLanguageMenu && (
-                <div className={`absolute right-0 mt-2 w-32 ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg shadow-lg border py-2 z-50`}>
-                  {(['en', 'zh'] as const).map((langOption) => (
-                    <button
-                      key={langOption}
-                      onClick={() => {
-                        setLanguage(langOption);
-                        setShowLanguageMenu(false);
-                      }}
-                      className={`w-full flex items-center space-x-2 px-3 py-2 text-left transition-colors ${
-                        language === langOption
-                          ? 'text-blue-400 bg-blue-600 bg-opacity-20'
-                          : `${isDark ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'}`
-                      }`}
-                    >
-                      <span className="text-sm">{t(`language.${langOption === 'en' ? 'english' : 'chinese'}`)}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
 
             {/* User Info */}
             <div className="relative menu-container">
@@ -253,14 +183,86 @@ export const Layout: React.FC<LayoutProps> = ({
               </button>
 
               {showUserMenu && (
-                <div className={`absolute right-0 mt-2 w-48 ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg shadow-lg border py-2 z-50`}>
-                  <button
-                    onClick={onLogout}
-                    className={`w-full flex items-center space-x-2 px-4 py-2 text-left ${isDark ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'} transition-colors`}
-                  >
-                    <LogOut className="w-4 h-4" />
-                    <span>{t('auth.logout')}</span>
-                  </button>
+                <div className={`absolute right-0 mt-2 w-64 ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg shadow-lg border py-2 z-50`}>
+                  {/* User Info Section */}
+                  <div className={`px-4 py-3 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
+                    <div className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{user.name}</div>
+                    <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{user.email}</div>
+                  </div>
+
+                  {/* Menu Items */}
+                  <div className="py-1">
+                    {/* Settings Group */}
+                    <button
+                      onClick={() => {
+                        onViewChange('settings');
+                        setShowUserMenu(false);
+                      }}
+                      className={`w-full flex items-center space-x-3 px-4 py-2 text-left ${isDark ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'} transition-colors`}
+                    >
+                      <Settings className="w-4 h-4" />
+                      <div>
+                        <div className="text-sm font-medium">{t('navigation.settings')}</div>
+                        <div className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>Trading & General Settings</div>
+                      </div>
+                    </button>
+
+                    {/* Theme & Language */}
+                    <div className={`px-4 py-2 border-t ${isDark ? 'border-gray-700' : 'border-gray-200'} mt-2`}>
+                      <div className={`text-xs font-medium ${isDark ? 'text-gray-400' : 'text-gray-500'} mb-2`}>PREFERENCES</div>
+                      
+                      {/* Quick Theme Toggle */}
+                      <div className="flex items-center justify-between mb-2">
+                        <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Theme</span>
+                        <div className="flex items-center space-x-1">
+                          {(['light', 'dark'] as const).map((themeOption) => (
+                            <button
+                              key={themeOption}
+                              onClick={() => setTheme(themeOption)}
+                              className={`px-2 py-1 text-xs rounded transition-colors ${
+                                theme === themeOption
+                                  ? 'bg-blue-600 text-white'
+                                  : `${isDark ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`
+                              }`}
+                            >
+                              {themeOption === 'light' ? '☀️' : '🌙'}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Quick Language Toggle */}
+                      <div className="flex items-center justify-between">
+                        <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Language</span>
+                        <div className="flex items-center space-x-1">
+                          {(['en', 'zh'] as const).map((langOption) => (
+                            <button
+                              key={langOption}
+                              onClick={() => setLanguage(langOption)}
+                              className={`px-2 py-1 text-xs rounded transition-colors ${
+                                language === langOption
+                                  ? 'bg-blue-600 text-white'
+                                  : `${isDark ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`
+                              }`}
+                            >
+                              {langOption === 'en' ? 'EN' : '中'}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Logout */}
+                    <div className={`border-t ${isDark ? 'border-gray-700' : 'border-gray-200'} mt-2 pt-2`}>
+                      <button
+                        onClick={onLogout}
+                        className={`w-full flex items-center space-x-2 px-4 py-2 text-left ${isDark ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'} transition-colors`}
+                      >
+                        <LogOut className="w-4 h-4" />
+                        <span>{t('auth.logout')}</span>
+                      </button>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>

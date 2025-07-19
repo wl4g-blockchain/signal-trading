@@ -153,19 +153,19 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
                 type="number"
                 value={config.interval || 5}
                 onChange={(e) => setConfig({ ...config, interval: Number(e.target.value) })}
-                className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+                className={`w-full ${isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'} px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
                 min="1"
                 max="60"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                 API URLs (readonly)
               </label>
               <textarea
                 value="https://api.twitter.com/2/tweets/search/recent\nhttps://api.twitter.com/2/users/by/username"
                 readOnly
-                className="w-full bg-gray-600 text-gray-300 px-3 py-2 rounded border border-gray-600 resize-none"
+                className={`w-full ${isDark ? 'bg-gray-600 text-gray-300 border-gray-600' : 'bg-gray-100 text-gray-600 border-gray-300'} px-3 py-2 rounded border resize-none`}
                 rows={3}
               />
             </div>
@@ -175,37 +175,37 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
         {listenerType === 'binance' && (
           <>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                 API Key
               </label>
               <input
                 type="password"
                 value={config.apiKey || ''}
                 onChange={(e) => setConfig({ ...config, apiKey: e.target.value })}
-                className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+                className={`w-full ${isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'} px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
                 placeholder="Enter Binance API Key"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                 Trading Pairs (comma separated)
               </label>
               <input
                 type="text"
                 value={config.pairs || ''}
                 onChange={(e) => setConfig({ ...config, pairs: e.target.value })}
-                className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+                className={`w-full ${isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'} px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
                 placeholder="BTCUSDT, ETHUSDT, BNBUSDT"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                 Timeframe
               </label>
               <select
                 value={config.timeframe || '1h'}
                 onChange={(e) => setConfig({ ...config, timeframe: e.target.value })}
-                className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+                className={`w-full ${isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'} px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
               >
                 <option value="1h">1 Hour</option>
                 <option value="4h">4 Hours</option>
@@ -216,13 +216,13 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                 API URLs (readonly)
               </label>
               <textarea
                 value="https://api.binance.com/api/v3/ticker/24hr\nhttps://api.binance.com/api/v3/klines"
                 readOnly
-                className="w-full bg-gray-600 text-gray-300 px-3 py-2 rounded border border-gray-600 resize-none"
+                className={`w-full ${isDark ? 'bg-gray-600 text-gray-300 border-gray-600' : 'bg-gray-100 text-gray-600 border-gray-300'} px-3 py-2 rounded border resize-none`}
                 rows={2}
               />
             </div>

@@ -29,7 +29,11 @@
     "email": "Email",
     "password": "Password",
     "loginWithGoogle": "Login with Google",
-    "loginWithGithub": "Login with GitHub"
+    "loginWithGithub": "Continue with GitHub",
+    "connecting": "Connecting...",
+    "loginDescription": "Connect your GitHub account to access the trading platform",
+    "termsAgreement": "By signing in, you agree to our Terms of Service",
+    "secureAuth": "Secure authentication powered by GitHub OAuth"
   },
   "theme": {
     "system": "System",
