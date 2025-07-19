@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BarChart3, Settings, Activity, FileText, LogOut, User, Globe } from 'lucide-react';
-import { serviceManager, ServiceType } from '../services';
+import { serviceManager, ApiType } from '../services';
 import { User as UserType } from '../types';
 
 interface LayoutProps {
@@ -18,7 +18,7 @@ export const Layout: React.FC<LayoutProps> = ({
   user, 
   onLogout 
 }) => {
-  const [serviceType, setServiceType] = useState<ServiceType>(serviceManager.getCurrentServiceType());
+  const [apiType, setApiType] = useState<ApiType>(serviceManager.getCurrentApiType());
   const [showUserMenu, setShowUserMenu] = useState(false);
 
   const navItems = [
@@ -27,9 +27,9 @@ export const Layout: React.FC<LayoutProps> = ({
     { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
-  const handleServiceSwitch = (type: ServiceType) => {
+  const handleAPISwitch = (type: ApiType) => {
     serviceManager.switchService(type);
-    setServiceType(type);
+    setApiType(type);
   };
 
   return (
@@ -60,22 +60,22 @@ export const Layout: React.FC<LayoutProps> = ({
             );
           })}
         </nav>
-        {/* 删除原底部 Service Mode 和 Vault Balance */}
+        {/* Footer API Mode & Vault Balance */}
       </div>
 
       {/* Main Content */}
       <div className="flex-1 overflow-hidden flex flex-col">
         {/* Top Bar */}
         <div className="bg-gray-800 border-b border-gray-700 px-6 py-4 flex items-center justify-end space-x-8">
-          {/* 新增 Service Mode 和 Vault Balance 到顶部栏 */}
+          {/* API Mode & Vault Balance to Top Bar */}
           <div className="flex items-center space-x-6">
-            {/* Service Switcher */}
+            {/* API Switcher */}
             <div className="flex items-center space-x-2 bg-gray-700 rounded-lg px-3 py-1">
               <span className="text-sm text-gray-400 mr-2">Service Mode</span>
               <button
-                onClick={() => handleServiceSwitch('mock')}
+                onClick={() => handleAPISwitch('MOCK')}
                 className={`px-2 py-1 text-xs rounded transition-colors ${
-                  serviceType === 'mock'
+                  apiType === 'MOCK'
                     ? 'bg-blue-600 text-white'
                     : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
                 }`}
@@ -83,14 +83,14 @@ export const Layout: React.FC<LayoutProps> = ({
                 Mock
               </button>
               <button
-                onClick={() => handleServiceSwitch('http')}
+                onClick={() => handleAPISwitch('API')}
                 className={`px-2 py-1 text-xs rounded transition-colors ${
-                  serviceType === 'http'
+                  apiType === 'API'
                     ? 'bg-blue-600 text-white'
                     : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
                 }`}
               >
-                HTTP
+                API
               </button>
             </div>
             {/* Vault Balance */}
@@ -101,7 +101,7 @@ export const Layout: React.FC<LayoutProps> = ({
               <span className="text-blue-400 font-medium">3</span>
             </div>
           </div>
-          {/* 用户信息 */}
+          {/* User Info */}
           <div className="relative">
             <button
               onClick={() => setShowUserMenu(!showUserMenu)}

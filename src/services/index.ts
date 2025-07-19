@@ -1,23 +1,23 @@
 import { ApiService, HttpApiService } from './api_service';
 import { MockApiService } from './mock_service';
 
-export type ServiceType = 'mock' | 'http';
+export type ApiType = 'MOCK' | 'API';
 
 class ServiceManager {
   private currentService: ApiService;
-  private serviceType: ServiceType = 'mock';
+  private apiType: ApiType = 'MOCK';
 
   constructor() {
     this.currentService = new MockApiService();
   }
 
-  switchService(type: ServiceType) {
-    this.serviceType = type;
+  switchService(type: ApiType) {
+    this.apiType = type;
     switch (type) {
-      case 'http':
+      case 'API':
         this.currentService = new HttpApiService();
         break;
-      case 'mock':
+      case 'MOCK':
       default:
         this.currentService = new MockApiService();
         break;
@@ -28,8 +28,8 @@ class ServiceManager {
     return this.currentService;
   }
 
-  getCurrentServiceType(): ServiceType {
-    return this.serviceType;
+  getCurrentApiType(): ApiType {
+    return this.apiType;
   }
 }
 
