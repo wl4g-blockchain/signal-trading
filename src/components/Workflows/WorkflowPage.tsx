@@ -3,7 +3,7 @@ import { ComponentNode, Connection } from '../../types';
 import { Canvas } from './Canvas';
 import { ComponentPalette } from './ComponentPalette';
 import { WorkflowList } from './WorkflowList';
-import { Play, Pause, Save, Settings, ChevronUp, ChevronDown } from 'lucide-react';
+import { Play, Pause, Save, Settings, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Radio, Brain, Zap, Database } from 'lucide-react';
 import { serviceManager } from '../../services';
 
 export const WorkflowPage: React.FC = () => {
@@ -16,6 +16,20 @@ export const WorkflowPage: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [running, setRunning] = useState(false);
   const [canvasScale, setCanvasScale] = useState(100);
+  const [rightPanelCollapsed, setRightPanelCollapsed] = useState(false);
+
+  // 智能预判：当用户收起右侧面板时，自动收起左侧菜单
+  const handleRightPanelToggle = () => {
+    const newRightPanelState = !rightPanelCollapsed;
+    setRightPanelCollapsed(newRightPanelState);
+    
+    // 如果收起右侧面板，自动收起左侧菜单
+    if (newRightPanelState) {
+      // 通过自定义事件通知App组件收起左侧菜单
+      const event = new CustomEvent('collapse-sidebar', { detail: { collapsed: true } });
+      window.dispatchEvent(event);
+    }
+  };
 
   // 监听画布缩放更新
   useEffect(() => {
@@ -290,11 +304,63 @@ export const WorkflowPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Component Palette */}
-      <ComponentPalette onAddNode={addNode} />
+      {/* Right Panel - Component Palette */}
+      <div className={`${rightPanelCollapsed ? 'w-12' : 'w-80'} bg-gray-800 border-l border-gray-700 transition-all duration-300 relative flex flex-col`}>
+        {/* Right Panel Toggle Button */}
+        <button
+          onClick={handleRightPanelToggle}
+          className="absolute -left-3 top-6 z-10 bg-gray-700 hover:bg-gray-600 rounded-full p-1 border border-gray-600 transition-colors"
+          title={rightPanelCollapsed ? "展开组件面板" : "收起组件面板"}
+        >
+          {rightPanelCollapsed ? (
+            <ChevronLeft className="w-4 h-4 text-gray-300" />
+          ) : (
+            <ChevronRight className="w-4 h-4 text-gray-300" />
+          )}
+        </button>
+
+        {rightPanelCollapsed ? (
+          /* Collapsed Right Panel - Component Icons */
+          <div className="p-2 flex flex-col items-center mt-16">
+            {/* 标题 */}
+            <div className="text-xs text-gray-400 mb-3 writing-mode-vertical text-center">
+              组件
+            </div>
+            <div className="w-8 h-px bg-gray-600 mb-3"></div>
+            
+            {/* 组件图标 */}
+            <div className="space-y-2">
+              {[
+                { type: 'listener', icon: 'Radio', color: 'bg-blue-600 hover:bg-blue-700', title: 'Data Listeners\n监听社交媒体、价格数据' },
+                { type: 'evaluator', icon: 'Brain', color: 'bg-purple-600 hover:bg-purple-700', title: 'AI Evaluators\n分析数据生成交易策略' },
+                { type: 'executor', icon: 'Zap', color: 'bg-green-600 hover:bg-green-700', title: 'DEX Executor\n去中心化交易所执行' },
+                { type: 'cex-executor', icon: 'Zap', color: 'bg-blue-600 hover:bg-blue-700', title: 'CEX Executor\n中心化交易所执行' },
+                { type: 'collector', icon: 'Database', color: 'bg-orange-600 hover:bg-orange-700', title: 'Result Collectors\n收集交易执行结果' },
+              ].map((component) => {
+                const IconComponent = component.icon === 'Radio' ? Radio : 
+                                    component.icon === 'Brain' ? Brain :
+                                    component.icon === 'Zap' ? Zap : Database;
+                return (
+                  <button
+                    key={component.type}
+                    onClick={() => addNode(component.type as ComponentNode['type'])}
+                    className={`quick-tooltip w-8 h-8 ${component.color} rounded-lg flex items-center justify-center transition-all duration-200 shadow-sm hover:shadow-md hover:scale-105`}
+                    data-tooltip={component.title}
+                  >
+                    <IconComponent className="w-4 h-4 text-white" />
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ) : (
+          /* Expanded Right Panel - Component Palette */
+          <ComponentPalette onAddNode={addNode} />
+        )}
+      </div>
 
       {/* Workflow List Panel */}
-      <div className="absolute bottom-0 left-0 right-80 z-10">
+      <div className={`absolute bottom-0 left-0 ${rightPanelCollapsed ? 'right-12' : 'right-80'} z-10 transition-all duration-300`}>
         {/* Toggle Button - Always Visible */}
         <div className="flex items-center justify-center py-2 bg-gray-800 border-t border-gray-700 cursor-pointer hover:bg-gray-700 transition-colors"
              onClick={() => setShowWorkflowList(!showWorkflowList)}>

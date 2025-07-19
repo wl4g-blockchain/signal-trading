@@ -51,7 +51,7 @@ export const ComponentPalette: React.FC<ComponentPaletteProps> = ({ onAddNode })
   ];
 
   return (
-    <div className="w-80 bg-gray-800 border-l border-gray-700 p-4 overflow-y-auto">
+    <div className="flex-1 p-4 overflow-y-auto">
       <h3 className="text-lg font-semibold text-white mb-4">Component Palette</h3>
       
       <div className="space-y-4">

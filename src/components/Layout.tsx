@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BarChart3, Settings, Activity, FileText, LogOut, User, Globe } from 'lucide-react';
+import { BarChart3, Settings, Activity, FileText, LogOut, User, Globe, ChevronLeft, ChevronRight } from 'lucide-react';
 import { serviceManager, ApiType } from '../services';
 import { User as UserType } from '../types';
 
@@ -9,6 +9,8 @@ interface LayoutProps {
   onViewChange: (view: string) => void;
   user: UserType;
   onLogout: () => void;
+  sidebarCollapsed?: boolean;
+  onSidebarCollapsedChange?: (collapsed: boolean) => void;
 }
 
 export const Layout: React.FC<LayoutProps> = ({ 
@@ -16,10 +18,23 @@ export const Layout: React.FC<LayoutProps> = ({
   currentView, 
   onViewChange, 
   user, 
-  onLogout 
+  onLogout,
+  sidebarCollapsed: externalSidebarCollapsed,
+  onSidebarCollapsedChange
 }) => {
   const [apiType, setApiType] = useState<ApiType>(serviceManager.getCurrentApiType());
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [internalSidebarCollapsed, setInternalSidebarCollapsed] = useState(false);
+  
+  // 使用外部状态或内部状态
+  const sidebarCollapsed = externalSidebarCollapsed !== undefined ? externalSidebarCollapsed : internalSidebarCollapsed;
+  const setSidebarCollapsed = (collapsed: boolean) => {
+    if (onSidebarCollapsedChange) {
+      onSidebarCollapsedChange(collapsed);
+    } else {
+      setInternalSidebarCollapsed(collapsed);
+    }
+  };
 
   const navItems = [
     { id: 'monitor', label: 'Dashboard', icon: Activity },
@@ -35,10 +50,33 @@ export const Layout: React.FC<LayoutProps> = ({
   return (
     <div className="h-screen bg-gray-900 text-white flex">
       {/* Sidebar */}
-      <div className="w-64 bg-gray-800 border-r border-gray-700">
+      <div className={`${sidebarCollapsed ? 'w-16' : 'w-64'} bg-gray-800 border-r border-gray-700 transition-all duration-300 relative`}>
+        {/* Collapse Toggle Button */}
+        <button
+          onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+          className="absolute -right-3 top-6 z-10 bg-gray-700 hover:bg-gray-600 rounded-full p-1 border border-gray-600 transition-colors"
+          title={sidebarCollapsed ? "展开菜单" : "收起菜单"}
+        >
+          {sidebarCollapsed ? (
+            <ChevronRight className="w-4 h-4 text-gray-300" />
+          ) : (
+            <ChevronLeft className="w-4 h-4 text-gray-300" />
+          )}
+        </button>
+
         <div className="p-6">
-          <h1 className="text-xl font-bold text-blue-400">Signal Trading</h1>
-          <p className="text-sm text-gray-400 mt-1">AI Trading</p>
+          {!sidebarCollapsed ? (
+            <>
+              <h1 className="text-xl font-bold text-blue-400">Signal Trading</h1>
+              <p className="text-sm text-gray-400 mt-1">AI Trading</p>
+            </>
+          ) : (
+            <div className="flex justify-center">
+              <div className="w-14 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shadow-lg" title="Signal Trading">
+                <span className="text-white font-bold text-base tracking-tight">ST</span>
+              </div>
+            </div>
+          )}
         </div>
         
         <nav className="mt-8">
@@ -48,14 +86,15 @@ export const Layout: React.FC<LayoutProps> = ({
               <button
                 key={item.id}
                 onClick={() => onViewChange(item.id)}
-                className={`w-full flex items-center px-6 py-3 text-left transition-colors ${
+                className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center px-3' : 'px-6'} py-3 text-left transition-colors ${
                   currentView === item.id
                     ? 'bg-blue-600 text-white border-r-2 border-blue-400'
                     : 'text-gray-300 hover:bg-gray-700'
                 }`}
+                title={sidebarCollapsed ? item.label : undefined}
               >
                 <Icon className="w-5 h-5 mr-3" />
-                {item.label}
+                {!sidebarCollapsed && item.label}
               </button>
             );
           })}

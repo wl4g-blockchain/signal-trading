@@ -11,6 +11,7 @@ function App() {
   const [currentView, setCurrentView] = useState('monitor');
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   useEffect(() => {
     // Check if user is already logged in
@@ -28,6 +29,18 @@ function App() {
     };
 
     checkAuth();
+  }, []);
+
+  // 监听侧边栏收起事件
+  useEffect(() => {
+    const handleSidebarCollapse = (event: CustomEvent) => {
+      setSidebarCollapsed(event.detail.collapsed);
+    };
+
+    window.addEventListener('collapse-sidebar', handleSidebarCollapse as EventListener);
+    return () => {
+      window.removeEventListener('collapse-sidebar', handleSidebarCollapse as EventListener);
+    };
   }, []);
 
   const handleLogin = (userData: User) => {
@@ -74,6 +87,8 @@ function App() {
       onViewChange={setCurrentView}
       user={user}
       onLogout={handleLogout}
+      sidebarCollapsed={sidebarCollapsed}
+      onSidebarCollapsedChange={setSidebarCollapsed}
     >
       {renderCurrentView()}
     </Layout>
