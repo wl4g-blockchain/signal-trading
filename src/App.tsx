@@ -4,7 +4,7 @@ import { LoginPage } from './components/Auth/LoginPage';
 import { WorkflowPage } from './components/Workflows/WorkflowPage';
 import { LiveDashboard } from './components/Dashboard/Dashboard';
 import { Settings } from './components/Settings/Settings';
-import { User } from './types';
+import { User, Workflow } from './types';
 import { serviceManager } from './services';
 
 function App() {
@@ -12,6 +12,9 @@ function App() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
+  const [workflowReadOnlyMode, setWorkflowReadOnlyMode] = useState<{ workflowId: string; tradeId: string } | null>(null);
+  const [readOnlyWorkflow, setReadOnlyWorkflow] = useState<Workflow | null>(null);
+  const [loadingReadOnlyWorkflow, setLoadingReadOnlyWorkflow] = useState(false);
 
   useEffect(() => {
     // Check if user is already logged in
@@ -56,9 +59,48 @@ function App() {
     }
   };
 
-  const handleNavigateToWorkflowRun = (workflowId: string, tradeId: string) => {
-    // Navigate to workflow page where user can see runs
-    setCurrentView('workflow');
+  const handleNavigateToWorkflowRun = async (workflowId: string, runId: string) => {
+    console.log('🔄 Loading workflow run:', { workflowId, runId });
+    setLoadingReadOnlyWorkflow(true);
+    try {
+      // Load workflow run details
+      const run = await serviceManager.getService().getWorkflowRun(runId);
+      console.log('📊 Workflow run loaded:', run);
+      
+      const workflow = await serviceManager.getService().getWorkflow(run.workflowId);
+      console.log('🏗️ Workflow loaded:', workflow);
+      
+      // Create a read-only version of the workflow with run states
+      const workflowWithRunStates: Workflow = {
+        ...workflow,
+        nodes: workflow.nodes.map(node => ({
+          ...node,
+          data: {
+            ...node.data,
+            runStatus: run.nodeStates[node.id]?.status || 'skipped',
+            runLogs: run.nodeStates[node.id]?.logs || [],
+            readonly: true
+          }
+        }))
+      };
+
+      console.log('✅ Workflow with run states created:', workflowWithRunStates);
+      
+      setReadOnlyWorkflow(workflowWithRunStates);
+      setWorkflowReadOnlyMode({ workflowId, tradeId: runId });
+      setCurrentView('workflow');
+    } catch (error) {
+      console.error('❌ Failed to load workflow run:', error);
+    } finally {
+      setLoadingReadOnlyWorkflow(false);
+    }
+  };
+
+  const handleExitReadOnlyMode = () => {
+    setWorkflowReadOnlyMode(null);
+    setReadOnlyWorkflow(null);
+    // 返回到Dashboard页面，因为通常是从Dashboard的trade详情进入只读模式
+    setCurrentView('monitor');
   };
 
   const renderCurrentView = () => {
@@ -71,7 +113,20 @@ function App() {
           />
         );
       case 'workflow':
-        return <WorkflowPage />;
+        if (loadingReadOnlyWorkflow) {
+          return (
+            <div className="flex items-center justify-center h-full">
+              <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          );
+        }
+        return (
+          <WorkflowPage 
+            readOnlyMode={workflowReadOnlyMode} 
+            readOnlyWorkflow={readOnlyWorkflow}
+            onExitReadOnlyMode={handleExitReadOnlyMode} 
+          />
+        );
       case 'settings':
         return <Settings />;
       default:

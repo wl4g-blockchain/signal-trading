@@ -137,7 +137,7 @@ export const ComponentPalette: React.FC<ComponentPaletteProps> = ({ onAddNode })
               
               {/* Hover 提示框（仅在紧凑模式显示）*/}
               {isCompact && (
-                <div className={`absolute left-full top-0 ml-2 w-64 ${isDark ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'} border rounded-lg p-3 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10`}>
+                <div className={`absolute left-full top-0 ml-2 w-64 ${isDark ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'} border rounded-lg p-3 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-75 z-10`}>
                   <div className="flex items-center space-x-2 mb-2">
                     <Icon className={`w-4 h-4 ${isDark ? 'text-gray-300' : 'text-gray-600'}`} />
                     <h4 className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{component.title}</h4>

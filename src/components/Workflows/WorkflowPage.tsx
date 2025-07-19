@@ -8,7 +8,17 @@ import { serviceManager } from '../../services';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
 
-export const WorkflowPage: React.FC = () => {
+interface WorkflowPageProps {
+  readOnlyMode?: { workflowId: string; tradeId: string } | null;
+  readOnlyWorkflow?: Workflow | null;
+  onExitReadOnlyMode?: () => void;
+}
+
+export const WorkflowPage: React.FC<WorkflowPageProps> = ({ 
+  readOnlyMode, 
+  readOnlyWorkflow,
+  onExitReadOnlyMode 
+}) => {
   const { isDark } = useTheme();
   const { t } = useTranslation();
   const [nodes, setNodes] = useState<ComponentNode[]>([]);
@@ -21,6 +31,29 @@ export const WorkflowPage: React.FC = () => {
   const [running, setRunning] = useState(false);
   const [canvasScale, setCanvasScale] = useState(100);
   const [rightPanelCollapsed, setRightPanelCollapsed] = useState(false);
+
+  // Load read-only workflow data if provided
+  useEffect(() => {
+    console.log('📄 WorkflowPage useEffect triggered:', { readOnlyMode, readOnlyWorkflow });
+    
+    if (readOnlyMode && readOnlyWorkflow) {
+      console.log('🔧 Setting up read-only workflow:', readOnlyWorkflow);
+      
+      setWorkflowId(readOnlyWorkflow.id);
+      setWorkflowName(readOnlyWorkflow.name);
+      setNodes(readOnlyWorkflow.nodes || []);
+      setConnections(readOnlyWorkflow.connections || []);
+      setShowWorkflowList(false); // Hide workflow list in read-only mode
+      
+      console.log('✅ Read-only workflow setup complete');
+      console.log('🔍 Nodes with run status:', readOnlyWorkflow.nodes?.map(n => ({
+        id: n.id,
+        type: n.type,
+        runStatus: n.data?.runStatus,
+        readonly: n.data?.readonly
+      })));
+    }
+  }, [readOnlyMode, readOnlyWorkflow]);
 
   // Smart prediction: Auto-collapse left menu when right panel is collapsed
   const handleRightPanelToggle = () => {
@@ -71,7 +104,10 @@ export const WorkflowPage: React.FC = () => {
 
   // Initialize with start and end nodes
   useEffect(() => {
-    if (nodes.length === 0) {
+    // 只在没有只读模式且没有现有节点时初始化默认节点
+    if (nodes.length === 0 && !readOnlyMode) {
+      console.log('🚀 Initializing default start/end nodes');
+      
       const startNode: ComponentNode = {
         id: 'start-node',
         type: 'start',
@@ -92,7 +128,7 @@ export const WorkflowPage: React.FC = () => {
 
       setNodes([startNode, endNode]);
     }
-  }, []);
+  }, [readOnlyMode]); // 添加 readOnlyMode 作为依赖项
   
   const addNode = (type: ComponentNode['type']) => {
     if (type === 'start' || type === 'end') return; // Prevent adding multiple start/end nodes
@@ -240,7 +276,8 @@ export const WorkflowPage: React.FC = () => {
               type="text"
               value={workflowName}
               onChange={(e) => setWorkflowName(e.target.value)}
-              className={`${isDark ? 'bg-gray-700 text-white border-gray-600 focus:border-blue-500' : 'bg-gray-50 text-gray-900 border-gray-300 focus:border-blue-500'} px-3 py-2 rounded border focus:outline-none`}
+              disabled={!!readOnlyMode}
+              className={`${isDark ? 'bg-gray-700 text-white border-gray-600 focus:border-blue-500' : 'bg-gray-50 text-gray-900 border-gray-300 focus:border-blue-500'} px-3 py-2 rounded border focus:outline-none ${readOnlyMode ? 'cursor-not-allowed opacity-50' : ''}`}
             />
             <div className="flex items-center space-x-2">
               <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{t('workflow.nodes')}: {nodes.length}</span>
@@ -251,9 +288,9 @@ export const WorkflowPage: React.FC = () => {
           <div className="flex items-center space-x-2">
             <button
               onClick={handleRunWorkflow}
-              disabled={running}
+              disabled={running || !!readOnlyMode}
               className={`flex items-center space-x-2 px-4 py-2 rounded transition-colors ${
-                running
+                running || readOnlyMode
                   ? `${isDark ? 'bg-gray-600' : 'bg-gray-400'} cursor-not-allowed`
                   : isRunning
                   ? 'bg-red-600 hover:bg-red-700'
@@ -271,8 +308,12 @@ export const WorkflowPage: React.FC = () => {
             </button>
             <button
               onClick={handleSaveWorkflow}
-              disabled={saving}
-              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
+              disabled={saving || !!readOnlyMode}
+              className={`flex items-center space-x-2 px-4 py-2 rounded transition-colors ${
+                saving || readOnlyMode 
+                  ? `${isDark ? 'bg-gray-600' : 'bg-gray-400'} cursor-not-allowed`
+                  : 'bg-blue-600 hover:bg-blue-700'
+              } text-white`}
             >
               {saving ? (
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -404,9 +445,10 @@ export const WorkflowPage: React.FC = () => {
                 return (
                   <div key={component.type} className="group relative">
                     <button
-                      onClick={() => addNode(component.type as ComponentNode['type'])}
-                      className={`w-8 h-8 ${component.color} rounded-lg flex items-center justify-center transition-all duration-150 shadow-sm hover:shadow-lg hover:scale-110 active:scale-95`}
-                      title={`${component.title} - ${component.description}`}
+                      onClick={() => !readOnlyMode && addNode(component.type as ComponentNode['type'])}
+                      disabled={!!readOnlyMode}
+                      className={`w-8 h-8 ${readOnlyMode ? 'bg-gray-500 cursor-not-allowed' : component.color} rounded-lg flex items-center justify-center transition-all duration-150 shadow-sm hover:shadow-lg hover:scale-110 active:scale-95 ${readOnlyMode ? 'opacity-50' : ''}`}
+                      title={readOnlyMode ? t('workflow.readOnlyMode') : `${component.title} - ${component.description}`}
                     >
                       <IconComponent className="w-4 h-4 text-white" />
                     </button>
@@ -426,7 +468,7 @@ export const WorkflowPage: React.FC = () => {
           </div>
         ) : (
           /* Expanded Right Panel - Component Palette */
-          <ComponentPalette onAddNode={addNode} />
+          <ComponentPalette onAddNode={readOnlyMode ? () => {} : addNode} />
         )}
       </div>
 

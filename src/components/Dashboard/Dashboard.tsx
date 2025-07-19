@@ -53,9 +53,14 @@ export const LiveDashboard: React.FC<LiveDashboardProps> = ({
   // Mock real-time data
   useEffect(() => {
     const interval = setInterval(() => {
+      // Use existing workflow run IDs from mock service
+      const workflowRunIds = ["run-1", "run-2"]; // These match the mock data in mock_service.ts
+      const randomRunId = workflowRunIds[Math.floor(Math.random() * workflowRunIds.length)];
+      
       const newTrade: TradeRecord = {
         id: `trade-${Date.now()}`,
-        workflowId: "workflow-1",
+        workflowId: "workflow-1", // This should match the workflow that contains the run
+        workflowRunId: randomRunId, // Add this field to link to specific run
         timestamp: new Date(),
         strategy: "Arbitrage ETH/USDC",
         pair: "ETH/USDC",
@@ -103,8 +108,14 @@ export const LiveDashboard: React.FC<LiveDashboardProps> = ({
   };
 
   const handleTradeClick = (trade: TradeRecord) => {
-    if (onNavigateToWorkflowRun) {
-      onNavigateToWorkflowRun(trade.workflowId, trade.id);
+    console.log('🔍 Trade clicked:', trade);
+    
+    if (onNavigateToWorkflowRun && trade.workflowRunId) {
+      console.log('🚀 Navigating to workflow run:', { workflowId: trade.workflowId, runId: trade.workflowRunId });
+      // Pass the workflow run ID instead of trade ID
+      onNavigateToWorkflowRun(trade.workflowId, trade.workflowRunId);
+    } else {
+      console.warn('⚠️ Cannot navigate to workflow run: missing workflowRunId', trade);
     }
   };
 

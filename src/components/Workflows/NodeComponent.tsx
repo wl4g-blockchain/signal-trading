@@ -415,7 +415,7 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
           {displayType && (
             <div className="mb-2">
               <span className={`${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Type: </span>
-              <span className="text-blue-400">{displayType}</span>
+              <span className={`${isDark ? 'text-blue-400' : 'text-blue-600'} font-medium`}>{displayType}</span>
             </div>
           )}
           {node.data?.status && (
@@ -425,6 +425,22 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
                 node.data.status === 'error' ? 'bg-red-400' : 'bg-gray-400'
               }`} />
               <span className="capitalize">{node.data.status}</span>
+            </div>
+          )}
+          
+          {/* 只读模式下显示运行状态 */}
+          {isReadonly && runStatus && (
+            <div className="mt-2 text-xs">
+              <span className={`${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Status: </span>
+              <span className={`capitalize font-medium ${
+                runStatus === 'success' ? 'text-green-400' :
+                runStatus === 'failed' ? 'text-red-400' :
+                runStatus === 'running' ? 'text-blue-400' :
+                runStatus === 'queued' ? 'text-yellow-400' :
+                'text-gray-400'
+              }`}>
+                {runStatus}
+              </span>
             </div>
           )}
         </div>

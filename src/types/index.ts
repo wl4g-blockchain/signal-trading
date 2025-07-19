@@ -97,6 +97,7 @@ export interface CollectorConfig {
 export interface TradeRecord {
   id: string;
   workflowId: string;
+  workflowRunId?: string; // Optional field to link to specific workflow run
   timestamp: Date;
   strategy: string;
   pair: string;
