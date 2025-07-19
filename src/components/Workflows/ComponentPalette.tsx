@@ -96,17 +96,17 @@ export const ComponentPalette: React.FC<ComponentPaletteProps> = ({ onAddNode })
       <div className={`mt-6 p-4 ${isDark ? 'bg-gray-700' : 'bg-white border border-gray-200'} rounded-lg`}>
         <h4 className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'} mb-2`}>{t('workflow.connectionRules')}</h4>
         <div className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'} space-y-1`}>
-          <p>• Start → Data Listener</p>
-          <p>• Data Listener → AI Evaluator</p>
-          <p>• AI Evaluator → AI Evaluator (multi-level)</p>
-          <p>• AI Evaluator → TX Executor</p>
-          <p>• TX Executor → Async Collector</p>
-          <p>• Async Collector → End</p>
+          <p>• {t('node.start')} → {t('node.listener')}</p>
+          <p>• {t('node.listener')} → {t('node.evaluator')}</p>
+          <p>• {t('node.evaluator')} → {t('node.evaluator')} (多级)</p>
+          <p>• {t('node.evaluator')} → {t('node.executor')}</p>
+          <p>• {t('node.executor')} → {t('node.collector')}</p>
+          <p>• {t('node.collector')} → {t('node.end')}</p>
         </div>
-        <div className="mt-3 text-xs text-blue-400">
-          <p>💡 Hover over nodes to see delete/config buttons</p>
-          <p>🖱️ Right-click + drag to pan canvas</p>
-          <p>🔍 Mouse wheel to zoom in/out</p>
+        <div className={`mt-3 text-xs ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>
+          <p>💡 {t('workflow.hoverNodeTip')}</p>
+          <p>🖱️ {t('workflow.rightClickDragTip')}</p>
+          <p>🔍 {t('workflow.mouseWheelZoomTip')}</p>
         </div>
       </div>
     </div>

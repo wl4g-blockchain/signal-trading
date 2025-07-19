@@ -6,7 +6,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 
 export const Settings: React.FC = () => {
   const { t } = useTranslation();
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, isDark } = useTheme();
   const { language, setLanguage } = useLanguage();
   const [activeTab, setActiveTab] = useState('trading');
   const [exchangeSubTab, setExchangeSubTab] = useState('dex');
@@ -88,11 +88,11 @@ export const Settings: React.FC = () => {
 
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold text-white mb-6">Settings</h2>
+      <h2 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'} mb-6`}>{t('settings.title')}</h2>
       
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Sidebar */}
-        <div className="bg-gray-800 rounded-lg p-4">
+        <div className={`${isDark ? 'bg-gray-800' : 'bg-white border border-gray-200'} rounded-lg p-4`}>
           <nav className="space-y-2">
             {tabs.map((tab) => {
               const Icon = tab.icon;
@@ -103,7 +103,7 @@ export const Settings: React.FC = () => {
                   className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
                     activeTab === tab.id
                       ? 'bg-blue-600 text-white'
-                      : 'text-gray-300 hover:bg-gray-700'
+                      : `${isDark ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'}`
                   }`}
                 >
                   <Icon className="w-5 h-5" />
@@ -115,38 +115,38 @@ export const Settings: React.FC = () => {
         </div>
 
         {/* Content */}
-        <div className="lg:col-span-3 bg-gray-800 rounded-lg p-6 min-h-[600px] max-h-[80vh] overflow-y-auto">
+        <div className={`lg:col-span-3 ${isDark ? 'bg-gray-800' : 'bg-white border border-gray-200'} rounded-lg p-6 min-h-[600px] max-h-[80vh] overflow-y-auto`}>
           {activeTab === 'trading' && (
             <div className="space-y-6">
-              <h3 className="text-lg font-semibold text-white">Trading Configuration</h3>
+              <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('settings.trading')} Configuration</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                     Max Amount Per Transaction ($)
                   </label>
                   <input
                     type="number"
                     value={settings.trading.maxAmountPerTx}
                     onChange={(e) => updateSetting('trading', 'maxAmountPerTx', Number(e.target.value))}
-                    className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+                    className={`w-full ${isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'} px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                     Min Amount Per Transaction ($)
                   </label>
                   <input
                     type="number"
                     value={settings.trading.minAmountPerTx}
                     onChange={(e) => updateSetting('trading', 'minAmountPerTx', Number(e.target.value))}
-                    className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+                    className={`w-full ${isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'} px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                     Default Slippage Tolerance (%)
                   </label>
                   <input
@@ -154,18 +154,18 @@ export const Settings: React.FC = () => {
                     step="0.01"
                     value={settings.trading.defaultSlippage}
                     onChange={(e) => updateSetting('trading', 'defaultSlippage', Number(e.target.value))}
-                    className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+                    className={`w-full ${isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'} px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                     Risk Tolerance
                   </label>
                   <select
                     value={settings.trading.riskTolerance}
                     onChange={(e) => updateSetting('trading', 'riskTolerance', e.target.value)}
-                    className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+                    className={`w-full ${isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'} px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
                   >
                     <option value="low">Low</option>
                     <option value="medium">Medium</option>
@@ -178,13 +178,13 @@ export const Settings: React.FC = () => {
 
           {activeTab === 'security' && (
             <div className="space-y-6">
-              <h3 className="text-lg font-semibold text-white">Security Settings</h3>
+              <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('settings.security')} Settings</h3>
               
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="text-white font-medium">Two-Factor Authentication</h4>
-                    <p className="text-sm text-gray-400">Add an extra layer of security to your account</p>
+                    <h4 className={`${isDark ? 'text-white' : 'text-gray-900'} font-medium`}>Two-Factor Authentication</h4>
+                    <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Add an extra layer of security to your account</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input
@@ -214,14 +214,14 @@ export const Settings: React.FC = () => {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                     Session Timeout (minutes)
                   </label>
                   <input
                     type="number"
                     value={settings.security.sessionTimeout}
                     onChange={(e) => updateSetting('security', 'sessionTimeout', Number(e.target.value))}
-                    className="w-full md:w-48 bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+                    className={`w-full md:w-48 ${isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'} px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
                   />
                 </div>
               </div>
@@ -230,13 +230,13 @@ export const Settings: React.FC = () => {
 
           {activeTab === 'notifications' && (
             <div className="space-y-6">
-              <h3 className="text-lg font-semibold text-white">Notification Preferences</h3>
+              <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('settings.notifications')} Preferences</h3>
               
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="text-white font-medium">Trade Executions</h4>
-                    <p className="text-sm text-gray-400">Get notified when trades are executed</p>
+                    <h4 className={`${isDark ? 'text-white' : 'text-gray-900'} font-medium`}>Trade Executions</h4>
+                    <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Get notified when trades are executed</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input
@@ -251,8 +251,8 @@ export const Settings: React.FC = () => {
                 
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="text-white font-medium">Profit Alerts</h4>
-                    <p className="text-sm text-gray-400">Receive alerts for significant profits</p>
+                    <h4 className={`${isDark ? 'text-white' : 'text-gray-900'} font-medium`}>Profit Alerts</h4>
+                    <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Receive alerts for significant profits</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input
@@ -688,12 +688,12 @@ export const Settings: React.FC = () => {
 
           {activeTab === 'appearance' && (
             <div className="space-y-6">
-              <h3 className="text-lg font-semibold text-white">{t('settings.appearance')}</h3>
+              <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('settings.appearance')}</h3>
               
               <div className="space-y-6">
                 {/* Theme Settings */}
                 <div>
-                  <h4 className="text-white font-medium mb-4">{t('settings.theme')}</h4>
+                  <h4 className={`${isDark ? 'text-white' : 'text-gray-900'} font-medium mb-4`}>{t('settings.theme')}</h4>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {(['system', 'light', 'dark'] as const).map((themeOption) => (
                       <button
@@ -701,8 +701,8 @@ export const Settings: React.FC = () => {
                         onClick={() => setTheme(themeOption)}
                         className={`p-4 rounded-lg border-2 transition-all ${
                           theme === themeOption
-                            ? 'border-blue-500 bg-blue-500 bg-opacity-20 text-blue-300'
-                            : 'border-gray-600 bg-gray-700 text-gray-300 hover:border-gray-500 hover:bg-gray-600'
+                            ? 'border-blue-500 bg-blue-500 bg-opacity-20 text-blue-400'
+                            : `${isDark ? 'border-gray-600 bg-gray-700 text-gray-300 hover:border-gray-500 hover:bg-gray-600' : 'border-gray-300 bg-gray-50 text-gray-700 hover:border-gray-400 hover:bg-gray-100'}`
                         }`}
                       >
                         <div className="text-center">
@@ -720,7 +720,7 @@ export const Settings: React.FC = () => {
 
                 {/* Language Settings */}
                 <div>
-                  <h4 className="text-white font-medium mb-4">{t('settings.language')}</h4>
+                  <h4 className={`${isDark ? 'text-white' : 'text-gray-900'} font-medium mb-4`}>{t('settings.language')}</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {(['en', 'zh'] as const).map((langOption) => (
                       <button
@@ -728,8 +728,8 @@ export const Settings: React.FC = () => {
                         onClick={() => setLanguage(langOption)}
                         className={`p-4 rounded-lg border-2 transition-all ${
                           language === langOption
-                            ? 'border-blue-500 bg-blue-500 bg-opacity-20 text-blue-300'
-                            : 'border-gray-600 bg-gray-700 text-gray-300 hover:border-gray-500 hover:bg-gray-600'
+                            ? 'border-blue-500 bg-blue-500 bg-opacity-20 text-blue-400'
+                            : `${isDark ? 'border-gray-600 bg-gray-700 text-gray-300 hover:border-gray-500 hover:bg-gray-600' : 'border-gray-300 bg-gray-50 text-gray-700 hover:border-gray-400 hover:bg-gray-100'}`
                         }`}
                       >
                         <div className="text-center">
@@ -744,7 +744,7 @@ export const Settings: React.FC = () => {
           )}
           
           <div className="flex justify-end pt-6">
-            <button className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors">
+            <button className={`px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors ${isDark ? '' : 'shadow-sm'}`}>
               {t('common.save')}
             </button>
           </div>

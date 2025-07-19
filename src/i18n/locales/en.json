@@ -13,7 +13,9 @@
     "error": "Error",
     "warning": "Warning",
     "expand": "Expand Menu",
-    "collapse": "Collapse Menu"
+    "collapse": "Collapse Menu",
+    "untitled": "Untitled",
+    "reset": "Reset"
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -40,6 +42,7 @@
   },
   "workflow": {
     "title": "Workflows",
+    "untitledWorkflow": "Untitled Workflow",
     "create": "Create Workflow",
     "edit": "Edit Workflow",
     "run": "Run",
@@ -65,7 +68,11 @@
     "evaluatorDescription": "Analyze data and generate trading strategies",
     "executorDescription": "Execute trades on decentralized exchanges",
     "cexExecutorDescription": "Execute trades on centralized exchanges",
-    "collectorDescription": "Monitor and collect trade execution results"
+    "collectorDescription": "Monitor and collect trade execution results",
+    "noRunHistory": "No run history",
+    "hoverNodeTip": "Hover over nodes to see delete/config buttons",
+    "rightClickDragTip": "Right-click + drag to pan canvas",
+    "mouseWheelZoomTip": "Mouse wheel to zoom in/out"
   },
   "node": {
     "start": "Start",

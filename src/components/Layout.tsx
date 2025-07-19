@@ -206,15 +206,15 @@ export const Layout: React.FC<LayoutProps> = ({
             <div className="relative menu-container">
               <button
                 onClick={() => setShowLanguageMenu(!showLanguageMenu)}
-                className="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+                className={`flex items-center space-x-2 px-3 py-2 rounded-lg ${isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} transition-colors`}
                 title={t('settings.language')}
               >
-                <Globe className="w-5 h-5 text-gray-400" />
-                <span className="text-sm text-gray-300">{t(`language.${language === 'en' ? 'english' : 'chinese'}`)}</span>
+                <Globe className={`w-5 h-5 ${isDark ? 'text-gray-400' : 'text-gray-600'}`} />
+                <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{t(`language.${language === 'en' ? 'english' : 'chinese'}`)}</span>
               </button>
 
               {showLanguageMenu && (
-                <div className="absolute right-0 mt-2 w-32 bg-gray-800 rounded-lg shadow-lg border border-gray-700 py-2 z-50">
+                <div className={`absolute right-0 mt-2 w-32 ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg shadow-lg border py-2 z-50`}>
                   {(['en', 'zh'] as const).map((langOption) => (
                     <button
                       key={langOption}
@@ -225,7 +225,7 @@ export const Layout: React.FC<LayoutProps> = ({
                       className={`w-full flex items-center space-x-2 px-3 py-2 text-left transition-colors ${
                         language === langOption
                           ? 'text-blue-400 bg-blue-600 bg-opacity-20'
-                          : 'text-gray-300 hover:bg-gray-700'
+                          : `${isDark ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'}`
                       }`}
                     >
                       <span className="text-sm">{t(`language.${langOption === 'en' ? 'english' : 'chinese'}`)}</span>
@@ -239,24 +239,24 @@ export const Layout: React.FC<LayoutProps> = ({
             <div className="relative menu-container">
               <button
                 onClick={() => setShowUserMenu(!showUserMenu)}
-                className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+                className={`flex items-center space-x-3 px-3 py-2 rounded-lg ${isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} transition-colors`}
               >
                 {user.avatar ? (
                   <img src={user.avatar} alt={user.name} className="w-8 h-8 rounded-full" />
                 ) : (
-                  <User className="w-8 h-8 text-gray-400" />
+                  <User className={`w-8 h-8 ${isDark ? 'text-gray-400' : 'text-gray-600'}`} />
                 )}
                 <div className="text-left">
-                  <p className="text-sm font-medium text-white">{user.name}</p>
-                  <p className="text-xs text-gray-400">{user.email}</p>
+                  <p className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{user.name}</p>
+                  <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{user.email}</p>
                 </div>
               </button>
 
               {showUserMenu && (
-                <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg border border-gray-700 py-2 z-50">
+                <div className={`absolute right-0 mt-2 w-48 ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg shadow-lg border py-2 z-50`}>
                   <button
                     onClick={onLogout}
-                    className="w-full flex items-center space-x-2 px-4 py-2 text-left text-gray-300 hover:bg-gray-700 transition-colors"
+                    className={`w-full flex items-center space-x-2 px-4 py-2 text-left ${isDark ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'} transition-colors`}
                   >
                     <LogOut className="w-4 h-4" />
                     <span>{t('auth.logout')}</span>

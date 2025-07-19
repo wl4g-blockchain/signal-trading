@@ -103,13 +103,13 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
     return (
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
+          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
             Data Source Type
           </label>
           <select
             value={listenerType}
             onChange={(e) => setConfig({ ...config, type: e.target.value })}
-            className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+            className={`w-full ${isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'} px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
           >
             <option value="twitter">Twitter</option>
             <option value="binance">Binance</option>
@@ -122,31 +122,31 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
         {listenerType === 'twitter' && (
           <>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                 API Key
               </label>
               <input
                 type="password"
                 value={config.apiKey || ''}
                 onChange={(e) => setConfig({ ...config, apiKey: e.target.value })}
-                className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+                className={`w-full ${isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'} px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
                 placeholder="Enter Twitter API Key"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                 Twitter IDs (comma separated)
               </label>
               <input
                 type="text"
                 value={config.twitterIds || ''}
                 onChange={(e) => setConfig({ ...config, twitterIds: e.target.value })}
-                className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+                className={`w-full ${isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'} px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
                 placeholder="elonmusk, VitalikButerin, trump"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                 Interval (minutes)
               </label>
               <input
@@ -465,7 +465,7 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
     return (
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
+          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
             Target Chain
           </label>
           <select
@@ -481,7 +481,7 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
                 dexAddress: newDexOptions[0]?.address || ''
               });
             }}
-            className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+            className={`w-full ${isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'} px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
           >
             <option value="mainnet">Ethereum Mainnet</option>
             <option value="goerli">Goerli Testnet</option>

@@ -13,7 +13,7 @@ export const WorkflowPage: React.FC = () => {
   const { t } = useTranslation();
   const [nodes, setNodes] = useState<ComponentNode[]>([]);
   const [connections, setConnections] = useState<Connection[]>([]);
-  const [workflowName, setWorkflowName] = useState('Untitled Workflow');
+  const [workflowName, setWorkflowName] = useState(t('workflow.untitledWorkflow'));
   const [workflowId, setWorkflowId] = useState<string | null>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [showWorkflowList, setShowWorkflowList] = useState(true);
@@ -35,6 +35,28 @@ export const WorkflowPage: React.FC = () => {
     }
   };
 
+  // Update workflow name when language changes (if it's still the default name)
+  useEffect(() => {
+    const defaultNames = ['Untitled Workflow', '未命名工作流'];
+    if (defaultNames.includes(workflowName)) {
+      setWorkflowName(t('workflow.untitledWorkflow'));
+    }
+  }, [t, workflowName]);
+
+  // Update start/end node names when language changes
+  useEffect(() => {
+    setNodes(prevNodes => 
+      prevNodes.map(node => {
+        if (node.type === 'start' && ['Start', '开始'].includes(node.data?.name || '')) {
+          return { ...node, data: { ...node.data, name: t('node.start') } };
+        } else if (node.type === 'end' && ['End', '结束'].includes(node.data?.name || '')) {
+          return { ...node, data: { ...node.data, name: t('node.end') } };
+        }
+        return node;
+      })
+    );
+  }, [t]);
+
   // Listen for canvas scale updates
   useEffect(() => {
     const handleScaleUpdate = (event: CustomEvent) => {
@@ -54,7 +76,7 @@ export const WorkflowPage: React.FC = () => {
         id: 'start-node',
         type: 'start',
         position: { x: 50, y: 200 },
-        data: { name: 'Start', status: 'idle' },
+        data: { name: t('node.start'), status: 'idle' },
         inputs: [],
         outputs: ['output'],
       };
@@ -63,7 +85,7 @@ export const WorkflowPage: React.FC = () => {
         id: 'end-node',
         type: 'end',
         position: { x: 800, y: 200 },
-        data: { name: 'End', status: 'idle' },
+        data: { name: t('node.end'), status: 'idle' },
         inputs: ['input'],
         outputs: [],
       };
@@ -264,23 +286,23 @@ export const WorkflowPage: React.FC = () => {
             </button>
             
             {/* Zoom controls - moved to top right */}
-            <div className={`flex items-center space-x-2 ${isDark ? 'bg-gray-700' : 'bg-gray-700'} rounded-lg p-2`}>
+            <div className={`flex items-center space-x-2 ${isDark ? 'bg-gray-700' : 'bg-gray-200'} rounded-lg p-2`}>
               <button
                 onClick={() => {
                   const event = new CustomEvent('canvas-zoom', { detail: { action: 'in' } });
                   window.dispatchEvent(event);
                 }}
-                className={`px-2 py-1 ${isDark ? 'bg-gray-600 hover:bg-gray-500' : 'bg-gray-600 hover:bg-gray-500'} text-white rounded text-xs`}
+                className={`px-2 py-1 ${isDark ? 'bg-gray-600 hover:bg-gray-500 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'} rounded text-xs`}
               >
                 +
               </button>
-              <span className="text-white text-xs min-w-[40px] text-center">{canvasScale}%</span>
+              <span className={`text-xs min-w-[40px] text-center ${isDark ? 'text-white' : 'text-gray-800'}`}>{canvasScale}%</span>
               <button
                 onClick={() => {
                   const event = new CustomEvent('canvas-zoom', { detail: { action: 'out' } });
                   window.dispatchEvent(event);
                 }}
-                className={`px-2 py-1 ${isDark ? 'bg-gray-600 hover:bg-gray-500' : 'bg-gray-600 hover:bg-gray-500'} text-white rounded text-xs`}
+                className={`px-2 py-1 ${isDark ? 'bg-gray-600 hover:bg-gray-500 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'} rounded text-xs`}
               >
                 -
               </button>
@@ -289,9 +311,9 @@ export const WorkflowPage: React.FC = () => {
                   const event = new CustomEvent('canvas-zoom', { detail: { action: 'reset' } });
                   window.dispatchEvent(event);
                 }}
-                className={`px-2 py-1 ${isDark ? 'bg-gray-600 hover:bg-gray-500' : 'bg-gray-600 hover:bg-gray-500'} text-white rounded text-xs`}
+                className={`px-2 py-1 ${isDark ? 'bg-gray-600 hover:bg-gray-500 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'} rounded text-xs`}
               >
-                Reset
+                {t('common.reset')}
               </button>
             </div>
           </div>

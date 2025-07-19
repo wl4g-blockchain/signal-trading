@@ -199,7 +199,7 @@ export const WorkflowList: React.FC<WorkflowListProps> = ({ onLoadWorkflow }) =>
                 
                 {workflowRuns.length === 0 && (
                   <div className={`text-center py-6 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-                    <p className="text-xs">暂无运行记录</p>
+                    <p className="text-xs">{t('workflow.noRunHistory')}</p>
                   </div>
                 )}
               </div>
