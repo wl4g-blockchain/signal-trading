@@ -17,7 +17,7 @@ function App() {
     // Check if user is already logged in
     const checkAuth = async () => {
       try {
-        const currentUser = await serviceManager.getService().getCurrentUser();
+        const currentUser = await serviceManager.getService().getCurrentUser() as User;
         if (currentUser) {
           setUser(currentUser);
         }
@@ -56,16 +56,31 @@ function App() {
     }
   };
 
+  const handleNavigateToWorkflowRun = (workflowId: string, tradeId: string) => {
+    // Navigate to workflow page where user can see runs
+    setCurrentView('workflow');
+  };
+
   const renderCurrentView = () => {
     switch (currentView) {
       case 'monitor':
-        return <LiveDashboard showReports={true} />;
+        return (
+          <LiveDashboard 
+            showReports={true} 
+            onNavigateToWorkflowRun={handleNavigateToWorkflowRun}
+          />
+        );
       case 'workflow':
         return <WorkflowPage />;
       case 'settings':
         return <Settings />;
       default:
-        return <LiveDashboard showReports={true} />;
+        return (
+          <LiveDashboard 
+            showReports={true} 
+            onNavigateToWorkflowRun={handleNavigateToWorkflowRun}
+          />
+        );
     }
   };
 

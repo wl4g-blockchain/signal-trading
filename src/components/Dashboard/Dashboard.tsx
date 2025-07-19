@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { TradeRecord } from "../../types";
-import { Activity, TrendingUp, DollarSign, Zap, Wallet, ExternalLink } from "lucide-react";
+import { Activity, TrendingUp, DollarSign, Zap, Wallet, ExternalLink, Eye } from "lucide-react";
 import {
   LineChart,
   Line,
@@ -17,10 +17,12 @@ import { useTranslation } from "react-i18next";
 
 interface LiveDashboardProps {
   showReports?: boolean;
+  onNavigateToWorkflowRun?: (workflowId: string, tradeId: string) => void;
 }
 
 export const LiveDashboard: React.FC<LiveDashboardProps> = ({
   showReports,
+  onNavigateToWorkflowRun,
 }) => {
   const { isDark } = useTheme();
   const { t } = useTranslation();
@@ -100,8 +102,14 @@ export const LiveDashboard: React.FC<LiveDashboardProps> = ({
     }
   };
 
+  const handleTradeClick = (trade: TradeRecord) => {
+    if (onNavigateToWorkflowRun) {
+      onNavigateToWorkflowRun(trade.workflowId, trade.id);
+    }
+  };
+
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('dashboard.title')}</h2>
@@ -111,11 +119,62 @@ export const LiveDashboard: React.FC<LiveDashboardProps> = ({
         </div>
       </div>
 
-      {/* Balance Section */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        {/* DEX Balances */}
-        <div className={`${isDark ? 'bg-gray-800' : 'bg-white border border-gray-200'} rounded-lg p-6`}>
-          <div className="flex items-center justify-between mb-4">
+      {/* Stats Cards Row */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className={`${isDark ? 'bg-gray-800' : 'bg-white border border-gray-200'} rounded-lg p-4`}>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'} text-sm`}>{t('dashboard.totalProfit')}</p>
+              <p className="text-xl font-bold text-green-400">
+                ${stats.totalProfit.toFixed(2)}
+              </p>
+            </div>
+            <DollarSign className="w-6 h-6 text-green-400" />
+          </div>
+        </div>
+
+        <div className={`${isDark ? 'bg-gray-800' : 'bg-white border border-gray-200'} rounded-lg p-4`}>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'} text-sm`}>{t('dashboard.todayProfit')}</p>
+              <p className="text-xl font-bold text-blue-400">
+                ${stats.todayProfit.toFixed(2)}
+              </p>
+            </div>
+            <TrendingUp className="w-6 h-6 text-blue-400" />
+          </div>
+        </div>
+
+        <div className={`${isDark ? 'bg-gray-800' : 'bg-white border border-gray-200'} rounded-lg p-4`}>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'} text-sm`}>{t('dashboard.successRate')}</p>
+              <p className="text-xl font-bold text-purple-400">
+                {stats.successRate}%
+              </p>
+            </div>
+            <Activity className="w-6 h-6 text-purple-400" />
+          </div>
+        </div>
+
+        <div className={`${isDark ? 'bg-gray-800' : 'bg-white border border-gray-200'} rounded-lg p-4`}>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'} text-sm`}>{t('dashboard.activeTrades')}</p>
+              <p className="text-xl font-bold text-orange-400">
+                {stats.activeTrades}
+              </p>
+            </div>
+            <Zap className="w-6 h-6 text-orange-400" />
+          </div>
+        </div>
+      </div>
+
+      {/* Balance Section - Compact */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+        {/* DEX Balances - Consistent with other sections */}
+        <div className={`${isDark ? 'bg-gray-800' : 'bg-white border border-gray-200'} rounded-lg p-4`}>
+          <div className="flex items-center justify-between mb-3">
             <div className="flex items-center space-x-2">
               <Wallet className="w-5 h-5 text-blue-400" />
               <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('dashboard.balance.dexBalance')}</h3>
@@ -127,35 +186,31 @@ export const LiveDashboard: React.FC<LiveDashboardProps> = ({
               </div>
             </div>
           </div>
-          <div className="space-y-3">
+          <div className="grid grid-cols-2 gap-2">
             {dexBalances.map((balance, idx) => (
-              <div key={idx} className={`flex items-center justify-between p-3 ${isDark ? 'bg-gray-700' : 'bg-gray-50'} rounded`}>
-                <div className="flex items-center space-x-3">
-                  <span className="text-lg">{getChainIcon(balance.chain)}</span>
+              <div key={idx} className={`flex items-center justify-between p-2 ${isDark ? 'bg-gray-700' : 'bg-gray-50'} rounded text-xs`}>
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm">{getChainIcon(balance.chain)}</span>
                   <div>
                     <div className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
                       {balance.balance} {balance.symbol}
                     </div>
-                    <div className="flex items-center space-x-1 text-xs text-gray-400">
-                      <span>{t(`dashboard.balance.${balance.chain}`)}</span>
-                      <ExternalLink className="w-3 h-3" />
-                      <span className="font-mono">{balance.vaultAddress}</span>
+                    <div className="text-xs text-gray-400 capitalize">
+                      {t(`dashboard.balance.${balance.chain}`)}
                     </div>
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                    ${balance.usdValue.toLocaleString()}
-                  </div>
+                <div className={`text-xs font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                  ${balance.usdValue.toLocaleString()}
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* CEX Balances */}
-        <div className={`${isDark ? 'bg-gray-800' : 'bg-white border border-gray-200'} rounded-lg p-6`}>
-          <div className="flex items-center justify-between mb-4">
+        {/* CEX Balances - Consistent with other sections */}
+        <div className={`${isDark ? 'bg-gray-800' : 'bg-white border border-gray-200'} rounded-lg p-4`}>
+          <div className="flex items-center justify-between mb-3">
             <div className="flex items-center space-x-2">
               <Activity className="w-5 h-5 text-purple-400" />
               <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('dashboard.balance.cexBalance')}</h3>
@@ -167,11 +222,11 @@ export const LiveDashboard: React.FC<LiveDashboardProps> = ({
               </div>
             </div>
           </div>
-          <div className="space-y-3">
+          <div className="grid grid-cols-2 gap-2">
             {cexBalances.map((balance, idx) => (
-              <div key={idx} className={`flex items-center justify-between p-3 ${isDark ? 'bg-gray-700' : 'bg-gray-50'} rounded`}>
-                <div className="flex items-center space-x-3">
-                  <span className="text-lg">{getExchangeIcon(balance.exchange)}</span>
+              <div key={idx} className={`flex items-center justify-between p-2 ${isDark ? 'bg-gray-700' : 'bg-gray-50'} rounded text-xs`}>
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm">{getExchangeIcon(balance.exchange)}</span>
                   <div>
                     <div className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
                       {balance.balance} {balance.symbol}
@@ -181,10 +236,8 @@ export const LiveDashboard: React.FC<LiveDashboardProps> = ({
                     </div>
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                    ${balance.usdValue.toLocaleString()}
-                  </div>
+                <div className={`text-xs font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                  ${balance.usdValue.toLocaleString()}
                 </div>
               </div>
             ))}
@@ -192,62 +245,12 @@ export const LiveDashboard: React.FC<LiveDashboardProps> = ({
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className={`${isDark ? 'bg-gray-800' : 'bg-white border border-gray-200'} rounded-lg p-6`}>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'} text-sm`}>{t('dashboard.totalProfit')}</p>
-              <p className="text-2xl font-bold text-green-400">
-                ${stats.totalProfit.toFixed(2)}
-              </p>
-            </div>
-            <DollarSign className="w-8 h-8 text-green-400" />
-          </div>
-        </div>
-
-        <div className={`${isDark ? 'bg-gray-800' : 'bg-white border border-gray-200'} rounded-lg p-6`}>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'} text-sm`}>{t('dashboard.todayProfit')}</p>
-              <p className="text-2xl font-bold text-blue-400">
-                ${stats.todayProfit.toFixed(2)}
-              </p>
-            </div>
-            <TrendingUp className="w-8 h-8 text-blue-400" />
-          </div>
-        </div>
-
-        <div className={`${isDark ? 'bg-gray-800' : 'bg-white border border-gray-200'} rounded-lg p-6`}>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'} text-sm`}>{t('dashboard.successRate')}</p>
-              <p className="text-2xl font-bold text-purple-400">
-                {stats.successRate}%
-              </p>
-            </div>
-            <Activity className="w-8 h-8 text-purple-400" />
-          </div>
-        </div>
-
-        <div className={`${isDark ? 'bg-gray-800' : 'bg-white border border-gray-200'} rounded-lg p-6`}>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'} text-sm`}>{t('dashboard.activeTrades')}</p>
-              <p className="text-2xl font-bold text-orange-400">
-                {stats.activeTrades}
-              </p>
-            </div>
-            <Zap className="w-8 h-8 text-orange-400" />
-          </div>
-        </div>
-      </div>
-
-      {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className={`${isDark ? 'bg-gray-800' : 'bg-white border border-gray-200'} rounded-lg p-6`}>
-          <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>
-            {t('dashboard.profitTimeline')}
+      {/* Charts Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className={`${isDark ? 'bg-gray-800' : 'bg-white border border-gray-200'} rounded-lg p-4`}>
+          <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'} mb-4 flex items-center space-x-2`}>
+            <TrendingUp className="w-5 h-5 text-blue-400" />
+            <span>{t('dashboard.profitTimeline')}</span>
           </h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -275,7 +278,7 @@ export const LiveDashboard: React.FC<LiveDashboardProps> = ({
           </div>
         </div>
 
-        <div className={`${isDark ? 'bg-gray-800' : 'bg-white border border-gray-200'} rounded-lg p-6`}>
+        <div className={`${isDark ? 'bg-gray-800' : 'bg-white border border-gray-200'} rounded-lg p-4`}>
           <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>
             {t('dashboard.tradePerformance')}
           </h3>
@@ -307,42 +310,43 @@ export const LiveDashboard: React.FC<LiveDashboardProps> = ({
       </div>
 
       {/* Recent Trades */}
-      <div className={`${isDark ? 'bg-gray-800' : 'bg-white border border-gray-200'} rounded-lg p-6`}>
+      <div className={`${isDark ? 'bg-gray-800' : 'bg-white border border-gray-200'} rounded-lg p-4`}>
         <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>{t('dashboard.recentTrades')}</h3>
-        <div className="overflow-x-auto max-h-80 overflow-y-auto">
+        <div className="overflow-x-auto max-h-64 overflow-y-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-700">
-                <th className="text-left py-3 px-4 text-gray-400">{t('dashboard.time')}</th>
-                <th className="text-left py-3 px-4 text-gray-400">{t('dashboard.strategy')}</th>
-                <th className="text-left py-3 px-4 text-gray-400">{t('dashboard.pair')}</th>
-                <th className="text-left py-3 px-4 text-gray-400">{t('dashboard.amount')}</th>
-                <th className="text-left py-3 px-4 text-gray-400">{t('dashboard.profit')}</th>
-                <th className="text-left py-3 px-4 text-gray-400">{t('dashboard.status')}</th>
+                <th className="text-left py-2 px-3 text-gray-400 text-sm">{t('dashboard.time')}</th>
+                <th className="text-left py-2 px-3 text-gray-400 text-sm">{t('dashboard.strategy')}</th>
+                <th className="text-left py-2 px-3 text-gray-400 text-sm">{t('dashboard.pair')}</th>
+                <th className="text-left py-2 px-3 text-gray-400 text-sm">{t('dashboard.amount')}</th>
+                <th className="text-left py-2 px-3 text-gray-400 text-sm">{t('dashboard.profit')}</th>
+                <th className="text-left py-2 px-3 text-gray-400 text-sm">{t('dashboard.status')}</th>
+                <th className="text-left py-2 px-3 text-gray-400 text-sm">{t('dashboard.action')}</th>
               </tr>
             </thead>
             <tbody>
               {trades.slice(0, 10).map((trade) => (
                 <tr
                   key={trade.id}
-                  className="border-b border-gray-700 hover:bg-gray-700"
+                  className={`border-b border-gray-700 hover:${isDark ? 'bg-gray-700' : 'bg-gray-50'} transition-colors`}
                 >
-                  <td className="py-3 px-4 text-gray-300">
+                  <td className="py-2 px-3 text-gray-300 text-sm">
                     {trade.timestamp.toLocaleTimeString()}
                   </td>
-                  <td className="py-3 px-4 text-gray-300">{trade.strategy}</td>
-                  <td className="py-3 px-4 text-gray-300">{trade.pair}</td>
-                  <td className="py-3 px-4 text-gray-300">
+                  <td className="py-2 px-3 text-gray-300 text-sm">{trade.strategy}</td>
+                  <td className="py-2 px-3 text-gray-300 text-sm">{trade.pair}</td>
+                  <td className="py-2 px-3 text-gray-300 text-sm">
                     ${trade.amount.toFixed(2)}
                   </td>
                   <td
-                    className={`py-3 px-4 font-medium ${
+                    className={`py-2 px-3 font-medium text-sm ${
                       trade.profit >= 0 ? "text-green-400" : "text-red-400"
                     }`}
                   >
                     ${trade.profit.toFixed(2)}
                   </td>
-                  <td className="py-3 px-4">
+                  <td className="py-2 px-3">
                     <span
                       className={`px-2 py-1 rounded-full text-xs ${
                         trade.status === "success"
@@ -353,6 +357,20 @@ export const LiveDashboard: React.FC<LiveDashboardProps> = ({
                       {trade.status}
                     </span>
                   </td>
+                  <td className="py-2 px-3">
+                    <button
+                      onClick={() => handleTradeClick(trade)}
+                      className={`inline-flex items-center space-x-1 px-2 py-1 text-xs rounded-md transition-colors ${
+                        isDark 
+                          ? 'bg-blue-600 hover:bg-blue-700 text-blue-100' 
+                          : 'bg-blue-100 hover:bg-blue-200 text-blue-700'
+                      }`}
+                      title={t('dashboard.viewWorkflowRun')}
+                    >
+                      <Eye className="w-3 h-3" />
+                      <span>{t('dashboard.viewDetails')}</span>
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -360,7 +378,7 @@ export const LiveDashboard: React.FC<LiveDashboardProps> = ({
         </div>
       </div>
       {/* 合并 Reports 内容 */}
-      {showReports && <div className="mt-10"></div>}
+      {showReports && <div className="mt-8"></div>}
     </div>
   );
 };

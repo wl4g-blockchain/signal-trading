@@ -16,7 +16,9 @@
     "collapse": "Collapse Menu",
     "untitled": "Untitled",
     "reset": "Reset",
-    "total": "Total"
+    "total": "Total",
+    "back": "Back",
+    "close": "Close"
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -134,6 +136,9 @@
     "amount": "Amount",
     "profit": "Profit",
     "status": "Status",
+    "action": "Action",
+    "viewDetails": "View Details",
+    "viewWorkflowRun": "View Workflow Run Details",
     "balance": {
       "dexBalance": "DEX Balance",
       "cexBalance": "CEX Balance",

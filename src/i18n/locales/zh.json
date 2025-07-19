@@ -16,7 +16,9 @@
     "collapse": "收起菜单",
     "untitled": "未命名",
     "reset": "重置",
-    "total": "总计"
+    "total": "总计",
+    "back": "返回",
+    "close": "关闭"
   },
   "navigation": {
     "dashboard": "仪表盘",
@@ -134,6 +136,9 @@
     "amount": "金额",
     "profit": "收益",
     "status": "状态",
+    "action": "操作",
+    "viewDetails": "查看详情",
+    "viewWorkflowRun": "查看工作流运行详情",
     "balance": {
       "dexBalance": "DEX 余额",
       "cexBalance": "CEX 余额",
