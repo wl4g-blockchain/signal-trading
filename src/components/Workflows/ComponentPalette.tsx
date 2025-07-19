@@ -149,19 +149,20 @@ export const ComponentPaletteCollapsed: React.FC<ComponentPaletteCollapsedProps>
             <button
               onClick={() => !readOnlyMode && onAddNode(component.type)}
               disabled={!!readOnlyMode}
-              className={`w-8 h-8 ${readOnlyMode ? 'bg-gray-500 cursor-not-allowed' : component.color} rounded-lg flex items-center justify-center transition-all duration-150 shadow-sm hover:shadow-lg hover:scale-110 active:scale-95 ${readOnlyMode ? 'opacity-50' : ''}`}
-              // Remove native title attribute to prevent 3-second delay, use only custom tooltip
+              className={`w-8 h-8 ${readOnlyMode ? 'bg-gray-500 cursor-not-allowed' : component.color} rounded-lg flex items-center justify-center transition-all duration-200 shadow-sm hover:shadow-lg hover:scale-110 active:scale-95 ${readOnlyMode ? 'opacity-50' : ''} group-hover:brightness-110`}
+              aria-label={`Add ${component.title} node`}
             >
-              <Icon className="w-4 h-4 text-white" />
+              <Icon className="w-4 h-4 text-white transition-transform group-hover:scale-105" />
             </button>
-            {/* Enhanced Tooltip - Immediate hover response */}
-            <div className={`absolute left-full ml-3 px-3 py-2 rounded-lg text-xs z-50 opacity-0 group-hover:opacity-100 transition-opacity duration-75 pointer-events-none ${isDark ? 'bg-gray-900 text-white border border-gray-600' : 'bg-white text-gray-800 border border-gray-300'} shadow-xl min-w-[160px]`}>
+            {/* Enhanced Tooltip - Display to left and higher z-index */}
+            <div className={`absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 rounded-lg text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none ${isDark ? 'bg-gray-900 text-white border border-gray-600' : 'bg-white text-gray-800 border border-gray-300'} shadow-2xl min-w-[200px] whitespace-nowrap`} 
+                 style={{ zIndex: 50000 }}>
               <div className="font-semibold text-xs mb-1">{component.title}</div>
-              <div className={`text-xs leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+              <div className={`text-xs leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-600'} whitespace-normal`}>
                 {component.description}
               </div>
-              {/* Arrow pointer */}
-              <div className={`absolute right-full top-3 w-0 h-0 border-t-4 border-b-4 border-r-4 ${isDark ? 'border-r-gray-900' : 'border-r-white'} border-t-transparent border-b-transparent`}></div>
+              {/* Arrow pointer pointing right */}
+              <div className={`absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 border-t-[6px] border-b-[6px] border-l-[6px] ${isDark ? 'border-l-gray-900' : 'border-l-white'} border-t-transparent border-b-transparent`}></div>
             </div>
           </div>
         );

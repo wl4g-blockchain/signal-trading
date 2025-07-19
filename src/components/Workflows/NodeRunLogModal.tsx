@@ -15,6 +15,9 @@ export const NodeRunLogModal: React.FC<NodeRunLogModalProps> = ({
 }) => {
   const { isDark } = useTheme();
   const { t } = useTranslation();
+  
+  // Fixed timestamp - generate once and reuse to prevent updates during renders
+  const logTimestamp = React.useMemo(() => new Date().toISOString().substring(11, 23), []);
 
   const runStatus = node.data?.runStatus || 'skipped';
   const runLogs = node.data?.runLogs || [];
@@ -79,7 +82,7 @@ export const NodeRunLogModal: React.FC<NodeRunLogModalProps> = ({
                 runLogs.map((log, index) => (
                   <div key={index} className="mb-1 flex">
                     <span className="text-gray-500 mr-2 select-none">
-                      [{new Date().toISOString().substring(11, 23)}]
+                      [{logTimestamp}]
                     </span>
                     <span className="text-green-400">{log}</span>
                   </div>
@@ -93,7 +96,7 @@ export const NodeRunLogModal: React.FC<NodeRunLogModalProps> = ({
               {/* Cursor Blink */}
               <div className="mt-2 flex items-center">
                 <span className="text-gray-500 mr-2">
-                  [{new Date().toISOString().substring(11, 23)}]
+                  [{logTimestamp}]
                 </span>
                 <span className="text-green-400">$</span>
                 <span className="ml-1 bg-green-400 w-2 h-4 animate-pulse"></span>

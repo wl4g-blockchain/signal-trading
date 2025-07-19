@@ -34,6 +34,9 @@ export const WorkflowRunCanvas: React.FC<WorkflowRunCanvasProps> = ({
   const [nodeLogs, setNodeLogs] = useState<string[]>([]);
   const [loadingLogs, setLoadingLogs] = useState(false);
   
+  // Fixed timestamp - generate once and reuse to prevent updates during drag
+  const [logTimestamp] = useState(() => new Date().toISOString().substring(11, 23));
+  
   // Drag resize state - Fixed initial values to prevent jumpy behavior
   const [isDragging, setIsDragging] = useState(false);
 
@@ -109,13 +112,6 @@ export const WorkflowRunCanvas: React.FC<WorkflowRunCanvasProps> = ({
       }
     }
   }, [nodes, selectedNodeId, logPanelVisible, handleNodeClick]);
-
-  // Close log panel
-  const closeLogPanel = useCallback(() => {
-    setLogPanelVisible(false);
-    setSelectedNodeId(null);
-    setNodeLogs([]);
-  }, []);
 
   // Handle resize drag start - Fixed to prevent initial width jumping
   const handleResizeDragStart = useCallback((e: React.MouseEvent) => {
@@ -378,12 +374,6 @@ export const WorkflowRunCanvas: React.FC<WorkflowRunCanvasProps> = ({
               </span>
             )}
           </div>
-          <button
-            onClick={closeLogPanel}
-            className={`p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors`}
-          >
-            <X className={`w-5 h-5 ${isDark ? 'text-gray-400' : 'text-gray-600'}`} />
-          </button>
         </div>
 
         {/* Log Content */}
@@ -407,7 +397,7 @@ export const WorkflowRunCanvas: React.FC<WorkflowRunCanvasProps> = ({
                 nodeLogs.map((log, index) => (
                   <div key={index} className="mb-1 flex">
                     <span className="text-gray-500 mr-2 select-none">
-                      [{new Date().toISOString().substring(11, 23)}]
+                      [{logTimestamp}]
                     </span>
                     <span className="text-green-400">{log}</span>
                   </div>
@@ -421,7 +411,7 @@ export const WorkflowRunCanvas: React.FC<WorkflowRunCanvasProps> = ({
               {/* Cursor Blink */}
               <div className="mt-2 flex items-center">
                 <span className="text-gray-500 mr-2">
-                  [{new Date().toISOString().substring(11, 23)}]
+                  [{logTimestamp}]
                 </span>
                 <span className="text-green-400">$</span>
                 <span className="ml-1 bg-green-400 w-2 h-4 animate-pulse"></span>
