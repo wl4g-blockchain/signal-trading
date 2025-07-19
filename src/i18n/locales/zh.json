@@ -1,0 +1,77 @@
+{
+  "common": {
+    "loading": "加载中",
+    "save": "保存",
+    "cancel": "取消",
+    "confirm": "确认",
+    "delete": "删除",
+    "edit": "编辑",
+    "create": "创建",
+    "connect": "连接",
+    "disconnect": "断开连接",
+    "success": "成功",
+    "error": "错误",
+    "warning": "警告",
+    "expand": "展开菜单",
+    "collapse": "收起菜单"
+  },
+  "navigation": {
+    "dashboard": "仪表盘",
+    "workflows": "工作流",
+    "settings": "设置",
+    "reports": "报告"
+  },
+  "auth": {
+    "login": "登录",
+    "logout": "登出",
+    "email": "邮箱",
+    "password": "密码",
+    "loginWithGoogle": "使用 Google 登录",
+    "loginWithGithub": "使用 GitHub 登录"
+  },
+  "theme": {
+    "system": "跟随系统",
+    "light": "浅色模式",
+    "dark": "深色模式"
+  },
+  "language": {
+    "english": "English",
+    "chinese": "中文"
+  },
+  "workflow": {
+    "title": "工作流管理",
+    "create": "创建工作流",
+    "edit": "编辑工作流",
+    "run": "运行",
+    "pause": "暂停",
+    "stop": "停止",
+    "status": "状态",
+    "draft": "草稿",
+    "running": "运行中",
+    "paused": "已暂停",
+    "completed": "已完成"
+  },
+  "node": {
+    "start": "开始",
+    "end": "结束",
+    "listener": "监听器",
+    "evaluator": "评估器",
+    "executor": "执行器",
+    "cexExecutor": "CEX执行器",
+    "collector": "收集器"
+  },
+  "settings": {
+    "title": "设置",
+    "general": "通用",
+    "appearance": "外观",
+    "language": "语言",
+    "theme": "主题",
+    "wallet": "钱包",
+    "connect": "连接钱包",
+    "disconnect": "断开钱包",
+    "trading": "交易",
+    "exchanges": "交易所",
+    "security": "安全",
+    "notifications": "通知"
+  }
+} 

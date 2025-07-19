@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { BarChart3, Settings, Activity, FileText, LogOut, User, Globe, ChevronLeft, ChevronRight } from 'lucide-react';
 import { serviceManager, ApiType } from '../services';
 import { User as UserType } from '../types';
+import { useTranslation } from 'react-i18next';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -22,11 +23,12 @@ export const Layout: React.FC<LayoutProps> = ({
   sidebarCollapsed: externalSidebarCollapsed,
   onSidebarCollapsedChange
 }) => {
+  const { t } = useTranslation();
   const [apiType, setApiType] = useState<ApiType>(serviceManager.getCurrentApiType());
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [internalSidebarCollapsed, setInternalSidebarCollapsed] = useState(false);
   
-  // 使用外部状态或内部状态
+  // Use external state or internal state
   const sidebarCollapsed = externalSidebarCollapsed !== undefined ? externalSidebarCollapsed : internalSidebarCollapsed;
   const setSidebarCollapsed = (collapsed: boolean) => {
     if (onSidebarCollapsedChange) {
@@ -37,9 +39,9 @@ export const Layout: React.FC<LayoutProps> = ({
   };
 
   const navItems = [
-    { id: 'monitor', label: 'Dashboard', icon: Activity },
-    { id: 'workflow', label: 'Workflows', icon: BarChart3 },
-    { id: 'settings', label: 'Settings', icon: Settings },
+    { id: 'monitor', label: t('navigation.dashboard'), icon: Activity },
+    { id: 'workflow', label: t('navigation.workflows'), icon: BarChart3 },
+    { id: 'settings', label: t('navigation.settings'), icon: Settings },
   ];
 
   const handleAPISwitch = (type: ApiType) => {
@@ -55,7 +57,7 @@ export const Layout: React.FC<LayoutProps> = ({
         <button
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
           className="absolute -right-3 top-6 z-10 bg-gray-700 hover:bg-gray-600 rounded-full p-1 border border-gray-600 transition-colors"
-          title={sidebarCollapsed ? "展开菜单" : "收起菜单"}
+          title={sidebarCollapsed ? t('common.expand') : t('common.collapse')}
         >
           {sidebarCollapsed ? (
             <ChevronRight className="w-4 h-4 text-gray-300" />
@@ -164,7 +166,7 @@ export const Layout: React.FC<LayoutProps> = ({
                   className="w-full flex items-center space-x-2 px-4 py-2 text-left text-gray-300 hover:bg-gray-700 transition-colors"
                 >
                   <LogOut className="w-4 h-4" />
-                  <span>Sign Out</span>
+                  <span>{t('auth.logout')}</span>
                 </button>
               </div>
             )}

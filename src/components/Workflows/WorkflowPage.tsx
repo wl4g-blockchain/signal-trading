@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ComponentNode, Connection } from '../../types';
+import { ComponentNode, Connection, Workflow } from '../../types';
 import { Canvas } from './Canvas';
 import { ComponentPalette } from './ComponentPalette';
 import { WorkflowList } from './WorkflowList';
@@ -18,20 +18,20 @@ export const WorkflowPage: React.FC = () => {
   const [canvasScale, setCanvasScale] = useState(100);
   const [rightPanelCollapsed, setRightPanelCollapsed] = useState(false);
 
-  // 智能预判：当用户收起右侧面板时，自动收起左侧菜单
+  // Smart prediction: Auto-collapse left menu when right panel is collapsed
   const handleRightPanelToggle = () => {
     const newRightPanelState = !rightPanelCollapsed;
     setRightPanelCollapsed(newRightPanelState);
     
-    // 如果收起右侧面板，自动收起左侧菜单
+    // If right panel is collapsed, auto-collapse left menu
     if (newRightPanelState) {
-      // 通过自定义事件通知App组件收起左侧菜单
+      // Notify App component to collapse left menu via custom event
       const event = new CustomEvent('collapse-sidebar', { detail: { collapsed: true } });
       window.dispatchEvent(event);
     }
   };
 
-  // 监听画布缩放更新
+  // Listen for canvas scale updates
   useEffect(() => {
     const handleScaleUpdate = (event: CustomEvent) => {
       setCanvasScale(event.detail.scale);
@@ -161,7 +161,11 @@ export const WorkflowPage: React.FC = () => {
       localStorage.setItem('current_workflow', JSON.stringify(workflow));
 
       // Then save via service
-      const savedWorkflow = await serviceManager.getService().saveWorkflow(workflow);
+      const workflowToSave = {
+        ...workflow,
+        id: workflowId || '' // Use empty string for new workflows
+      };
+      const savedWorkflow = await serviceManager.getService().saveWorkflow(workflowToSave);
       setWorkflowId(savedWorkflow.id);
       
       console.log('Workflow saved successfully');
@@ -190,7 +194,7 @@ export const WorkflowPage: React.FC = () => {
     }
   };
 
-  const handleLoadWorkflow = (workflow: any) => {
+  const handleLoadWorkflow = (workflow: Workflow) => {
     setWorkflowId(workflow.id);
     setWorkflowName(workflow.name);
     setNodes(workflow.nodes || []);
@@ -254,7 +258,7 @@ export const WorkflowPage: React.FC = () => {
               <Settings className="w-4 h-4" />
             </button>
             
-            {/* 缩放控制器 - 移动到右上角 */}
+            {/* Zoom controls - moved to top right */}
             <div className="flex items-center space-x-2 bg-gray-700 rounded-lg p-2">
               <button
                 onClick={() => {
@@ -296,7 +300,7 @@ export const WorkflowPage: React.FC = () => {
             onNodesChange={setNodes}
             onConnectionsChange={setConnections}
             onDeleteNode={(nodeId) => {
-              // 删除节点及其相关连接
+              // Delete node and its related connections
               setNodes(nodes.filter(n => n.id !== nodeId));
               setConnections(connections.filter(c => c.source !== nodeId && c.target !== nodeId));
             }}
@@ -310,7 +314,7 @@ export const WorkflowPage: React.FC = () => {
         <button
           onClick={handleRightPanelToggle}
           className="absolute -left-3 top-6 z-10 bg-gray-700 hover:bg-gray-600 rounded-full p-1 border border-gray-600 transition-colors"
-          title={rightPanelCollapsed ? "展开组件面板" : "收起组件面板"}
+          title={rightPanelCollapsed ? "Expand component panel" : "Collapse component panel"}
         >
           {rightPanelCollapsed ? (
             <ChevronLeft className="w-4 h-4 text-gray-300" />
@@ -322,13 +326,13 @@ export const WorkflowPage: React.FC = () => {
         {rightPanelCollapsed ? (
           /* Collapsed Right Panel - Component Icons */
           <div className="p-2 flex flex-col items-center mt-16">
-            {/* 标题 */}
+            {/* Title */}
             <div className="text-xs text-gray-400 mb-3 writing-mode-vertical text-center">
-              组件
+              Coms
             </div>
             <div className="w-8 h-px bg-gray-600 mb-3"></div>
             
-            {/* 组件图标 */}
+            {/* Component icons */}
             <div className="space-y-2">
               {[
                 { type: 'listener', icon: 'Radio', color: 'bg-blue-600 hover:bg-blue-700', title: 'Data Listeners\n监听社交媒体、价格数据' },

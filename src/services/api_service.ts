@@ -1,6 +1,6 @@
 import { Workflow, WorkflowRun, TradeRecord } from '../types';
 import * as mockService from './mock_service';
-// import * as httpService from './http_service'; // 循环依赖，已移除
+// import * as httpService from './http_service'; // Circular dependency, removed
 
 export interface ApiService {
   // Auth

@@ -86,7 +86,7 @@ const getDisplayType = (node: ComponentNode): string => {
     case 'evaluator':
       return node.data?.model || 'deepseek-v3';
     case 'executor':
-      // 显示 DEX 名称，如果没有则显示链名称
+      // Show DEX name, if not available show chain name
       const dexName = node.data?.targetDex || '';
       switch (dexName) {
         case 'uniswap':
@@ -113,7 +113,7 @@ const getDisplayType = (node: ComponentNode): string => {
           return node.data?.rpcEndpoint || 'mainnet';
       }
     case 'cex-executor':
-      // 显示 CEX 名称
+      // Show CEX name
       const exchangeName = node.data?.exchange || '';
       switch (exchangeName) {
         case 'binance':
@@ -232,9 +232,9 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
                 onConnectionEnd(node.id, 'input');
               }}
               onMouseEnter={(e) => {
-                // 当鼠标进入输入端口时，如果正在连接，则自动连接
+                // When mouse enters input port, auto-connect if currently connecting
                 const event = e as any;
-                if (event.buttons === 1) { // 左键按下状态
+                                  if (event.buttons === 1) { // Left mouse button pressed
                   onConnectionEnd(node.id, 'input');
                 }
               }}

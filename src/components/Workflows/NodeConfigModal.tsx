@@ -13,7 +13,7 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
   onSave,
   onClose,
 }) => {
-  // 根据链获取 vault 地址的统一函数
+  // Unified function to get vault address by chain
   const getVaultAddress = (chain: string, customVaultAddress?: string) => {
     switch (chain) {
       case 'mainnet':
@@ -33,7 +33,7 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
     }
   };
 
-  // 初始化配置时，为 executor 节点设置正确的 vault 地址和 DEX 配置
+  // Initialize configuration with correct vault address and DEX config for executor nodes
   const getInitialConfig = () => {
     const baseConfig = node.data || {};
     
@@ -43,7 +43,7 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
       const needsDexConfig = !baseConfig.targetDex || !baseConfig.dexAddress;
       
       if (needsVaultAddress || needsDexConfig) {
-        // 获取默认 DEX 配置 - 选择启用的主流 DEX
+        // Get default DEX configuration - select enabled mainstream DEXs
         const getDefaultDex = (chain: string) => {
           switch (chain) {
             case 'mainnet':
@@ -418,12 +418,12 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
   const renderExecutorConfig = () => {
     const currentVaultAddress = getVaultAddress(config.rpcEndpoint || 'mainnet', config.customVaultAddress);
 
-    // 根据选择的链获取可用的 DEX 选项
+    // Get available DEX options based on selected chain
     const getDexOptions = (chain: string) => {
       switch (chain) {
         case 'mainnet':
           return [
-            { value: 'uniswap-v4', label: 'Uniswap V4', address: '0x0000000000000000000000000000000000000000', enabled: true }, // V4 最新版本
+            { value: 'uniswap-v4', label: 'Uniswap V4', address: '0x0000000000000000000000000000000000000000', enabled: true }, // V4 latest version
             { value: 'uniswap-v3', label: 'Uniswap V3', address: '0xE592427A0AEce92De3Edee1F18E0157C05861564', enabled: true },
             { value: 'uniswap-v2', label: 'Uniswap V2', address: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D', enabled: true },
             { value: 'sushiswap', label: 'SushiSwap (Coming Soon)', address: '0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F', enabled: false },
@@ -719,7 +719,7 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
             <button
               type="button"
               onClick={() => {
-                // TODO: 实现授权额度查询功能
+                // TODO: Implement authorization quota query functionality
                 console.log('Query authorization allowance');
               }}
               className="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded"

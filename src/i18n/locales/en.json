@@ -1,0 +1,77 @@
+{
+  "common": {
+    "loading": "Loading",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "success": "Success",
+    "error": "Error",
+    "warning": "Warning",
+    "expand": "Expand Menu",
+    "collapse": "Collapse Menu"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "workflows": "Workflows",
+    "settings": "Settings",
+    "reports": "Reports"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "loginWithGoogle": "Login with Google",
+    "loginWithGithub": "Login with GitHub"
+  },
+  "theme": {
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark"
+  },
+  "language": {
+    "english": "English",
+    "chinese": "中文"
+  },
+  "workflow": {
+    "title": "Workflow Management",
+    "create": "Create Workflow",
+    "edit": "Edit Workflow",
+    "run": "Run",
+    "pause": "Pause",
+    "stop": "Stop",
+    "status": "Status",
+    "draft": "Draft",
+    "running": "Running",
+    "paused": "Paused",
+    "completed": "Completed"
+  },
+  "node": {
+    "start": "Start",
+    "end": "End",
+    "listener": "Listener",
+    "evaluator": "Evaluator",
+    "executor": "Executor",
+    "cexExecutor": "CEX Executor",
+    "collector": "Collector"
+  },
+  "settings": {
+    "title": "Settings",
+    "general": "General",
+    "appearance": "Appearance",
+    "language": "Language",
+    "theme": "Theme",
+    "wallet": "Wallet",
+    "connect": "Connect Wallet",
+    "disconnect": "Disconnect Wallet",
+    "trading": "Trading",
+    "exchanges": "Exchanges",
+    "security": "Security",
+    "notifications": "Notifications"
+  }
+} 

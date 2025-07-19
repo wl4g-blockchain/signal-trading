@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
-import { Settings as SettingsIcon, Shield, Bell, Database, Zap } from 'lucide-react';
+import { Settings as SettingsIcon, Shield, Bell, Database, Zap, Globe, Palette } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { useTheme } from '../../contexts/ThemeContext';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 export const Settings: React.FC = () => {
+  const { t } = useTranslation();
+  const { theme, setTheme } = useTheme();
+  const { language, setLanguage } = useLanguage();
   const [activeTab, setActiveTab] = useState('trading');
   const [exchangeSubTab, setExchangeSubTab] = useState('dex');
   const [settings, setSettings] = useState({
@@ -63,10 +69,11 @@ export const Settings: React.FC = () => {
   });
 
   const tabs = [
-    { id: 'trading', label: 'Trading', icon: SettingsIcon },
-    { id: 'exchanges', label: 'Exchanges', icon: Zap },
-    { id: 'security', label: 'Security', icon: Shield },
-    { id: 'notifications', label: 'Notifications', icon: Bell },
+    { id: 'trading', label: t('settings.trading'), icon: SettingsIcon },
+    { id: 'exchanges', label: t('settings.exchanges'), icon: Zap },
+    { id: 'security', label: t('settings.security'), icon: Shield },
+    { id: 'notifications', label: t('settings.notifications'), icon: Bell },
+    { id: 'appearance', label: t('settings.appearance'), icon: Palette },
   ];
 
   const updateSetting = (category: string, key: string, value: any) => {
@@ -327,7 +334,7 @@ export const Settings: React.FC = () => {
                           <button
                             onClick={() => {
                               if (settings.exchanges.dex.vault.connected) {
-                                // 断开连接
+                                // Disconnect
                                 updateSetting('exchanges', 'dex', { 
                                   ...settings.exchanges.dex, 
                                   vault: { 
@@ -338,7 +345,7 @@ export const Settings: React.FC = () => {
                                   }
                                 });
                               } else {
-                                // 模拟连接钱包
+                                // Simulate wallet connection
                                 updateSetting('exchanges', 'dex', { 
                                   ...settings.exchanges.dex, 
                                   vault: { 
@@ -678,10 +685,67 @@ export const Settings: React.FC = () => {
               )}
             </div>
           )}
+
+          {activeTab === 'appearance' && (
+            <div className="space-y-6">
+              <h3 className="text-lg font-semibold text-white">{t('settings.appearance')}</h3>
+              
+              <div className="space-y-6">
+                {/* Theme Settings */}
+                <div>
+                  <h4 className="text-white font-medium mb-4">{t('settings.theme')}</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {(['system', 'light', 'dark'] as const).map((themeOption) => (
+                      <button
+                        key={themeOption}
+                        onClick={() => setTheme(themeOption)}
+                        className={`p-4 rounded-lg border-2 transition-all ${
+                          theme === themeOption
+                            ? 'border-blue-500 bg-blue-500 bg-opacity-20 text-blue-300'
+                            : 'border-gray-600 bg-gray-700 text-gray-300 hover:border-gray-500 hover:bg-gray-600'
+                        }`}
+                      >
+                        <div className="text-center">
+                          <div className="text-lg font-medium mb-2">{t(`theme.${themeOption}`)}</div>
+                          <div className="text-sm opacity-75">
+                            {themeOption === 'system' && t('theme.system')}
+                            {themeOption === 'light' && t('theme.light')}
+                            {themeOption === 'dark' && t('theme.dark')}
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Language Settings */}
+                <div>
+                  <h4 className="text-white font-medium mb-4">{t('settings.language')}</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {(['en', 'zh'] as const).map((langOption) => (
+                      <button
+                        key={langOption}
+                        onClick={() => setLanguage(langOption)}
+                        className={`p-4 rounded-lg border-2 transition-all ${
+                          language === langOption
+                            ? 'border-blue-500 bg-blue-500 bg-opacity-20 text-blue-300'
+                            : 'border-gray-600 bg-gray-700 text-gray-300 hover:border-gray-500 hover:bg-gray-600'
+                        }`}
+                      >
+                        <div className="text-center">
+                          <div className="text-lg font-medium">{t(`language.${langOption === 'en' ? 'english' : 'chinese'}`)}</div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
           
           <div className="flex justify-end pt-6">
             <button className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors">
-              Save Changes
+              {t('common.save')}
             </button>
           </div>
         </div>

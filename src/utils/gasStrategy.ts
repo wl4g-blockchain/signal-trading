@@ -33,29 +33,29 @@ export class GasStrategy {
     maxFeePerGas?: ethers.BigNumber;
     maxPriorityFeePerGas?: ethers.BigNumber;
   }> {
-    // 获取网络当前的 Gas 信息
+    // Get current network gas information
     const networkGasInfo = await this.getNetworkGasInfo();
     
     let gasPrice: number; // in Gwei
     
     switch (strategy.gasStrategy) {
       case 'slow':
-        // 慢速：使用基础价格的 80%，适合不着急的交易
+        // Slow: Use 80% of base price, suitable for non-urgent transactions
         gasPrice = networkGasInfo.baseGasPrice * 0.8;
         break;
         
       case 'standard':
-        // 标准：使用基础价格，大多数情况下的选择
+        // Standard: Use base price, choice for most situations
         gasPrice = networkGasInfo.baseGasPrice * 1.0;
         break;
         
       case 'fast':
-        // 快速：使用基础价格的 150%，适合急需确认的交易
+        // Fast: Use 150% of base price, suitable for urgent transactions
         gasPrice = networkGasInfo.baseGasPrice * 1.5;
         break;
         
       case 'custom':
-        // 自定义：用户指定的 Gas 价格
+        // Custom: User-specified gas price
         gasPrice = strategy.customGasPrice || networkGasInfo.baseGasPrice;
         break;
         
@@ -63,14 +63,14 @@ export class GasStrategy {
         gasPrice = networkGasInfo.baseGasPrice;
     }
 
-    // 转换为 Wei
+    // Convert to Wei
     const gasPriceWei = ethers.utils.parseUnits(gasPrice.toString(), 'gwei');
     
-    // 检查是否支持 EIP-1559 (Type 2 transactions)
+    // Check if EIP-1559 is supported (Type 2 transactions)
     const isEIP1559Supported = await this.checkEIP1559Support();
     
     if (isEIP1559Supported) {
-      // 使用 EIP-1559 格式 (Ethereum Mainnet, Polygon 等)
+      // Use EIP-1559 format (Ethereum Mainnet, Polygon, etc.)
       const maxPriorityFeePerGas = ethers.utils.parseUnits(
         (networkGasInfo.maxPriorityFeePerGas * this.getMultiplier(strategy.gasStrategy)).toString(),
         'gwei'
@@ -85,7 +85,7 @@ export class GasStrategy {
         maxPriorityFeePerGas
       };
     } else {
-      // 使用传统格式 (BSC, older networks)
+      // Use legacy format (BSC, older networks)
       return {
         gasPrice: gasPriceWei
       };
@@ -105,21 +105,21 @@ export class GasStrategy {
     signer: ethers.Signer
   ): Promise<ethers.providers.TransactionResponse> {
     
-    // 1. 计算 Gas Price
+    // 1. Calculate Gas Price
     const gasConfig = await this.calculateGasPrice(strategy);
     
-    // 2. 估算 Gas Limit
+    // 2. Estimate Gas Limit
     const gasLimit = await signer.estimateGas(transaction);
     
-    // 3. 构建最终交易
+    // 3. Build final transaction
     const finalTransaction = {
       ...transaction,
-      gasLimit: gasLimit.mul(110).div(100), // 增加 10% 的 Gas Limit 缓冲
-      ...gasConfig // 应用 Gas 价格配置
+              gasLimit: gasLimit.mul(110).div(100), // Add 10% gas limit buffer
+              ...gasConfig // Apply gas price configuration
     };
 
-    // 4. 发送交易
-    console.log(`发送交易使用 ${strategy.gasStrategy} Gas 策略:`, {
+    // 4. Send transaction
+            console.log(`Sending transaction using ${strategy.gasStrategy} gas strategy:`, {
       gasLimit: finalTransaction.gasLimit?.toString(),
       gasPrice: gasConfig.gasPrice?.toString(),
       maxFeePerGas: gasConfig.maxFeePerGas?.toString(),
@@ -134,11 +134,11 @@ export class GasStrategy {
    */
   private async getNetworkGasInfo(): Promise<NetworkGasInfo> {
     try {
-      // 获取当前 Gas 价格
+      // Get current gas price
       const gasPrice = await this.provider.getGasPrice();
       const gasPriceGwei = parseFloat(ethers.utils.formatUnits(gasPrice, 'gwei'));
       
-      // 尝试获取 EIP-1559 信息
+      // Try to get EIP-1559 information
       try {
         const feeData = await this.provider.getFeeData();
         
@@ -152,7 +152,7 @@ export class GasStrategy {
             : gasPriceGwei * 2
         };
       } catch {
-        // 如果不支持 EIP-1559，返回基础信息
+        // If EIP-1559 is not supported, return basic information
         return {
           baseGasPrice: gasPriceGwei,
           maxPriorityFeePerGas: gasPriceGwei * 0.1,
@@ -160,8 +160,8 @@ export class GasStrategy {
         };
       }
     } catch (error) {
-      console.error('获取网络 Gas 信息失败:', error);
-      // 返回默认值
+              console.error('Failed to get network gas information:', error);
+      // Return default values
       return {
         baseGasPrice: 20, // 20 Gwei
         maxPriorityFeePerGas: 2, // 2 Gwei
@@ -198,17 +198,17 @@ export class GasStrategy {
 /**
  * 使用示例：
  * 
- * // 1. 初始化 Gas Strategy
+ * // 1. Initialize Gas Strategy
  * const provider = new ethers.providers.JsonRpcProvider('https://mainnet.infura.io/v3/YOUR-PROJECT-ID');
  * const gasStrategy = new GasStrategy(provider);
  * 
- * // 2. 配置 Gas 策略
+ * // 2. Configure Gas Strategy
  * const strategyConfig: GasStrategyConfig = {
- *   gasStrategy: 'standard', // 或 'slow', 'fast', 'custom'
- *   customGasPrice: 25 // 仅在 'custom' 时使用
+ *   gasStrategy: 'standard', // or 'slow', 'fast', 'custom'
+ *   customGasPrice: 25 // Only used when 'custom'
  * };
  * 
- * // 3. 发送交易
+ * // 3. Send Transaction
  * const transaction = {
  *   to: '0x...',
  *   value: ethers.utils.parseEther('0.1'),
@@ -221,9 +221,9 @@ export class GasStrategy {
  *   signer
  * );
  * 
- * // 4. 等待确认
+ * // 4. Wait for Confirmation
  * const receipt = await txResponse.wait();
- * console.log('交易确认:', receipt.transactionHash);
+ * console.log('Transaction confirmed:', receipt.transactionHash);
  */
 
 export default GasStrategy; 

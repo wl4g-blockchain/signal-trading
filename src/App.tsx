@@ -31,7 +31,7 @@ function App() {
     checkAuth();
   }, []);
 
-  // 监听侧边栏收起事件
+  // Listen for sidebar collapse events
   useEffect(() => {
     const handleSidebarCollapse = (event: CustomEvent) => {
       setSidebarCollapsed(event.detail.collapsed);
