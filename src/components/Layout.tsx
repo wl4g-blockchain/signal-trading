@@ -354,7 +354,7 @@ export const Layout: React.FC<LayoutProps> = ({
                               <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
                                 {notification.message}
                               </p>
-                              {/* 可点击提示 */}
+                              {/* jump to workflow run */}
                               {notification.type === 'Transaction' && notification.workflowRunId && (
                                 <p className={`text-xs ${isDark ? 'text-blue-400' : 'text-blue-600'} mt-1 italic`}>
                                   {t('dashboard.viewDetails')} →

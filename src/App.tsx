@@ -34,26 +34,58 @@ function App() {
     checkAuth();
   }, []);
 
-  // Listen for sidebar collapse events
+  // Listen for sidebar collapse events, workflow run navigation, and exit readonly mode
   useEffect(() => {
     const handleSidebarCollapse = (event: CustomEvent) => {
       setSidebarCollapsed(event.detail.collapsed);
     };
 
+    const handleWorkflowRunNavigation = (event: CustomEvent) => {
+      const { workflowId, runId } = event.detail;
+      handleNavigateToWorkflowRun(workflowId, runId);
+    };
+
+    const handleExitReadOnlyMode = () => {
+      setWorkflowReadOnlyMode(null);
+      setReadOnlyWorkflow(null);
+    };
+
+    const handleNavigateToWorkflows = () => {
+      // Force clear read-only mode and navigate to workflows
+      setWorkflowReadOnlyMode(null);
+      setReadOnlyWorkflow(null);
+      setCurrentView('workflow');
+    };
+
     window.addEventListener('collapse-sidebar', handleSidebarCollapse as EventListener);
+    window.addEventListener('navigate-to-workflow-run', handleWorkflowRunNavigation as EventListener);
+    window.addEventListener('exit-readonly-mode', handleExitReadOnlyMode as EventListener);
+    window.addEventListener('navigate-to-workflows', handleNavigateToWorkflows as EventListener);
+    
     return () => {
       window.removeEventListener('collapse-sidebar', handleSidebarCollapse as EventListener);
+      window.removeEventListener('navigate-to-workflow-run', handleWorkflowRunNavigation as EventListener);
+      window.removeEventListener('exit-readonly-mode', handleExitReadOnlyMode as EventListener);
+      window.removeEventListener('navigate-to-workflows', handleNavigateToWorkflows as EventListener);
     };
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Handle view changes and clear read-only mode when user actively navigates to workflows
   const handleViewChange = (view: string) => {
-    // If user clicks workflows menu, clear read-only mode to allow normal workflow design
-    if (view === 'workflow' && workflowReadOnlyMode) {
+    // Always clear read-only mode when user clicks workflows menu to ensure design mode
+    if (view === 'workflow') {
       setWorkflowReadOnlyMode(null);
       setReadOnlyWorkflow(null);
     }
     setCurrentView(view);
+    
+    // Force re-render by updating state
+    if (view === 'workflow' && workflowReadOnlyMode) {
+      // Add a small delay to ensure state updates are applied
+      setTimeout(() => {
+        setCurrentView('workflow');
+      }, 10);
+    }
   };
 
   const handleLogin = (userData: User) => {
@@ -113,15 +145,17 @@ function App() {
   };
 
   const renderCurrentView = () => {
-    // If there's a read-only workflow, prioritize showing WorkflowPage
+    // Show loading state when navigating to workflow run
+    if (loadingReadOnlyWorkflow) {
+      return (
+        <div className="flex items-center justify-center h-full">
+          <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      );
+    }
+
+    // If there's a read-only workflow, show WorkflowPage in read-only mode
     if (workflowReadOnlyMode && readOnlyWorkflow) {
-      if (loadingReadOnlyWorkflow) {
-        return (
-          <div className="flex items-center justify-center h-full">
-            <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-          </div>
-        );
-      }
       return (
         <WorkflowPage 
           readOnlyMode={workflowReadOnlyMode} 
@@ -131,7 +165,7 @@ function App() {
       );
     }
 
-    // Normal view rendering logic
+    // Normal view rendering logic - ensure clean state for workflow design
     switch (currentView) {
       case 'monitor':
         return (
@@ -143,6 +177,7 @@ function App() {
       case 'workflow':
         return (
           <WorkflowPage 
+            key={`workflow-${Date.now()}`} // Force re-render when returning from read-only mode
             readOnlyMode={null} 
             readOnlyWorkflow={null}
             onExitReadOnlyMode={undefined} 

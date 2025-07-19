@@ -85,7 +85,8 @@
     "stop": "停止",
     "viewingRunDetails": "查看运行详情",
     "exitReadOnlyMode": "退出只读模式",
-    "readOnlyMode": "只读模式"
+    "readOnlyMode": "只读模式",
+    "multiLevel": "多级"
   },
   "node": {
     "start": "开始",

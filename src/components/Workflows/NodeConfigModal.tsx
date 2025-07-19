@@ -436,7 +436,7 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
         case 'goerli':
         case 'sepolia':
           return [
-            { value: 'uniswap-v4', label: 'Uniswap V4 (Testnet)', address: '0x0000000000000000000000000000000000000000', enabled: true }, // V4 测试网
+            { value: 'uniswap-v4', label: 'Uniswap V4 (Testnet)', address: '0x0000000000000000000000000000000000000000', enabled: true }, // V4 testnet
             { value: 'uniswap-v3', label: 'Uniswap V3 (Testnet)', address: '0xE592427A0AEce92De3Edee1F18E0157C05861564', enabled: true },
             { value: 'uniswap-v2', label: 'Uniswap V2 (Testnet)', address: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D', enabled: true },
           ];

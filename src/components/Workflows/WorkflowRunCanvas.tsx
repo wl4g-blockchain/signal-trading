@@ -3,6 +3,8 @@ import { ComponentNode, Connection } from '../../types';
 import { NodeComponent } from './NodeComponent';
 import { ConnectionLine } from './ConnectionLine';
 import { useTheme } from '../../contexts/ThemeContext';
+import { useTranslation } from 'react-i18next';
+import { Edit } from 'lucide-react';
 
 interface WorkflowRunCanvasProps {
   nodes: ComponentNode[];
@@ -14,12 +16,24 @@ export const WorkflowRunCanvas: React.FC<WorkflowRunCanvasProps> = ({
   connections,
 }) => {
   const { isDark } = useTheme();
+  const { t } = useTranslation();
   const canvasRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.8);
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
   const [touchStartPositions, setTouchStartPositions] = useState<React.TouchList | null>(null);
   const [isThreeFingerPanning, setIsThreeFingerPanning] = useState(false);
+
+  // Handle navigation back to design editor
+  const handleBackToDesign = useCallback(() => {
+    // Clear read-only mode and navigate to workflows
+    const exitEvent = new CustomEvent('exit-readonly-mode');
+    window.dispatchEvent(exitEvent);
+    
+    // Navigate to workflows view
+    const navEvent = new CustomEvent('navigate-to-workflows');
+    window.dispatchEvent(navEvent);
+  }, []);
 
   // Handle mouse down for panning only
   const handleMouseDown = useCallback((event: React.MouseEvent) => {
@@ -151,7 +165,7 @@ export const WorkflowRunCanvas: React.FC<WorkflowRunCanvasProps> = ({
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      {/* 缩放和平移容器 */}
+      {/* Zoom and pan container */}
       <div
         style={{
           transform: `translate(${panOffset.x}px, ${panOffset.y}px) scale(${scale})`,
@@ -210,6 +224,18 @@ export const WorkflowRunCanvas: React.FC<WorkflowRunCanvasProps> = ({
             onConfig={() => {}}
           />
         ))}
+      </div>
+      
+      {/* Floating Action Button - Return to Design Editor */}
+      <div className="absolute top-4 right-4 z-10">
+        <button
+          onClick={handleBackToDesign}
+          className={`flex items-center space-x-2 px-4 py-2 ${isDark ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-600 hover:bg-blue-700'} text-white rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95`}
+          title={t('workflow.redesign')}
+        >
+          <Edit className="w-4 h-4" />
+          <span className="text-sm font-medium">{t('workflow.redesign')}</span>
+        </button>
       </div>
     </div>
   );

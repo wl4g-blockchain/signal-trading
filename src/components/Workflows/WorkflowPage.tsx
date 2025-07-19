@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { ComponentNode, Connection, Workflow } from '../../types';
-import { Canvas } from './Canvas';
+import { Canvas } from './WorkflowCanvas';
 import { WorkflowRunCanvas } from './WorkflowRunCanvas';
-import { ComponentPalette } from './ComponentPalette';
+import { ComponentPalette, ComponentPaletteCollapsed } from './ComponentPalette';
 import { WorkflowList } from './WorkflowList';
-import { Play, Pause, Save, Settings, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Radio, Brain, Zap, Database, X } from 'lucide-react';
+import { Play, Pause, Save, Settings, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { serviceManager } from '../../services';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
@@ -404,7 +404,7 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({
           </button>
 
           {rightPanelCollapsed ? (
-            /* Collapsed Right Panel - Component Icons */
+            /* Collapsed Right Panel - Component Icons - 与 ComponentPalette 保持一致 */
             <div className="p-2 flex flex-col items-center mt-16">
               {/* Title */}
               <div className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'} mb-3 writing-mode-vertical text-center`}>
@@ -412,70 +412,14 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({
               </div>
               <div className={`w-8 h-px ${isDark ? 'bg-gray-600' : 'bg-gray-300'} mb-3`}></div>
               
-              {/* Component icons */}
+              {/* Component icons - 使用与 ComponentPalette 相同的组件列表 */}
               <div className="space-y-2">
-                {[
-                  { 
-                    type: 'listener', 
-                    icon: 'Radio', 
-                    color: 'bg-blue-600 hover:bg-blue-700', 
-                    title: t('node.listener'),
-                    description: t('workflow.listenerDescription')
-                  },
-                  { 
-                    type: 'evaluator', 
-                    icon: 'Brain', 
-                    color: 'bg-purple-600 hover:bg-purple-700', 
-                    title: t('node.evaluator'),
-                    description: t('workflow.evaluatorDescription')
-                  },
-                  { 
-                    type: 'executor', 
-                    icon: 'Zap', 
-                    color: 'bg-green-600 hover:bg-green-700', 
-                    title: t('node.executor'),
-                    description: t('workflow.executorDescription')
-                  },
-                  { 
-                    type: 'cex-executor', 
-                    icon: 'Zap', 
-                    color: 'bg-blue-600 hover:bg-blue-700', 
-                    title: t('node.cexExecutor'),
-                    description: t('workflow.cexExecutorDescription')
-                  },
-                  { 
-                    type: 'collector', 
-                    icon: 'Database', 
-                    color: 'bg-orange-600 hover:bg-orange-700', 
-                    title: t('node.collector'),
-                    description: t('workflow.collectorDescription')
-                  },
-                ].map((component) => {
-                  const IconComponent = component.icon === 'Radio' ? Radio : 
-                                      component.icon === 'Brain' ? Brain :
-                                      component.icon === 'Zap' ? Zap : Database;
-                  return (
-                    <div key={component.type} className="group relative">
-                      <button
-                        onClick={() => !readOnlyMode && addNode(component.type as ComponentNode['type'])}
-                        disabled={!!readOnlyMode}
-                        className={`w-8 h-8 ${readOnlyMode ? 'bg-gray-500 cursor-not-allowed' : component.color} rounded-lg flex items-center justify-center transition-all duration-150 shadow-sm hover:shadow-lg hover:scale-110 active:scale-95 ${readOnlyMode ? 'opacity-50' : ''}`}
-                        title={readOnlyMode ? t('workflow.readOnlyMode') : `${component.title} - ${component.description}`}
-                      >
-                        <IconComponent className="w-4 h-4 text-white" />
-                      </button>
-                      {/* Enhanced Tooltip */}
-                      <div className={`absolute left-full ml-3 px-3 py-2 rounded-lg text-xs z-50 opacity-0 group-hover:opacity-100 transition-all duration-150 delay-100 pointer-events-none ${isDark ? 'bg-gray-900 text-white border border-gray-600' : 'bg-white text-gray-800 border border-gray-300'} shadow-xl min-w-[160px]`}>
-                        <div className="font-semibold text-xs mb-1">{component.title}</div>
-                        <div className={`text-xs leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-                          {component.description}
-                        </div>
-                        {/* Arrow pointer */}
-                        <div className={`absolute right-full top-3 w-0 h-0 border-t-4 border-b-4 border-r-4 ${isDark ? 'border-r-gray-900' : 'border-r-white'} border-t-transparent border-b-transparent`}></div>
-                      </div>
-                    </div>
-                  );
-                })}
+                <ComponentPaletteCollapsed 
+                  onAddNode={readOnlyMode ? () => {} : addNode} 
+                  readOnlyMode={!!readOnlyMode}
+                  isDark={isDark}
+                  t={t}
+                />
               </div>
             </div>
           ) : (

@@ -59,22 +59,13 @@ export const WorkflowList: React.FC<WorkflowListProps> = ({ onLoadWorkflow }) =>
 
   const handleViewRunDetails = async (runId: string) => {
     try {
+          // Use the same navigation approach as Dashboard/notifications to ensure page consistency
+    // Trigger global workflow run navigation event
       const run = await serviceManager.getService().getWorkflowRun(runId);
-      const workflow = await serviceManager.getService().getWorkflow(run.workflowId);
-      // Create a read-only version of the workflow with run states
-      const workflowWithRunStates = {
-        ...workflow,
-        nodes: workflow.nodes.map(node => ({
-          ...node,
-          data: {
-            ...node.data,
-            runStatus: run.nodeStates[node.id]?.status || 'skipped',
-            runLogs: run.nodeStates[node.id]?.logs || [],
-            readonly: true
-          }
-        }))
-      };
-      onLoadWorkflow(workflowWithRunStates);
+      const event = new CustomEvent('navigate-to-workflow-run', { 
+        detail: { workflowId: run.workflowId, runId: runId } 
+      });
+      window.dispatchEvent(event);
     } catch (error) {
       console.error('Failed to load workflow run details:', error);
     }

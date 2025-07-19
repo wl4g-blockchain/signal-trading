@@ -83,7 +83,8 @@
     "stop": "Stop",
     "viewingRunDetails": "Viewing Run Details",
     "exitReadOnlyMode": "Exit Read-Only Mode",
-    "readOnlyMode": "Read-Only Mode"
+    "readOnlyMode": "Read-Only Mode",
+    "multiLevel": "multi-level"
   },
   "node": {
     "start": "Start",
