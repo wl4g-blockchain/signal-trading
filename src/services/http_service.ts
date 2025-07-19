@@ -2,7 +2,8 @@ import { ApiService } from "./api_service";
 import { Workflow } from "../types";
 
 export class HttpApiService implements ApiService {
-  private baseUrl = "/api";
+  // TODO: setup on build or dynamic current domain?
+  private baseUrl = "/api/v1";
   private token: string | null = null;
 
   constructor() {
