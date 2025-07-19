@@ -26,7 +26,7 @@ export const Layout: React.FC<LayoutProps> = ({
   onSidebarCollapsedChange
 }) => {
   const { t } = useTranslation();
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, isDark } = useTheme();
   const { language, setLanguage } = useLanguage();
   const [apiType, setApiType] = useState<ApiType>(serviceManager.getCurrentApiType());
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -74,19 +74,19 @@ export const Layout: React.FC<LayoutProps> = ({
   }, []);
 
   return (
-    <div className="h-screen bg-gray-900 text-white flex">
+    <div className={`h-screen ${isDark ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'} flex`}>
       {/* Sidebar */}
-      <div className={`${sidebarCollapsed ? 'w-16' : 'w-64'} bg-gray-800 border-r border-gray-700 transition-all duration-300 relative`}>
+      <div className={`${sidebarCollapsed ? 'w-16' : 'w-64'} ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-r transition-all duration-300 relative`}>
         {/* Collapse Toggle Button */}
         <button
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-          className="absolute -right-3 top-6 z-10 bg-gray-700 hover:bg-gray-600 rounded-full p-1 border border-gray-600 transition-colors"
+          className={`absolute -right-3 top-6 z-10 ${isDark ? 'bg-gray-700 hover:bg-gray-600 border-gray-600' : 'bg-gray-200 hover:bg-gray-300 border-gray-300'} rounded-full p-1 border transition-colors`}
           title={sidebarCollapsed ? t('common.expand') : t('common.collapse')}
         >
           {sidebarCollapsed ? (
-            <ChevronRight className="w-4 h-4 text-gray-300" />
+            <ChevronRight className={`w-4 h-4 ${isDark ? 'text-gray-300' : 'text-gray-600'}`} />
           ) : (
-            <ChevronLeft className="w-4 h-4 text-gray-300" />
+            <ChevronLeft className={`w-4 h-4 ${isDark ? 'text-gray-300' : 'text-gray-600'}`} />
           )}
         </button>
 
@@ -94,7 +94,7 @@ export const Layout: React.FC<LayoutProps> = ({
           {!sidebarCollapsed ? (
             <>
               <h1 className="text-xl font-bold text-blue-400">Signal Trading</h1>
-              <p className="text-sm text-gray-400 mt-1">AI Trading</p>
+              <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'} mt-1`}>AI Trading</p>
             </>
           ) : (
             <div className="flex justify-center">
@@ -115,7 +115,7 @@ export const Layout: React.FC<LayoutProps> = ({
                 className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center px-3' : 'px-6'} py-3 text-left transition-colors ${
                   currentView === item.id
                     ? 'bg-blue-600 text-white border-r-2 border-blue-400'
-                    : 'text-gray-300 hover:bg-gray-700'
+                    : `${isDark ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'}`
                 }`}
                 title={sidebarCollapsed ? item.label : undefined}
               >
@@ -131,18 +131,18 @@ export const Layout: React.FC<LayoutProps> = ({
       {/* Main Content */}
       <div className="flex-1 overflow-hidden flex flex-col">
         {/* Top Bar */}
-        <div className="bg-gray-800 border-b border-gray-700 px-6 py-4 flex items-center justify-between">
+        <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-b px-6 py-4 flex items-center justify-between`}>
           {/* Left side - API Mode & Vault Balance */}
           <div className="flex items-center space-x-6">
             {/* API Switcher */}
-            <div className="flex items-center space-x-2 bg-gray-700 rounded-lg px-3 py-1">
-              <span className="text-sm text-gray-400 mr-2">Service Mode</span>
+            <div className={`flex items-center space-x-2 ${isDark ? 'bg-gray-700' : 'bg-gray-100'} rounded-lg px-3 py-1`}>
+              <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'} mr-2`}>Service Mode</span>
               <button
                 onClick={() => handleAPISwitch('MOCK')}
                 className={`px-2 py-1 text-xs rounded transition-colors ${
                   apiType === 'MOCK'
                     ? 'bg-blue-600 text-white'
-                    : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
+                    : `${isDark ? 'bg-gray-600 text-gray-300 hover:bg-gray-500' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`
                 }`}
               >
                 Mock
@@ -152,17 +152,17 @@ export const Layout: React.FC<LayoutProps> = ({
                 className={`px-2 py-1 text-xs rounded transition-colors ${
                   apiType === 'API'
                     ? 'bg-blue-600 text-white'
-                    : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
+                    : `${isDark ? 'bg-gray-600 text-gray-300 hover:bg-gray-500' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`
                 }`}
               >
                 API
               </button>
             </div>
             {/* Vault Balance */}
-            <div className="flex items-center bg-gray-700 rounded-lg px-3 py-1 space-x-3">
-              <span className="text-gray-400 text-sm">Vault Balance</span>
+            <div className={`flex items-center ${isDark ? 'bg-gray-700' : 'bg-gray-100'} rounded-lg px-3 py-1 space-x-3`}>
+              <span className={`${isDark ? 'text-gray-400' : 'text-gray-600'} text-sm`}>Vault Balance</span>
               <span className="text-green-400 font-medium">$12,450.00</span>
-              <span className="text-gray-400 text-sm ml-4">Active Strategies</span>
+              <span className={`${isDark ? 'text-gray-400' : 'text-gray-600'} text-sm ml-4`}>Active Strategies</span>
               <span className="text-blue-400 font-medium">3</span>
             </div>
           </div>
@@ -173,15 +173,15 @@ export const Layout: React.FC<LayoutProps> = ({
             <div className="relative menu-container">
               <button
                 onClick={() => setShowThemeMenu(!showThemeMenu)}
-                className="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+                className={`flex items-center space-x-2 px-3 py-2 rounded-lg ${isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} transition-colors`}
                 title={t('settings.theme')}
               >
-                <Palette className="w-5 h-5 text-gray-400" />
-                <span className="text-sm text-gray-300">{t(`theme.${theme}`)}</span>
+                <Palette className={`w-5 h-5 ${isDark ? 'text-gray-400' : 'text-gray-600'}`} />
+                <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{t(`theme.${theme}`)}</span>
               </button>
 
               {showThemeMenu && (
-                <div className="absolute right-0 mt-2 w-32 bg-gray-800 rounded-lg shadow-lg border border-gray-700 py-2 z-50">
+                <div className={`absolute right-0 mt-2 w-32 ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg shadow-lg border py-2 z-50`}>
                   {(['system', 'light', 'dark'] as const).map((themeOption) => (
                     <button
                       key={themeOption}
@@ -192,7 +192,7 @@ export const Layout: React.FC<LayoutProps> = ({
                       className={`w-full flex items-center space-x-2 px-3 py-2 text-left transition-colors ${
                         theme === themeOption
                           ? 'text-blue-400 bg-blue-600 bg-opacity-20'
-                          : 'text-gray-300 hover:bg-gray-700'
+                          : `${isDark ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'}`
                       }`}
                     >
                       <span className="text-sm">{t(`theme.${themeOption}`)}</span>

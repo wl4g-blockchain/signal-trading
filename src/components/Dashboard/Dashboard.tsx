@@ -12,6 +12,7 @@ import {
   AreaChart,
   Area,
 } from "recharts";
+import { useTheme } from "../../contexts/ThemeContext";
 
 interface LiveDashboardProps {
   showReports?: boolean;
@@ -20,6 +21,7 @@ interface LiveDashboardProps {
 export const LiveDashboard: React.FC<LiveDashboardProps> = ({
   showReports,
 }) => {
+  const { isDark } = useTheme();
   const [trades, setTrades] = useState<TradeRecord[]>([]);
   const stats = {
     totalProfit: 12450.32,
@@ -66,7 +68,7 @@ export const LiveDashboard: React.FC<LiveDashboardProps> = ({
     <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-white">Live Trading Monitor</h2>
+        <h2 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>Live Trading Monitor</h2>
         <div className="flex items-center space-x-2">
           <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
           <span className="text-green-400 font-medium">Live</span>
@@ -75,10 +77,10 @@ export const LiveDashboard: React.FC<LiveDashboardProps> = ({
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-gray-800 rounded-lg p-6">
+        <div className={`${isDark ? 'bg-gray-800' : 'bg-white border border-gray-200'} rounded-lg p-6`}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm">Total Profit</p>
+              <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'} text-sm`}>Total Profit</p>
               <p className="text-2xl font-bold text-green-400">
                 ${stats.totalProfit.toFixed(2)}
               </p>
@@ -87,10 +89,10 @@ export const LiveDashboard: React.FC<LiveDashboardProps> = ({
           </div>
         </div>
 
-        <div className="bg-gray-800 rounded-lg p-6">
+        <div className={`${isDark ? 'bg-gray-800' : 'bg-white border border-gray-200'} rounded-lg p-6`}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm">Today's Profit</p>
+              <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'} text-sm`}>Today's Profit</p>
               <p className="text-2xl font-bold text-blue-400">
                 ${stats.todayProfit.toFixed(2)}
               </p>
@@ -99,10 +101,10 @@ export const LiveDashboard: React.FC<LiveDashboardProps> = ({
           </div>
         </div>
 
-        <div className="bg-gray-800 rounded-lg p-6">
+        <div className={`${isDark ? 'bg-gray-800' : 'bg-white border border-gray-200'} rounded-lg p-6`}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm">Success Rate</p>
+              <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'} text-sm`}>Success Rate</p>
               <p className="text-2xl font-bold text-purple-400">
                 {stats.successRate}%
               </p>
@@ -111,10 +113,10 @@ export const LiveDashboard: React.FC<LiveDashboardProps> = ({
           </div>
         </div>
 
-        <div className="bg-gray-800 rounded-lg p-6">
+        <div className={`${isDark ? 'bg-gray-800' : 'bg-white border border-gray-200'} rounded-lg p-6`}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm">Active Trades</p>
+              <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'} text-sm`}>Active Trades</p>
               <p className="text-2xl font-bold text-orange-400">
                 {stats.activeTrades}
               </p>
@@ -126,8 +128,8 @@ export const LiveDashboard: React.FC<LiveDashboardProps> = ({
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-gray-800 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-white mb-4">
+        <div className={`${isDark ? 'bg-gray-800' : 'bg-white border border-gray-200'} rounded-lg p-6`}>
+          <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>
             Profit Timeline
           </h3>
           <div className="h-64">
@@ -156,8 +158,8 @@ export const LiveDashboard: React.FC<LiveDashboardProps> = ({
           </div>
         </div>
 
-        <div className="bg-gray-800 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-white mb-4">
+        <div className={`${isDark ? 'bg-gray-800' : 'bg-white border border-gray-200'} rounded-lg p-6`}>
+          <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>
             Trade Performance
           </h3>
           <div className="h-64">
@@ -188,8 +190,8 @@ export const LiveDashboard: React.FC<LiveDashboardProps> = ({
       </div>
 
       {/* Recent Trades */}
-      <div className="bg-gray-800 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">Recent Trades</h3>
+      <div className={`${isDark ? 'bg-gray-800' : 'bg-white border border-gray-200'} rounded-lg p-6`}>
+        <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>Recent Trades</h3>
         <div className="overflow-x-auto max-h-80 overflow-y-auto">
           <table className="w-full">
             <thead>

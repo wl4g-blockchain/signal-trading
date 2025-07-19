@@ -3,6 +3,7 @@ import { ComponentNode, Connection } from '../../types';
 import { NodeComponent } from './NodeComponent';
 import { ConnectionLine } from './ConnectionLine';
 import { NodeConfigModal } from './NodeConfigModal';
+import { useTheme } from '../../contexts/ThemeContext';
 
 interface CanvasProps {
   nodes: ComponentNode[];
@@ -19,6 +20,7 @@ export const Canvas: React.FC<CanvasProps> = ({
   onConnectionsChange,
   onDeleteNode,
 }) => {
+  const { isDark } = useTheme();
   const canvasRef = useRef<HTMLDivElement>(null);
   const [draggedNode, setDraggedNode] = useState<string | null>(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
@@ -327,7 +329,7 @@ export const Canvas: React.FC<CanvasProps> = ({
     <>
       <div
         ref={canvasRef}
-        className="relative w-full h-full bg-gray-800 overflow-hidden"
+        className={`relative w-full h-full ${isDark ? 'bg-gray-800' : 'bg-gray-50'} overflow-hidden`}
         onMouseMove={handleDragMove}
         onMouseUp={handleDragEnd}
         onMouseLeave={handleDragEnd}

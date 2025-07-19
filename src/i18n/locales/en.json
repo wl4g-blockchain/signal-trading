@@ -39,7 +39,7 @@
     "chinese": "简体中文"
   },
   "workflow": {
-    "title": "Workflow Management",
+    "title": "Workflows",
     "create": "Create Workflow",
     "edit": "Edit Workflow",
     "run": "Run",
@@ -49,7 +49,23 @@
     "draft": "Draft",
     "running": "Running",
     "paused": "Paused",
-    "completed": "Completed"
+    "completed": "Completed",
+    "starting": "Starting...",
+    "saving": "Saving...",
+    "nodes": "Nodes",
+    "connections": "Connections",
+    "components": "Components",
+    "componentPalette": "Component Palette",
+    "connectionRules": "Connection Rules",
+    "created": "Created",
+    "design": "Design",
+    "runs": "Runs",
+    "runHistory": "Run History",
+    "listenerDescription": "Monitor social media, price feeds, and market data",
+    "evaluatorDescription": "Analyze data and generate trading strategies",
+    "executorDescription": "Execute trades on decentralized exchanges",
+    "cexExecutorDescription": "Execute trades on centralized exchanges",
+    "collectorDescription": "Monitor and collect trade execution results"
   },
   "node": {
     "start": "Start",

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ComponentNode } from '../../types';
 import { X, Save } from 'lucide-react';
+import { useTheme } from '../../contexts/ThemeContext';
 
 interface NodeConfigModalProps {
   node: ComponentNode;
@@ -13,6 +14,7 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
   onSave,
   onClose,
 }) => {
+  const { isDark } = useTheme();
   // Unified function to get vault address by chain
   const getVaultAddress = (chain: string, customVaultAddress?: string) => {
     switch (chain) {
@@ -1173,38 +1175,38 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-gray-800 rounded-lg p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
+      <div className={`${isDark ? 'bg-gray-800' : 'bg-white border border-gray-200'} rounded-lg p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto`}>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-white">
+          <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
             Configure {node.data?.name || node.type}
           </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
+            className={`p-2 ${isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} rounded-lg transition-colors`}
           >
-            <X className="w-5 h-5 text-gray-400" />
+            <X className={`w-5 h-5 ${isDark ? 'text-gray-400' : 'text-gray-600'}`} />
           </button>
         </div>
 
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-300 mb-2">
+          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
             Node Name
           </label>
           <input
             type="text"
             value={config.name || ''}
             onChange={(e) => setConfig({ ...config, name: e.target.value })}
-            className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+            className={`w-full ${isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'} px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
             placeholder={`${node.type.charAt(0).toUpperCase() + node.type.slice(1)} Component`}
           />
         </div>
 
         {renderConfigContent()}
 
-        <div className="flex justify-end space-x-3 mt-6 pt-6 border-t border-gray-700">
+        <div className={`flex justify-end space-x-3 mt-6 pt-6 border-t ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-gray-600 hover:bg-gray-500 text-white rounded transition-colors"
+            className={`px-4 py-2 ${isDark ? 'bg-gray-600 hover:bg-gray-500' : 'bg-gray-200 hover:bg-gray-300'} ${isDark ? 'text-white' : 'text-gray-900'} rounded transition-colors`}
           >
             Cancel
           </button>

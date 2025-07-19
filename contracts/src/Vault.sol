@@ -22,43 +22,72 @@ contract Vault is Ownable2Step, Pausable, ReentrancyGuard {
     uint256 public constant VERSION = 1;
 
     // 主网代币地址 - 请在部署时验证这些地址
-    address public constant USDC = 0xa0b86a33E6441E6b421d8bb5fB9Ca9336b3AE695; // USDC 主网地址
+    address public constant USDC = 0xa0b86a33e6441E6b421d8bb5fB9Ca9336b3AE695; // USDC 主网地址
     address public constant USDT = 0xdAC17F958D2ee523a2206206994597C13D831ec7; // USDT 主网地址
-    
+
     // 支持的保证金代币
     mapping(address => bool) public supportedMarginTokens;
-    
+
     // 支持的交易代币
     mapping(address => bool) public supportedTradingTokens;
-    
+
     // 用户保证金余额 user => token => balance
     mapping(address => mapping(address => uint256)) public marginBalances;
-    
+
     // 用户交易代币余额 user => token => balance
     mapping(address => mapping(address => uint256)) public tradingBalances;
-    
+
     // 用户紧急锁定状态
     mapping(address => bool) public emergencyLocked;
-    
+
     // 授权的交易执行者
     mapping(address => bool) public authorizedExecutors;
-    
+
     // 用户授权的交易执行者
     mapping(address => mapping(address => bool)) public userAuthorizedExecutors;
-    
+
     // 用户冻结余额（紧急锁定时使用）
     mapping(address => mapping(address => uint256)) public frozenBalances;
 
     // 事件定义
-    event MarginDeposited(address indexed user, address indexed token, uint256 amount);
-    event MarginWithdrawn(address indexed user, address indexed token, uint256 amount);
-    event TradingTokenDeposited(address indexed user, address indexed token, uint256 amount);
-    event TradingTokenWithdrawn(address indexed user, address indexed token, uint256 amount);
+    event MarginDeposited(
+        address indexed user,
+        address indexed token,
+        uint256 amount
+    );
+    event MarginWithdrawn(
+        address indexed user,
+        address indexed token,
+        uint256 amount
+    );
+    event TradingTokenDeposited(
+        address indexed user,
+        address indexed token,
+        uint256 amount
+    );
+    event TradingTokenWithdrawn(
+        address indexed user,
+        address indexed token,
+        uint256 amount
+    );
     event ExecutorAuthorized(address indexed executor, bool authorized);
-    event UserExecutorAuthorized(address indexed user, address indexed executor, bool authorized);
+    event UserExecutorAuthorized(
+        address indexed user,
+        address indexed executor,
+        bool authorized
+    );
     event EmergencyLocked(address indexed user, bool locked);
-    event TokenSupported(address indexed token, bool isMarginToken, bool supported);
-    event TradeExecuted(address indexed user, address indexed executor, address indexed token, uint256 amount);
+    event TokenSupported(
+        address indexed token,
+        bool isMarginToken,
+        bool supported
+    );
+    event TradeExecuted(
+        address indexed user,
+        address indexed executor,
+        address indexed token,
+        uint256 amount
+    );
 
     // 错误定义
     error TokenNotSupported();
@@ -106,12 +135,10 @@ contract Vault is Ownable2Step, Pausable, ReentrancyGuard {
      * @param token 代币地址
      * @param amount 数量
      */
-    function depositMargin(address token, uint256 amount) 
-        external 
-        whenNotPaused 
-        nonReentrant 
-        notEmergencyLocked(msg.sender)
-    {
+    function depositMargin(
+        address token,
+        uint256 amount
+    ) external whenNotPaused nonReentrant notEmergencyLocked(msg.sender) {
         if (!supportedMarginTokens[token]) {
             revert TokenNotSupported();
         }
@@ -130,20 +157,19 @@ contract Vault is Ownable2Step, Pausable, ReentrancyGuard {
      * @param token 代币地址
      * @param amount 数量
      */
-    function withdrawMargin(address token, uint256 amount) 
-        external 
-        whenNotPaused 
-        nonReentrant 
-        notEmergencyLocked(msg.sender)
-    {
+    function withdrawMargin(
+        address token,
+        uint256 amount
+    ) external whenNotPaused nonReentrant notEmergencyLocked(msg.sender) {
         if (!supportedMarginTokens[token]) {
             revert TokenNotSupported();
         }
         if (amount == 0) {
             revert InvalidAmount();
         }
-        
-        uint256 availableBalance = marginBalances[msg.sender][token] - frozenBalances[msg.sender][token];
+
+        uint256 availableBalance = marginBalances[msg.sender][token] -
+            frozenBalances[msg.sender][token];
         if (availableBalance < amount) {
             revert InsufficientBalance();
         }
@@ -159,12 +185,10 @@ contract Vault is Ownable2Step, Pausable, ReentrancyGuard {
      * @param token 代币地址
      * @param amount 数量
      */
-    function depositTradingToken(address token, uint256 amount) 
-        external 
-        whenNotPaused 
-        nonReentrant 
-        notEmergencyLocked(msg.sender)
-    {
+    function depositTradingToken(
+        address token,
+        uint256 amount
+    ) external whenNotPaused nonReentrant notEmergencyLocked(msg.sender) {
         if (!supportedTradingTokens[token]) {
             revert TokenNotSupported();
         }
@@ -183,20 +207,19 @@ contract Vault is Ownable2Step, Pausable, ReentrancyGuard {
      * @param token 代币地址
      * @param amount 数量
      */
-    function withdrawTradingToken(address token, uint256 amount) 
-        external 
-        whenNotPaused 
-        nonReentrant 
-        notEmergencyLocked(msg.sender)
-    {
+    function withdrawTradingToken(
+        address token,
+        uint256 amount
+    ) external whenNotPaused nonReentrant notEmergencyLocked(msg.sender) {
         if (!supportedTradingTokens[token]) {
             revert TokenNotSupported();
         }
         if (amount == 0) {
             revert InvalidAmount();
         }
-        
-        uint256 availableBalance = tradingBalances[msg.sender][token] - frozenBalances[msg.sender][token];
+
+        uint256 availableBalance = tradingBalances[msg.sender][token] -
+            frozenBalances[msg.sender][token];
         if (availableBalance < amount) {
             revert InsufficientBalance();
         }
@@ -223,7 +246,7 @@ contract Vault is Ownable2Step, Pausable, ReentrancyGuard {
         if (amount == 0) {
             revert InvalidAmount();
         }
-        
+
         // 检查用户是否授权当前执行者
         if (!userAuthorizedExecutors[user][msg.sender]) {
             revert UnauthorizedExecutor();
@@ -233,23 +256,25 @@ contract Vault is Ownable2Step, Pausable, ReentrancyGuard {
             if (!supportedMarginTokens[token]) {
                 revert TokenNotSupported();
             }
-            
-            uint256 availableBalance = marginBalances[user][token] - frozenBalances[user][token];
+
+            uint256 availableBalance = marginBalances[user][token] -
+                frozenBalances[user][token];
             if (availableBalance < amount) {
                 revert InsufficientBalance();
             }
-            
+
             marginBalances[user][token] -= amount;
         } else {
             if (!supportedTradingTokens[token]) {
                 revert TokenNotSupported();
             }
-            
-            uint256 availableBalance = tradingBalances[user][token] - frozenBalances[user][token];
+
+            uint256 availableBalance = tradingBalances[user][token] -
+                frozenBalances[user][token];
             if (availableBalance < amount) {
                 revert InsufficientBalance();
             }
-            
+
             tradingBalances[user][token] -= amount;
         }
 
@@ -262,7 +287,7 @@ contract Vault is Ownable2Step, Pausable, ReentrancyGuard {
      */
     function setEmergencyLock(bool locked) external {
         emergencyLocked[msg.sender] = locked;
-        
+
         if (locked) {
             // 锁定时冻结所有余额
             _freezeUserBalances(msg.sender);
@@ -270,7 +295,7 @@ contract Vault is Ownable2Step, Pausable, ReentrancyGuard {
             // 解锁时解冻所有余额
             _unfreezeUserBalances(msg.sender);
         }
-        
+
         emit EmergencyLocked(msg.sender, locked);
     }
 
@@ -289,7 +314,10 @@ contract Vault is Ownable2Step, Pausable, ReentrancyGuard {
      * @param executor 执行者地址
      * @param authorized 是否授权
      */
-    function setAuthorizedExecutor(address executor, bool authorized) external onlyOwner {
+    function setAuthorizedExecutor(
+        address executor,
+        bool authorized
+    ) external onlyOwner {
         authorizedExecutors[executor] = authorized;
         emit ExecutorAuthorized(executor, authorized);
     }
@@ -299,7 +327,10 @@ contract Vault is Ownable2Step, Pausable, ReentrancyGuard {
      * @param token 代币地址
      * @param supported 是否支持
      */
-    function setSupportedMarginToken(address token, bool supported) external onlyOwner {
+    function setSupportedMarginToken(
+        address token,
+        bool supported
+    ) external onlyOwner {
         if (token == address(0)) {
             revert InvalidTokenAddress();
         }
@@ -312,7 +343,10 @@ contract Vault is Ownable2Step, Pausable, ReentrancyGuard {
      * @param token 代币地址
      * @param supported 是否支持
      */
-    function setSupportedTradingToken(address token, bool supported) external onlyOwner {
+    function setSupportedTradingToken(
+        address token,
+        bool supported
+    ) external onlyOwner {
         if (token == address(0)) {
             revert InvalidTokenAddress();
         }
@@ -340,7 +374,10 @@ contract Vault is Ownable2Step, Pausable, ReentrancyGuard {
      * @param token 代币地址
      * @return 余额
      */
-    function getMarginBalance(address user, address token) external view returns (uint256) {
+    function getMarginBalance(
+        address user,
+        address token
+    ) external view returns (uint256) {
         return marginBalances[user][token];
     }
 
@@ -350,7 +387,10 @@ contract Vault is Ownable2Step, Pausable, ReentrancyGuard {
      * @param token 代币地址
      * @return 余额
      */
-    function getTradingBalance(address user, address token) external view returns (uint256) {
+    function getTradingBalance(
+        address user,
+        address token
+    ) external view returns (uint256) {
         return tradingBalances[user][token];
     }
 
@@ -361,8 +401,14 @@ contract Vault is Ownable2Step, Pausable, ReentrancyGuard {
      * @param isMarginToken 是否为保证金代币
      * @return 可用余额
      */
-    function getAvailableBalance(address user, address token, bool isMarginToken) external view returns (uint256) {
-        uint256 totalBalance = isMarginToken ? marginBalances[user][token] : tradingBalances[user][token];
+    function getAvailableBalance(
+        address user,
+        address token,
+        bool isMarginToken
+    ) external view returns (uint256) {
+        uint256 totalBalance = isMarginToken
+            ? marginBalances[user][token]
+            : tradingBalances[user][token];
         uint256 frozen = frozenBalances[user][token];
         return totalBalance > frozen ? totalBalance - frozen : 0;
     }
@@ -372,7 +418,9 @@ contract Vault is Ownable2Step, Pausable, ReentrancyGuard {
      * @param token 代币地址
      * @return 总余额
      */
-    function getTotalTokenBalance(address token) external view returns (uint256) {
+    function getTotalTokenBalance(
+        address token
+    ) external view returns (uint256) {
         return IERC20(token).balanceOf(address(this));
     }
 
@@ -384,16 +432,19 @@ contract Vault is Ownable2Step, Pausable, ReentrancyGuard {
      * @return balances 余额数组
      */
     function getUserBalances(
-        address user, 
-        address[] calldata tokens, 
+        address user,
+        address[] calldata tokens,
         bool[] calldata isMarginTokens
     ) external view returns (uint256[] memory balances) {
-        require(tokens.length == isMarginTokens.length, "Array lengths mismatch");
-        
+        require(
+            tokens.length == isMarginTokens.length,
+            "Array lengths mismatch"
+        );
+
         balances = new uint256[](tokens.length);
         for (uint256 i = 0; i < tokens.length; i++) {
-            balances[i] = isMarginTokens[i] 
-                ? marginBalances[user][tokens[i]] 
+            balances[i] = isMarginTokens[i]
+                ? marginBalances[user][tokens[i]]
                 : tradingBalances[user][tokens[i]];
         }
     }
@@ -406,7 +457,7 @@ contract Vault is Ownable2Step, Pausable, ReentrancyGuard {
         // 冻结保证金代币余额
         frozenBalances[user][USDC] = marginBalances[user][USDC];
         frozenBalances[user][USDT] = marginBalances[user][USDT];
-        
+
         // 这里可以扩展为冻结用户的所有代币余额
         // 为了简化，目前只冻结主要的保证金代币
     }
@@ -427,7 +478,11 @@ contract Vault is Ownable2Step, Pausable, ReentrancyGuard {
      * @param to 接收地址
      * @param amount 数量
      */
-    function emergencyWithdraw(address token, address to, uint256 amount) external onlyOwner {
+    function emergencyWithdraw(
+        address token,
+        address to,
+        uint256 amount
+    ) external onlyOwner {
         IERC20(token).safeTransfer(to, amount);
     }
 
@@ -440,4 +495,4 @@ contract Vault is Ownable2Step, Pausable, ReentrancyGuard {
         _unfreezeUserBalances(user);
         emit EmergencyLocked(user, false);
     }
-} 
+}

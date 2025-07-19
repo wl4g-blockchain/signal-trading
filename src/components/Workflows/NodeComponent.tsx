@@ -11,6 +11,7 @@ import {
   Trash2,
   Settings,
 } from 'lucide-react';
+import { useTheme } from '../../contexts/ThemeContext';
 
 interface NodeComponentProps {
   node: ComponentNode;
@@ -146,6 +147,7 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
   onDelete,
   onConfig,
 }) => {
+  const { isDark } = useTheme();
   const Icon = getNodeIcon(node.type);
   const SubIcon = getSubIcon(node.type, node.data?.type);
   const colorClass = getNodeColor(node.type);
@@ -166,7 +168,7 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
         </div>
         
         <div className="text-center mt-2">
-          <span className="text-white font-medium text-sm">{node.data?.name}</span>
+          <span className={`font-medium text-sm ${isDark ? 'text-white' : 'text-gray-900'}`}>{node.data?.name}</span>
         </div>
 
         {/* Output ports for start node - 四个方向 */}
@@ -174,7 +176,7 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
           <>
             {/* 右侧输出端口 */}
             <div
-              className="absolute right-0 w-3 h-3 bg-green-400 rounded-full cursor-pointer hover:bg-green-300 z-10 border-2 border-gray-800"
+              className={`absolute right-0 w-3 h-3 bg-green-400 rounded-full cursor-pointer hover:bg-green-300 z-10 border-2 ${isDark ? 'border-gray-800' : 'border-white'}`}
               style={{ right: '-6px', top: 'calc(50% - 8px)', transform: 'translateY(-50%)' }}
               onMouseDown={(e) => {
                 e.preventDefault();
@@ -184,7 +186,7 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
             />
             {/* 下侧输出端口 - 在圆形节点边缘 */}
             <div
-              className="absolute left-1/2 w-3 h-3 bg-green-400 rounded-full cursor-pointer hover:bg-green-300 transform -translate-x-1/2 z-10 border-2 border-gray-800"
+              className={`absolute left-1/2 w-3 h-3 bg-green-400 rounded-full cursor-pointer hover:bg-green-300 transform -translate-x-1/2 z-10 border-2 ${isDark ? 'border-gray-800' : 'border-white'}`}
               style={{ top: '94px' }}
               onMouseDown={(e) => {
                 e.preventDefault();
@@ -194,7 +196,7 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
             />
             {/* 左侧输出端口 */}
             <div
-              className="absolute left-0 w-3 h-3 bg-green-400 rounded-full cursor-pointer hover:bg-green-300 z-10 border-2 border-gray-800"
+              className={`absolute left-0 w-3 h-3 bg-green-400 rounded-full cursor-pointer hover:bg-green-300 z-10 border-2 ${isDark ? 'border-gray-800' : 'border-white'}`}
               style={{ left: '-6px', top: 'calc(50% - 8px)', transform: 'translateY(-50%)' }}
               onMouseDown={(e) => {
                 e.preventDefault();
@@ -204,7 +206,7 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
             />
             {/* 上侧输出端口 */}
             <div
-              className="absolute top-0 left-1/2 w-3 h-3 bg-green-400 rounded-full cursor-pointer hover:bg-green-300 transform -translate-x-1/2 z-10 border-2 border-gray-800"
+              className={`absolute top-0 left-1/2 w-3 h-3 bg-green-400 rounded-full cursor-pointer hover:bg-green-300 transform -translate-x-1/2 z-10 border-2 ${isDark ? 'border-gray-800' : 'border-white'}`}
               style={{ top: '-6px' }}
               onMouseDown={(e) => {
                 e.preventDefault();
@@ -220,7 +222,7 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
           <>
             {/* 左侧输入端口 */}
             <div
-              className="absolute left-0 w-3 h-3 bg-blue-400 rounded-full cursor-pointer hover:bg-blue-300 z-10 border-2 border-gray-800"
+              className={`absolute left-0 w-3 h-3 bg-blue-400 rounded-full cursor-pointer hover:bg-blue-300 z-10 border-2 ${isDark ? 'border-gray-800' : 'border-white'}`}
               style={{ left: '-6px', top: 'calc(50% - 8px)', transform: 'translateY(-50%)' }}
               onMouseDown={(e) => {
                 e.preventDefault();
@@ -241,7 +243,7 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
             />
             {/* 上侧输入端口 - 在圆形节点边缘 */}
             <div
-              className="absolute left-1/2 w-3 h-3 bg-blue-400 rounded-full cursor-pointer hover:bg-blue-300 transform -translate-x-1/2 z-10 border-2 border-gray-800"
+              className={`absolute left-1/2 w-3 h-3 bg-blue-400 rounded-full cursor-pointer hover:bg-blue-300 transform -translate-x-1/2 z-10 border-2 ${isDark ? 'border-gray-800' : 'border-white'}`}
               style={{ top: '-6px' }}
               onMouseDown={(e) => {
                 e.preventDefault();
@@ -261,7 +263,7 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
             />
             {/* 右侧输入端口 */}
             <div
-              className="absolute right-0 w-3 h-3 bg-blue-400 rounded-full cursor-pointer hover:bg-blue-300 z-10 border-2 border-gray-800"
+              className={`absolute right-0 w-3 h-3 bg-blue-400 rounded-full cursor-pointer hover:bg-blue-300 z-10 border-2 ${isDark ? 'border-gray-800' : 'border-white'}`}
               style={{ right: '-6px', top: 'calc(50% - 8px)', transform: 'translateY(-50%)' }}
               onMouseDown={(e) => {
                 e.preventDefault();
@@ -281,7 +283,7 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
             />
             {/* 下侧输入端口 - 在圆形节点边缘 */}
             <div
-              className="absolute left-1/2 w-3 h-3 bg-blue-400 rounded-full cursor-pointer hover:bg-blue-300 transform -translate-x-1/2 z-10 border-2 border-gray-800"
+              className={`absolute left-1/2 w-3 h-3 bg-blue-400 rounded-full cursor-pointer hover:bg-blue-300 transform -translate-x-1/2 z-10 border-2 ${isDark ? 'border-gray-800' : 'border-white'}`}
               style={{ top: '94px' }}
               onMouseDown={(e) => {
                 e.preventDefault();
@@ -312,7 +314,7 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
       }}
       onMouseDown={(e) => onDragStart(node.id, e)}
     >
-      <div className={`w-48 bg-gray-700 border-2 ${colorClass} rounded-lg shadow-lg hover:shadow-xl transition-shadow`}>
+      <div className={`w-48 ${isDark ? 'bg-gray-700' : 'bg-white border border-gray-200'} border-2 ${colorClass} rounded-lg shadow-lg hover:shadow-xl transition-shadow`}>
         {/* Header */}
         <div className={`p-3 ${colorClass} rounded-t-lg flex items-center space-x-2`}>
           <Icon className="w-5 h-5 text-white" />
@@ -349,10 +351,10 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
         </div>
 
         {/* Content */}
-        <div className="p-3 text-sm text-gray-300">
+        <div className={`p-3 text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
           {displayType && (
             <div className="mb-2">
-              <span className="text-gray-400">Type: </span>
+              <span className={`${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Type: </span>
               <span className="text-blue-400">{displayType}</span>
             </div>
           )}
@@ -372,7 +374,7 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
           <>
             {/* 左侧输入端口 */}
             <div
-              className="absolute left-0 top-1/2 w-3 h-3 bg-blue-400 rounded-full cursor-pointer hover:bg-blue-300 transform -translate-y-1/2 z-10 border-2 border-gray-800"
+              className={`absolute left-0 top-1/2 w-3 h-3 bg-blue-400 rounded-full cursor-pointer hover:bg-blue-300 transform -translate-y-1/2 z-10 border-2 ${isDark ? 'border-gray-800' : 'border-white'}`}
               style={{ left: '-6px' }}
               onMouseDown={(e) => {
                 e.preventDefault();
@@ -392,7 +394,7 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
             />
             {/* 上侧输入端口 */}
             <div
-              className="absolute top-0 left-1/2 w-3 h-3 bg-blue-400 rounded-full cursor-pointer hover:bg-blue-300 transform -translate-x-1/2 z-10 border-2 border-gray-800"
+              className={`absolute top-0 left-1/2 w-3 h-3 bg-blue-400 rounded-full cursor-pointer hover:bg-blue-300 transform -translate-x-1/2 z-10 border-2 ${isDark ? 'border-gray-800' : 'border-white'}`}
               style={{ top: '-6px' }}
               onMouseDown={(e) => {
                 e.preventDefault();
@@ -417,7 +419,7 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
           <>
             {/* 右侧输出端口 */}
             <div
-              className="absolute right-0 top-1/2 w-3 h-3 bg-green-400 rounded-full cursor-pointer hover:bg-green-300 transform -translate-y-1/2 z-10 border-2 border-gray-800"
+              className={`absolute right-0 top-1/2 w-3 h-3 bg-green-400 rounded-full cursor-pointer hover:bg-green-300 transform -translate-y-1/2 z-10 border-2 ${isDark ? 'border-gray-800' : 'border-white'}`}
               style={{ right: '-6px' }}
               onMouseDown={(e) => {
                 e.preventDefault();
@@ -427,7 +429,7 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
             />
             {/* 下侧输出端口 */}
             <div
-              className="absolute bottom-0 left-1/2 w-3 h-3 bg-green-400 rounded-full cursor-pointer hover:bg-green-300 transform -translate-x-1/2 z-10 border-2 border-gray-800"
+              className={`absolute bottom-0 left-1/2 w-3 h-3 bg-green-400 rounded-full cursor-pointer hover:bg-green-300 transform -translate-x-1/2 z-10 border-2 ${isDark ? 'border-gray-800' : 'border-white'}`}
               style={{ bottom: '-6px' }}
               onMouseDown={(e) => {
                 e.preventDefault();
