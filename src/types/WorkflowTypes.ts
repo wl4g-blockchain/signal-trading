@@ -108,10 +108,10 @@ export interface Workflow {
 
 // Component categories for UI organization
 export const COMPONENT_CATEGORIES = {
-  FLOW_CONTROL: {
-    name: 'Flow Control',
-    types: [COMPONENT_TYPES.START, COMPONENT_TYPES.END],
-  },
+  // FLOW_CONTROL: {
+  //   name: 'Flow Control',
+  //   types: [COMPONENT_TYPES.START, COMPONENT_TYPES.END],
+  // },
   DATA_SOURCES: {
     name: 'Data Sources',
     types: [

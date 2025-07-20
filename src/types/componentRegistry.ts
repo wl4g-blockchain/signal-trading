@@ -455,9 +455,7 @@ export const getComponentsByCategory = (category: string): ComponentSchema[] => 
   if (!categoryConfig) {
     return Object.values(COMPONENT_REGISTRY).filter(schema => schema.category === category);
   }
-  
+
   // Return components in the order defined in COMPONENT_CATEGORIES
-  return categoryConfig.types
-    .map((type: ComponentType) => COMPONENT_REGISTRY[type])
-    .filter(Boolean);
+  return categoryConfig.types.map((type: ComponentType) => COMPONENT_REGISTRY[type]).filter(Boolean);
 };
