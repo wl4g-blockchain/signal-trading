@@ -10,11 +10,7 @@ interface NodeConfigModalProps {
   onClose: () => void;
 }
 
-export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
-  node,
-  onSave,
-  onClose,
-}) => {
+export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({ node, onSave, onClose }) => {
   const { isDark } = useTheme();
   const { t } = useTranslation();
   // Unified function to get vault address by chain
@@ -40,12 +36,12 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
   // Initialize configuration with correct vault address and DEX config for executor nodes
   const getInitialConfig = () => {
     const baseConfig = node.data || {};
-    
+
     if (node.type === 'executor') {
       const chain = baseConfig.rpcEndpoint || 'mainnet';
       const needsVaultAddress = !baseConfig.vaultAddress;
       const needsDexConfig = !baseConfig.targetDex || !baseConfig.dexAddress;
-      
+
       if (needsVaultAddress || needsDexConfig) {
         // Get default DEX configuration - select enabled mainstream DEXs
         const getDefaultDex = (chain: string) => {
@@ -55,37 +51,37 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
             case 'sepolia':
               return {
                 targetDex: 'uniswap-v4',
-                dexAddress: '0x0000000000000000000000000000000000000000'
+                dexAddress: '0x0000000000000000000000000000000000000000',
               };
             case 'polygon':
               return {
                 targetDex: 'quickswap',
-                dexAddress: '0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff'
+                dexAddress: '0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff',
               };
             case 'bsc':
               return {
                 targetDex: 'pancakeswap',
-                dexAddress: '0x10ED43C718714eb63d5aA57B78B54704E256024E'
+                dexAddress: '0x10ED43C718714eb63d5aA57B78B54704E256024E',
               };
             default:
               return {
                 targetDex: 'uniswap-v4',
-                dexAddress: '0x0000000000000000000000000000000000000000'
+                dexAddress: '0x0000000000000000000000000000000000000000',
               };
           }
         };
-        
+
         const defaultDex = getDefaultDex(chain);
         return {
           ...baseConfig,
           vaultAddress: needsVaultAddress ? getVaultAddress(chain, baseConfig.customVaultAddress) : baseConfig.vaultAddress,
           targetDex: needsDexConfig ? defaultDex.targetDex : baseConfig.targetDex,
           dexAddress: needsDexConfig ? defaultDex.dexAddress : baseConfig.dexAddress,
-          allowedTradingPairs: baseConfig.allowedTradingPairs || ['WETH/USDC', 'WETH/USDT']
+          allowedTradingPairs: baseConfig.allowedTradingPairs || ['WETH/USDC', 'WETH/USDT'],
         };
       }
     }
-    
+
     return baseConfig;
   };
 
@@ -94,24 +90,24 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
   const handleSave = () => {
     const updatedNode = {
       ...node,
-      data: { ...config }
+      data: { ...config },
     };
     onSave(updatedNode);
   };
 
   const renderListenerConfig = () => {
     const listenerType = config.type || 'twitter';
-    
+
     return (
       <div className="space-y-4">
         <div>
-          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
-            Data Source Type
-          </label>
+          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>Data Source Type</label>
           <select
             value={listenerType}
-            onChange={(e) => setConfig({ ...config, type: e.target.value })}
-            className={`w-full ${isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'} px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
+            onChange={e => setConfig({ ...config, type: e.target.value })}
+            className={`w-full ${
+              isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'
+            } px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
           >
             <option value="twitter">Twitter</option>
             <option value="binance">Binance</option>
@@ -124,50 +120,50 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
         {listenerType === 'twitter' && (
           <>
             <div>
-              <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
-                API Key
-              </label>
+              <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>API Key</label>
               <input
                 type="password"
                 value={config.apiKey || ''}
-                onChange={(e) => setConfig({ ...config, apiKey: e.target.value })}
-                className={`w-full ${isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'} px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
+                onChange={e => setConfig({ ...config, apiKey: e.target.value })}
+                className={`w-full ${
+                  isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'
+                } px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
                 placeholder="Enter Twitter API Key"
               />
             </div>
             <div>
-              <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
-                Twitter IDs (comma separated)
-              </label>
+              <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>Twitter IDs (comma separated)</label>
               <input
                 type="text"
                 value={config.twitterIds || ''}
-                onChange={(e) => setConfig({ ...config, twitterIds: e.target.value })}
-                className={`w-full ${isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'} px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
+                onChange={e => setConfig({ ...config, twitterIds: e.target.value })}
+                className={`w-full ${
+                  isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'
+                } px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
                 placeholder="elonmusk, VitalikButerin, trump"
               />
             </div>
             <div>
-              <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
-                Interval (minutes)
-              </label>
+              <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>Interval (minutes)</label>
               <input
                 type="number"
                 value={config.interval || 5}
-                onChange={(e) => setConfig({ ...config, interval: Number(e.target.value) })}
-                className={`w-full ${isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'} px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
+                onChange={e => setConfig({ ...config, interval: Number(e.target.value) })}
+                className={`w-full ${
+                  isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'
+                } px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
                 min="1"
                 max="60"
               />
             </div>
             <div>
-              <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
-                API URLs (readonly)
-              </label>
+              <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>API URLs (readonly)</label>
               <textarea
                 value="https://api.twitter.com/2/tweets/search/recent\nhttps://api.twitter.com/2/users/by/username"
                 readOnly
-                className={`w-full ${isDark ? 'bg-gray-600 text-gray-300 border-gray-600' : 'bg-gray-100 text-gray-600 border-gray-300'} px-3 py-2 rounded border resize-none`}
+                className={`w-full ${
+                  isDark ? 'bg-gray-600 text-gray-300 border-gray-600' : 'bg-gray-100 text-gray-600 border-gray-300'
+                } px-3 py-2 rounded border resize-none`}
                 rows={3}
               />
             </div>
@@ -177,14 +173,14 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
         {listenerType === 'binance' && (
           <>
             <div>
-              <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
-                API Key
-              </label>
+              <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>API Key</label>
               <input
                 type="password"
                 value={config.apiKey || ''}
-                onChange={(e) => setConfig({ ...config, apiKey: e.target.value })}
-                className={`w-full ${isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'} px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
+                onChange={e => setConfig({ ...config, apiKey: e.target.value })}
+                className={`w-full ${
+                  isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'
+                } px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
                 placeholder="Enter Binance API Key"
               />
             </div>
@@ -195,19 +191,21 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
               <input
                 type="text"
                 value={config.pairs || ''}
-                onChange={(e) => setConfig({ ...config, pairs: e.target.value })}
-                className={`w-full ${isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'} px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
+                onChange={e => setConfig({ ...config, pairs: e.target.value })}
+                className={`w-full ${
+                  isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'
+                } px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
                 placeholder="BTCUSDT, ETHUSDT, BNBUSDT"
               />
             </div>
             <div>
-              <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
-                Timeframe
-              </label>
+              <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>Timeframe</label>
               <select
                 value={config.timeframe || '1h'}
-                onChange={(e) => setConfig({ ...config, timeframe: e.target.value })}
-                className={`w-full ${isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'} px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
+                onChange={e => setConfig({ ...config, timeframe: e.target.value })}
+                className={`w-full ${
+                  isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'
+                } px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
               >
                 <option value="1h">1 Hour</option>
                 <option value="4h">4 Hours</option>
@@ -218,13 +216,13 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
               </select>
             </div>
             <div>
-              <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
-                API URLs (readonly)
-              </label>
+              <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>API URLs (readonly)</label>
               <textarea
                 value="https://api.binance.com/api/v3/ticker/24hr\nhttps://api.binance.com/api/v3/klines"
                 readOnly
-                className={`w-full ${isDark ? 'bg-gray-600 text-gray-300 border-gray-600' : 'bg-gray-100 text-gray-600 border-gray-300'} px-3 py-2 rounded border resize-none`}
+                className={`w-full ${
+                  isDark ? 'bg-gray-600 text-gray-300 border-gray-600' : 'bg-gray-100 text-gray-600 border-gray-300'
+                } px-3 py-2 rounded border resize-none`}
                 rows={2}
               />
             </div>
@@ -234,24 +232,20 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
         {listenerType === 'uniswap' && (
           <>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Pool Addresses (comma separated)
-              </label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Pool Addresses (comma separated)</label>
               <input
                 type="text"
                 value={config.pools || ''}
-                onChange={(e) => setConfig({ ...config, pools: e.target.value })}
+                onChange={e => setConfig({ ...config, pools: e.target.value })}
                 className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
                 placeholder="0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Timeframe
-              </label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Timeframe</label>
               <select
                 value={config.timeframe || '1h'}
-                onChange={(e) => setConfig({ ...config, timeframe: e.target.value })}
+                onChange={e => setConfig({ ...config, timeframe: e.target.value })}
                 className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
               >
                 <option value="1h">1 Hour</option>
@@ -263,9 +257,7 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                GraphQL Endpoint (readonly)
-              </label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">GraphQL Endpoint (readonly)</label>
               <input
                 value="https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3"
                 readOnly
@@ -278,33 +270,27 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
         {listenerType === 'coinmarket' && (
           <>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                API Key
-              </label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">API Key</label>
               <input
                 type="password"
                 value={config.apiKey || ''}
-                onChange={(e) => setConfig({ ...config, apiKey: e.target.value })}
+                onChange={e => setConfig({ ...config, apiKey: e.target.value })}
                 className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
                 placeholder="Enter CoinMarketCap API Key"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Symbols (comma separated)
-              </label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Symbols (comma separated)</label>
               <input
                 type="text"
                 value={config.symbols || ''}
-                onChange={(e) => setConfig({ ...config, symbols: e.target.value })}
+                onChange={e => setConfig({ ...config, symbols: e.target.value })}
                 className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
                 placeholder="BTC, ETH, BNB"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                API URL (readonly)
-              </label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">API URL (readonly)</label>
               <input
                 value="https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest"
                 readOnly
@@ -317,36 +303,30 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
         {listenerType === 'custom' && (
           <>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Custom API URL
-              </label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Custom API URL</label>
               <input
                 type="url"
                 value={config.customUrl || ''}
-                onChange={(e) => setConfig({ ...config, customUrl: e.target.value })}
+                onChange={e => setConfig({ ...config, customUrl: e.target.value })}
                 className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
                 placeholder="https://api.example.com/data"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Headers (JSON format)
-              </label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Headers (JSON format)</label>
               <textarea
                 value={config.headers || '{}'}
-                onChange={(e) => setConfig({ ...config, headers: e.target.value })}
+                onChange={e => setConfig({ ...config, headers: e.target.value })}
                 className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
                 rows={3}
                 placeholder='{"Authorization": "Bearer token", "Content-Type": "application/json"}'
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Request Method
-              </label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Request Method</label>
               <select
                 value={config.method || 'GET'}
-                onChange={(e) => setConfig({ ...config, method: e.target.value })}
+                onChange={e => setConfig({ ...config, method: e.target.value })}
                 className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
               >
                 <option value="GET">GET</option>
@@ -363,12 +343,10 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
     return (
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            AI Model
-          </label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">AI Model</label>
           <select
             value={config.model || 'deepseek-v3'}
-            onChange={(e) => setConfig({ ...config, model: e.target.value })}
+            onChange={e => setConfig({ ...config, model: e.target.value })}
             className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
           >
             <option value="deepseek-v3">DeepSeek V3</option>
@@ -381,9 +359,17 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
             {t('nodeConfig.systemPrompt', 'System Prompt')}
           </label>
           <textarea
-            value={config.systemPrompt || t('nodeConfig.defaultSystemPrompt', 'You are a professional trading analyst. Analyze the provided market data and provide trading recommendations.')}
-            onChange={(e) => setConfig({ ...config, systemPrompt: e.target.value })}
-            className={`w-full ${isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'} px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
+            value={
+              config.systemPrompt ||
+              t(
+                'nodeConfig.defaultSystemPrompt',
+                'You are a professional trading analyst. Analyze the provided market data and provide trading recommendations.'
+              )
+            }
+            onChange={e => setConfig({ ...config, systemPrompt: e.target.value })}
+            className={`w-full ${
+              isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'
+            } px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
             rows={4}
           />
         </div>
@@ -392,28 +378,32 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
             {t('nodeConfig.assistantPrompt', 'Assistant Prompt')}
           </label>
           <textarea
-            value={config.assistantPrompt || t('nodeConfig.defaultAssistantPrompt', 'Based on the market data, I will provide a clear BUY, SELL, or HOLD recommendation with confidence score and reasoning.')}
-            onChange={(e) => setConfig({ ...config, assistantPrompt: e.target.value })}
-            className={`w-full ${isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'} px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
+            value={
+              config.assistantPrompt ||
+              t(
+                'nodeConfig.defaultAssistantPrompt',
+                'Based on the market data, I will provide a clear BUY, SELL, or HOLD recommendation with confidence score and reasoning.'
+              )
+            }
+            onChange={e => setConfig({ ...config, assistantPrompt: e.target.value })}
+            className={`w-full ${
+              isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'
+            } px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
             rows={3}
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Confidence Threshold
-          </label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Confidence Threshold</label>
           <input
             type="range"
             min="0.1"
             max="1"
             step="0.1"
             value={config.confidenceThreshold || 0.7}
-            onChange={(e) => setConfig({ ...config, confidenceThreshold: Number(e.target.value) })}
+            onChange={e => setConfig({ ...config, confidenceThreshold: Number(e.target.value) })}
             className="w-full"
           />
-          <div className="text-center text-sm text-gray-400 mt-1">
-            {((config.confidenceThreshold || 0.7) * 100).toFixed(0)}%
-          </div>
+          <div className="text-center text-sm text-gray-400 mt-1">{((config.confidenceThreshold || 0.7) * 100).toFixed(0)}%</div>
         </div>
       </div>
     );
@@ -453,9 +443,7 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
             { value: '1inch', label: '1inch (Coming Soon)', address: '0x111111125421cA6dc452d289314280a0f8842A65', enabled: false },
           ];
         case 'custom':
-          return [
-            { value: 'custom', label: 'Custom DEX', address: config.customDexAddress || '', enabled: true },
-          ];
+          return [{ value: 'custom', label: 'Custom DEX', address: config.customDexAddress || '', enabled: true }];
         default:
           return [];
       }
@@ -467,23 +455,23 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
     return (
       <div className="space-y-4">
         <div>
-          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
-            Target Chain
-          </label>
+          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>Target Chain</label>
           <select
             value={config.rpcEndpoint || 'mainnet'}
-            onChange={(e) => {
+            onChange={e => {
               const newEndpoint = e.target.value;
               const newDexOptions = getDexOptions(newEndpoint);
-              setConfig({ 
-                ...config, 
+              setConfig({
+                ...config,
                 rpcEndpoint: newEndpoint,
                 vaultAddress: getVaultAddress(newEndpoint, config.customVaultAddress),
                 targetDex: newDexOptions[0]?.value || '',
-                dexAddress: newDexOptions[0]?.address || ''
+                dexAddress: newDexOptions[0]?.address || '',
               });
             }}
-            className={`w-full ${isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'} px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
+            className={`w-full ${
+              isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'
+            } px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
           >
             <option value="mainnet">Ethereum Mainnet</option>
             <option value="goerli">Goerli Testnet</option>
@@ -495,13 +483,11 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
         </div>
         {config.rpcEndpoint === 'custom' && (
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Custom RPC URL
-            </label>
+            <label className="block text-sm font-medium text-gray-300 mb-2">Custom RPC URL</label>
             <input
               type="url"
               value={config.customRpc || ''}
-              onChange={(e) => setConfig({ ...config, customRpc: e.target.value })}
+              onChange={e => setConfig({ ...config, customRpc: e.target.value })}
               className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
               placeholder="https://mainnet.infura.io/v3/YOUR-PROJECT-ID"
             />
@@ -509,26 +495,24 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
         )}
 
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Target DEX
-          </label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Target DEX</label>
           <select
             value={config.targetDex || dexOptions.find(dex => dex.enabled !== false)?.value || ''}
-            onChange={(e) => {
+            onChange={e => {
               const selectedDexOption = dexOptions.find(dex => dex.value === e.target.value);
               if (selectedDexOption && selectedDexOption.enabled !== false) {
-                setConfig({ 
-                  ...config, 
+                setConfig({
+                  ...config,
                   targetDex: e.target.value,
-                  dexAddress: selectedDexOption?.address || ''
+                  dexAddress: selectedDexOption?.address || '',
                 });
               }
             }}
             className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
           >
             {dexOptions.map(dex => (
-              <option 
-                key={dex.value} 
+              <option
+                key={dex.value}
                 value={dex.value}
                 disabled={dex.enabled === false}
                 className={dex.enabled !== false ? 'text-white' : 'text-gray-500'}
@@ -540,39 +524,35 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            DEX Router Address
-          </label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">DEX Router Address</label>
           <input
             type="text"
             value={selectedDex?.address || ''}
             readOnly
             className="w-full bg-gray-600 text-gray-300 px-3 py-2 rounded border border-gray-600 cursor-not-allowed"
           />
-          <div className="text-xs text-gray-400 mt-1">
-            Auto-configured for selected DEX
-          </div>
+          <div className="text-xs text-gray-400 mt-1">Auto-configured for selected DEX</div>
         </div>
 
         {config.rpcEndpoint === 'custom' && config.targetDex === 'custom' && (
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Custom DEX Router Address
-            </label>
+            <label className="block text-sm font-medium text-gray-300 mb-2">Custom DEX Router Address</label>
             <input
               type="text"
               value={config.customDexAddress || ''}
-              onChange={(e) => setConfig({ 
-                ...config, 
-                customDexAddress: e.target.value,
-                dexAddress: e.target.value
-              })}
+              onChange={e =>
+                setConfig({
+                  ...config,
+                  customDexAddress: e.target.value,
+                  dexAddress: e.target.value,
+                })
+              }
               className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
               placeholder="0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
             />
           </div>
         )}
-        
+
         <div>
           <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
             {t('nodeConfig.vaultContractAddress', 'Vault Contract Address')}
@@ -581,7 +561,9 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
             type="text"
             value={currentVaultAddress}
             readOnly
-            className={`w-full ${isDark ? 'bg-gray-600 text-gray-300 border-gray-600' : 'bg-gray-100 text-gray-600 border-gray-300'} px-3 py-2 rounded border cursor-not-allowed`}
+            className={`w-full ${
+              isDark ? 'bg-gray-600 text-gray-300 border-gray-600' : 'bg-gray-100 text-gray-600 border-gray-300'
+            } px-3 py-2 rounded border cursor-not-allowed`}
           />
           <div className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'} mt-1`}>
             {t('nodeConfig.autoConfigured', 'Auto-configured for selected chain')}
@@ -590,17 +572,17 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
 
         {config.rpcEndpoint === 'custom' && (
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Custom Vault Address
-            </label>
+            <label className="block text-sm font-medium text-gray-300 mb-2">Custom Vault Address</label>
             <input
               type="text"
               value={config.customVaultAddress || ''}
-              onChange={(e) => setConfig({ 
-                ...config, 
-                customVaultAddress: e.target.value,
-                vaultAddress: e.target.value
-              })}
+              onChange={e =>
+                setConfig({
+                  ...config,
+                  customVaultAddress: e.target.value,
+                  vaultAddress: e.target.value,
+                })
+              }
               className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
               placeholder="0x742d35Cc6634C0532925a3b8D401d2EdC8d4a5b1"
             />
@@ -609,48 +591,52 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
 
         <div>
           <div className="flex items-center justify-between mb-2">
-            <label className="block text-sm font-medium text-gray-300">
-              Allowed Trading Pairs
-            </label>
+            <label className="block text-sm font-medium text-gray-300">Allowed Trading Pairs</label>
             <div className="flex flex-wrap gap-1">
               <button
                 type="button"
-                onClick={() => setConfig({ 
-                  ...config, 
-                  allowedTradingPairs: [
-                    'WETH/USDC', 'WETH/USDT', 'WETH/DAI', 'USDC/USDT', 'WBTC/WETH', 'WBTC/USDC'
-                  ]
-                })}
+                onClick={() =>
+                  setConfig({
+                    ...config,
+                    allowedTradingPairs: ['WETH/USDC', 'WETH/USDT', 'WETH/DAI', 'USDC/USDT', 'WBTC/WETH', 'WBTC/USDC'],
+                  })
+                }
                 className="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded"
               >
                 All Available
               </button>
               <button
                 type="button"
-                onClick={() => setConfig({ 
-                  ...config, 
-                  allowedTradingPairs: ['WETH/USDC', 'WETH/USDT', 'WETH/DAI']
-                })}
+                onClick={() =>
+                  setConfig({
+                    ...config,
+                    allowedTradingPairs: ['WETH/USDC', 'WETH/USDT', 'WETH/DAI'],
+                  })
+                }
                 className="px-2 py-1 bg-green-600 hover:bg-green-700 text-white text-xs rounded"
               >
                 ETH Pairs
               </button>
               <button
                 type="button"
-                onClick={() => setConfig({ 
-                  ...config, 
-                  allowedTradingPairs: ['USDC/USDT']
-                })}
+                onClick={() =>
+                  setConfig({
+                    ...config,
+                    allowedTradingPairs: ['USDC/USDT'],
+                  })
+                }
                 className="px-2 py-1 bg-purple-600 hover:bg-purple-700 text-white text-xs rounded"
               >
                 Stables
               </button>
               <button
                 type="button"
-                onClick={() => setConfig({ 
-                  ...config, 
-                  allowedTradingPairs: ['WBTC/WETH', 'WBTC/USDC']
-                })}
+                onClick={() =>
+                  setConfig({
+                    ...config,
+                    allowedTradingPairs: ['WBTC/WETH', 'WBTC/USDC'],
+                  })
+                }
                 className="px-2 py-1 bg-orange-600 hover:bg-orange-700 text-white text-xs rounded"
               >
                 BTC Pairs
@@ -680,25 +666,25 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
               { pair: 'SUSHI/WETH', enabled: false },
               { pair: 'CRV/WETH', enabled: false },
               { pair: 'SNX/WETH', enabled: false },
-              { pair: 'MKR/WETH', enabled: false }
+              { pair: 'MKR/WETH', enabled: false },
             ].map(({ pair, enabled }) => (
               <label key={pair} className={`flex items-center space-x-2 py-1 hover:bg-gray-600 rounded px-2 ${!enabled ? 'opacity-50' : ''}`}>
                 <input
                   type="checkbox"
                   checked={config.allowedTradingPairs?.includes(pair) || false}
                   disabled={!enabled}
-                  onChange={(e) => {
+                  onChange={e => {
                     if (!enabled) return;
                     const currentPairs = config.allowedTradingPairs || [];
                     if (e.target.checked) {
-                      setConfig({ 
-                        ...config, 
-                        allowedTradingPairs: [...currentPairs, pair]
+                      setConfig({
+                        ...config,
+                        allowedTradingPairs: [...currentPairs, pair],
                       });
                     } else {
-                      setConfig({ 
-                        ...config, 
-                        allowedTradingPairs: currentPairs.filter((p: string) => p !== pair)
+                      setConfig({
+                        ...config,
+                        allowedTradingPairs: currentPairs.filter((p: string) => p !== pair),
                       });
                     }
                   }}
@@ -748,45 +734,37 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Max Amount Per Transaction (ETH)
-          </label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Max Amount Per Transaction (ETH)</label>
           <input
             type="number"
             step="0.0001"
             value={config.maxAmount || 0.1}
-            onChange={(e) => setConfig({ ...config, maxAmount: Number(e.target.value) })}
+            onChange={e => setConfig({ ...config, maxAmount: Number(e.target.value) })}
             className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
           />
-          <div className="text-xs text-gray-400 mt-1">
-            Must not exceed available authorized amount
-          </div>
+          <div className="text-xs text-gray-400 mt-1">Must not exceed available authorized amount</div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Min Amount Per Transaction (ETH)
-          </label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Min Amount Per Transaction (ETH)</label>
           <input
             type="number"
             step="0.0001"
             value={config.minAmount || 0.01}
-            onChange={(e) => setConfig({ ...config, minAmount: Number(e.target.value) })}
+            onChange={e => setConfig({ ...config, minAmount: Number(e.target.value) })}
             className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Slippage Tolerance (%)
-          </label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Slippage Tolerance (%)</label>
           <input
             type="number"
             step="0.01"
             min="0.01"
             max="10"
             value={config.slippagePercent || 1.0}
-            onChange={(e) => setConfig({ ...config, slippagePercent: Number(e.target.value) })}
+            onChange={e => setConfig({ ...config, slippagePercent: Number(e.target.value) })}
             className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
           />
         </div>
@@ -797,8 +775,10 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
           </label>
           <select
             value={config.gasStrategy || 'standard'}
-            onChange={(e) => setConfig({ ...config, gasStrategy: e.target.value })}
-            className={`w-full ${isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'} px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
+            onChange={e => setConfig({ ...config, gasStrategy: e.target.value })}
+            className={`w-full ${
+              isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'
+            } px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
           >
             <option value="slow">{t('nodeConfig.gasStrategySlow', 'Slow (Low Gas) - ~5-15 minutes')}</option>
             <option value="standard">{t('nodeConfig.gasStrategyStandard', 'Standard - ~1-3 minutes')}</option>
@@ -812,14 +792,12 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
 
         {config.gasStrategy === 'custom' && (
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Custom Gas Price (Gwei)
-            </label>
+            <label className="block text-sm font-medium text-gray-300 mb-2">Custom Gas Price (Gwei)</label>
             <input
               type="number"
               step="0.1"
               value={config.customGasPrice || 20}
-              onChange={(e) => setConfig({ ...config, customGasPrice: Number(e.target.value) })}
+              onChange={e => setConfig({ ...config, customGasPrice: Number(e.target.value) })}
               className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
             />
           </div>
@@ -831,10 +809,18 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
             <div className={`text-sm ${isDark ? 'text-blue-200' : 'text-blue-800'}`}>
               <div className="font-medium mb-2">{t('nodeConfig.gasPriceImplementation', 'Gas Price Strategy Implementation:')}</div>
               <div className="space-y-1 text-xs">
-                <div><strong>{t('nodeConfig.slow', 'Slow')}:</strong> gasPrice = network.baseGasPrice * 0.8</div>
-                <div><strong>{t('nodeConfig.standard', 'Standard')}:</strong> gasPrice = network.baseGasPrice * 1.0</div>
-                <div><strong>{t('nodeConfig.fast', 'Fast')}:</strong> gasPrice = network.baseGasPrice * 1.5</div>
-                <div><strong>{t('nodeConfig.custom', 'Custom')}:</strong> gasPrice = config.customGasPrice (in Gwei)</div>
+                <div>
+                  <strong>{t('nodeConfig.slow', 'Slow')}:</strong> gasPrice = network.baseGasPrice * 0.8
+                </div>
+                <div>
+                  <strong>{t('nodeConfig.standard', 'Standard')}:</strong> gasPrice = network.baseGasPrice * 1.0
+                </div>
+                <div>
+                  <strong>{t('nodeConfig.fast', 'Fast')}:</strong> gasPrice = network.baseGasPrice * 1.5
+                </div>
+                <div>
+                  <strong>{t('nodeConfig.custom', 'Custom')}:</strong> gasPrice = config.customGasPrice (in Gwei)
+                </div>
               </div>
               <div className="mt-2 text-xs">
                 <strong>{t('nodeConfig.usageInTx', 'Usage in tx.send()')}:</strong> transaction.gasPrice = calculateGasPrice(strategy)
@@ -860,71 +846,59 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
     return (
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Monitor Duration (minutes)
-          </label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Monitor Duration (minutes)</label>
           <input
             type="number"
             value={config.monitorDuration || 30}
-            onChange={(e) => setConfig({ ...config, monitorDuration: Number(e.target.value) })}
+            onChange={e => setConfig({ ...config, monitorDuration: Number(e.target.value) })}
             className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
             min="1"
             max="1440"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Check Interval (seconds)
-          </label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Check Interval (seconds)</label>
           <input
             type="number"
             value={config.checkInterval || 30}
-            onChange={(e) => setConfig({ ...config, checkInterval: Number(e.target.value) })}
+            onChange={e => setConfig({ ...config, checkInterval: Number(e.target.value) })}
             className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
             min="5"
             max="300"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Success Criteria
-          </label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Success Criteria</label>
           <div className="space-y-2">
             <div>
-              <label className="block text-xs text-gray-400 mb-1">
-                Min Profit Percentage
-              </label>
+              <label className="block text-xs text-gray-400 mb-1">Min Profit Percentage</label>
               <input
                 type="number"
                 step="0.1"
                 value={config.minProfitPercent || 0.5}
-                onChange={(e) => setConfig({ ...config, minProfitPercent: Number(e.target.value) })}
+                onChange={e => setConfig({ ...config, minProfitPercent: Number(e.target.value) })}
                 className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-400 mb-1">
-                Max Slippage Percentage
-              </label>
+              <label className="block text-xs text-gray-400 mb-1">Max Slippage Percentage</label>
               <input
                 type="number"
                 step="0.1"
                 value={config.maxSlippagePercent || 2.0}
-                onChange={(e) => setConfig({ ...config, maxSlippagePercent: Number(e.target.value) })}
+                onChange={e => setConfig({ ...config, maxSlippagePercent: Number(e.target.value) })}
                 className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
               />
             </div>
           </div>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Database Update Settings
-          </label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Database Update Settings</label>
           <div className="flex items-center space-x-2">
             <input
               type="checkbox"
               checked={config.updateDatabase !== false}
-              onChange={(e) => setConfig({ ...config, updateDatabase: e.target.checked })}
+              onChange={e => setConfig({ ...config, updateDatabase: e.target.checked })}
               className="rounded"
             />
             <span className="text-sm text-gray-300">Update workflow run record in PostgreSQL</span>
@@ -949,21 +923,14 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
     return (
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Target Exchange
-          </label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Target Exchange</label>
           <select
             value={config.exchange || exchangeOptions.find(ex => ex.enabled)?.value || ''}
-            onChange={(e) => setConfig({ ...config, exchange: e.target.value })}
+            onChange={e => setConfig({ ...config, exchange: e.target.value })}
             className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
           >
             {exchangeOptions.map(ex => (
-              <option 
-                key={ex.value} 
-                value={ex.value}
-                disabled={!ex.enabled}
-                className={ex.enabled ? 'text-white' : 'text-gray-500'}
-              >
+              <option key={ex.value} value={ex.value} disabled={!ex.enabled} className={ex.enabled ? 'text-white' : 'text-gray-500'}>
                 {ex.label}
               </option>
             ))}
@@ -982,38 +949,40 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
 
         <div>
           <div className="flex items-center justify-between mb-2">
-            <label className="block text-sm font-medium text-gray-300">
-              Allowed Trading Pairs
-            </label>
+            <label className="block text-sm font-medium text-gray-300">Allowed Trading Pairs</label>
             <div className="flex flex-wrap gap-1">
               <button
                 type="button"
-                onClick={() => setConfig({ 
-                  ...config, 
-                  allowedTradingPairs: [
-                    'BTC/USDT', 'ETH/USDT', 'BNB/USDT', 'SOL/USDT', 'ADA/USDT', 'DOT/USDT'
-                  ]
-                })}
+                onClick={() =>
+                  setConfig({
+                    ...config,
+                    allowedTradingPairs: ['BTC/USDT', 'ETH/USDT', 'BNB/USDT', 'SOL/USDT', 'ADA/USDT', 'DOT/USDT'],
+                  })
+                }
                 className="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded"
               >
                 All Available
               </button>
               <button
                 type="button"
-                onClick={() => setConfig({ 
-                  ...config, 
-                  allowedTradingPairs: ['BTC/USDT', 'ETH/USDT']
-                })}
+                onClick={() =>
+                  setConfig({
+                    ...config,
+                    allowedTradingPairs: ['BTC/USDT', 'ETH/USDT'],
+                  })
+                }
                 className="px-2 py-1 bg-green-600 hover:bg-green-700 text-white text-xs rounded"
               >
                 Major Pairs
               </button>
               <button
                 type="button"
-                onClick={() => setConfig({ 
-                  ...config, 
-                  allowedTradingPairs: ['BTC/USDT', 'ETH/USDT', 'BNB/USDT', 'SOL/USDT']
-                })}
+                onClick={() =>
+                  setConfig({
+                    ...config,
+                    allowedTradingPairs: ['BTC/USDT', 'ETH/USDT', 'BNB/USDT', 'SOL/USDT'],
+                  })
+                }
                 className="px-2 py-1 bg-purple-600 hover:bg-purple-700 text-white text-xs rounded"
               >
                 Top 4
@@ -1040,25 +1009,25 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
               { pair: 'MATIC/USDT', enabled: false },
               { pair: 'UNI/USDT', enabled: false },
               { pair: 'ATOM/USDT', enabled: false },
-              { pair: 'FIL/USDT', enabled: false }
+              { pair: 'FIL/USDT', enabled: false },
             ].map(({ pair, enabled }) => (
               <label key={pair} className={`flex items-center space-x-2 py-1 hover:bg-gray-600 rounded px-2 ${!enabled ? 'opacity-50' : ''}`}>
                 <input
                   type="checkbox"
                   checked={config.allowedTradingPairs?.includes(pair) || false}
                   disabled={!enabled}
-                  onChange={(e) => {
+                  onChange={e => {
                     if (!enabled) return;
                     const currentPairs = config.allowedTradingPairs || [];
                     if (e.target.checked) {
-                      setConfig({ 
-                        ...config, 
-                        allowedTradingPairs: [...currentPairs, pair]
+                      setConfig({
+                        ...config,
+                        allowedTradingPairs: [...currentPairs, pair],
                       });
                     } else {
-                      setConfig({ 
-                        ...config, 
-                        allowedTradingPairs: currentPairs.filter((p: string) => p !== pair)
+                      setConfig({
+                        ...config,
+                        allowedTradingPairs: currentPairs.filter((p: string) => p !== pair),
                       });
                     }
                   }}
@@ -1078,12 +1047,10 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Order Type
-          </label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Order Type</label>
           <select
             value={config.orderType || 'market'}
-            onChange={(e) => setConfig({ ...config, orderType: e.target.value })}
+            onChange={e => setConfig({ ...config, orderType: e.target.value })}
             className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
           >
             <option value="market">Market Order</option>
@@ -1094,40 +1061,34 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Max Position Size (USDT)
-          </label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Max Position Size (USDT)</label>
           <input
             type="number"
             step="10"
             value={config.maxPositionSize || 1000}
-            onChange={(e) => setConfig({ ...config, maxPositionSize: Number(e.target.value) })}
+            onChange={e => setConfig({ ...config, maxPositionSize: Number(e.target.value) })}
             className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Min Position Size (USDT)
-          </label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Min Position Size (USDT)</label>
           <input
             type="number"
             step="1"
             value={config.minPositionSize || 10}
-            onChange={(e) => setConfig({ ...config, minPositionSize: Number(e.target.value) })}
+            onChange={e => setConfig({ ...config, minPositionSize: Number(e.target.value) })}
             className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Max Slippage Tolerance (%)
-          </label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Max Slippage Tolerance (%)</label>
           <input
             type="number"
             step="0.1"
             value={config.maxSlippage || 0.5}
-            onChange={(e) => setConfig({ ...config, maxSlippage: Number(e.target.value) })}
+            onChange={e => setConfig({ ...config, maxSlippage: Number(e.target.value) })}
             className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
           />
         </div>
@@ -1179,26 +1140,21 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className={`${isDark ? 'bg-gray-800' : 'bg-white border border-gray-200'} rounded-lg p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto`}>
         <div className="flex items-center justify-between mb-6">
-          <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
-            Configure {node.data?.name || node.type}
-          </h2>
-          <button
-            onClick={onClose}
-            className={`p-2 ${isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} rounded-lg transition-colors`}
-          >
+          <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>Configure {node.data?.name || node.type}</h2>
+          <button onClick={onClose} className={`p-2 ${isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} rounded-lg transition-colors`}>
             <X className={`w-5 h-5 ${isDark ? 'text-gray-400' : 'text-gray-600'}`} />
           </button>
         </div>
 
         <div className="mb-6">
-          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
-            Node Name
-          </label>
+          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>Node Name</label>
           <input
             type="text"
             value={config.name || ''}
-            onChange={(e) => setConfig({ ...config, name: e.target.value })}
-            className={`w-full ${isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'} px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
+            onChange={e => setConfig({ ...config, name: e.target.value })}
+            className={`w-full ${
+              isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'
+            } px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
             placeholder={`${node.type.charAt(0).toUpperCase() + node.type.slice(1)} Component`}
           />
         </div>
@@ -1208,7 +1164,9 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({
         <div className={`flex justify-end space-x-3 mt-6 pt-6 border-t ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
           <button
             onClick={onClose}
-            className={`px-4 py-2 ${isDark ? 'bg-gray-600 hover:bg-gray-500' : 'bg-gray-200 hover:bg-gray-300'} ${isDark ? 'text-white' : 'text-gray-900'} rounded transition-colors`}
+            className={`px-4 py-2 ${isDark ? 'bg-gray-600 hover:bg-gray-500' : 'bg-gray-200 hover:bg-gray-300'} ${
+              isDark ? 'text-white' : 'text-gray-900'
+            } rounded transition-colors`}
           >
             Cancel
           </button>

@@ -1,13 +1,5 @@
 // Re-export workflow types from dedicated workflow types file
-export type { 
-  ComponentType, 
-  ComponentNode, 
-  Connection, 
-  Workflow, 
-  ComponentSchema,
-  Position,
-  ConnectionMode
-} from './WorkflowTypes';
+export type { ComponentType, ComponentNode, Connection, Workflow, ComponentSchema, Position, ConnectionMode } from './WorkflowTypes';
 
 export interface WorkflowRun {
   id: string;
@@ -20,7 +12,7 @@ export interface WorkflowRun {
     amount: number;
     percentage: number;
   };
-  params: any;
+  params: Record<string, unknown>;
   nodeStates: {
     [nodeId: string]: {
       status: 'queued' | 'running' | 'success' | 'failed' | 'skipped';

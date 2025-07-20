@@ -1,6 +1,6 @@
-import React from "react";
-import { X } from "lucide-react";
-import { COMPONENT_TYPES } from "../../types/WorkflowTypes";
+import React from 'react';
+import { X } from 'lucide-react';
+import { COMPONENT_TYPES } from '../../types/WorkflowTypes';
 
 interface ConnectionLineProps {
   sourcePosition: { x: number; y: number };
@@ -104,28 +104,20 @@ export const ConnectionLine: React.FC<ConnectionLineProps> = ({
     const controlPointOffset = Math.abs(endX - startX) * 0.3;
     if (deltaX > 0) {
       // Connect to the right
-      path = `M ${startX} ${startY} C ${
-        startX + controlPointOffset
-      } ${startY}, ${endX - controlPointOffset} ${endY}, ${endX} ${endY}`;
+      path = `M ${startX} ${startY} C ${startX + controlPointOffset} ${startY}, ${endX - controlPointOffset} ${endY}, ${endX} ${endY}`;
     } else {
       // Connect to the left
-      path = `M ${startX} ${startY} C ${
-        startX - controlPointOffset
-      } ${startY}, ${endX + controlPointOffset} ${endY}, ${endX} ${endY}`;
+      path = `M ${startX} ${startY} C ${startX - controlPointOffset} ${startY}, ${endX + controlPointOffset} ${endY}, ${endX} ${endY}`;
     }
   } else {
     // Vertical connection
     const controlPointOffset = Math.abs(endY - startY) * 0.3;
     if (deltaY > 0) {
       // Connect downward
-      path = `M ${startX} ${startY} C ${startX} ${
-        startY + controlPointOffset
-      }, ${endX} ${endY - controlPointOffset}, ${endX} ${endY}`;
+      path = `M ${startX} ${startY} C ${startX} ${startY + controlPointOffset}, ${endX} ${endY - controlPointOffset}, ${endX} ${endY}`;
     } else {
       // Connect upward
-      path = `M ${startX} ${startY} C ${startX} ${
-        startY - controlPointOffset
-      }, ${endX} ${endY + controlPointOffset}, ${endX} ${endY}`;
+      path = `M ${startX} ${startY} C ${startX} ${startY - controlPointOffset}, ${endX} ${endY + controlPointOffset}, ${endX} ${endY}`;
     }
   }
 
@@ -139,36 +131,16 @@ export const ConnectionLine: React.FC<ConnectionLineProps> = ({
         height: `${100 / scale}%`,
       }}
     >
-      <path
-        d={path}
-        fill="none"
-        stroke="#3B82F6"
-        strokeWidth="2"
-        className="hover:stroke-blue-400 pointer-events-auto"
-        markerEnd="url(#arrowhead)"
-      />
+      <path d={path} fill="none" stroke="#3B82F6" strokeWidth="2" className="hover:stroke-blue-400 pointer-events-auto" markerEnd="url(#arrowhead)" />
 
       <defs>
-        <marker
-          id="arrowhead"
-          markerWidth="10"
-          markerHeight="7"
-          refX="10"
-          refY="3.5"
-          orient="auto"
-        >
+        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
           <polygon points="0 0, 10 3.5, 0 7" fill="#3B82F6" />
         </marker>
       </defs>
 
       {/* Delete button */}
-      <foreignObject
-        x={midX - 10}
-        y={midY - 10}
-        width="20"
-        height="20"
-        className="pointer-events-auto"
-      >
+      <foreignObject x={midX - 10} y={midY - 10} width="20" height="20" className="pointer-events-auto">
         <button
           className="w-5 h-5 bg-red-600 hover:bg-red-700 rounded-full flex items-center justify-center opacity-70 hover:opacity-100 transition-opacity"
           onClick={onDelete}

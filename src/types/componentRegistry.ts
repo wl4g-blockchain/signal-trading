@@ -1,23 +1,16 @@
 // Component Registry with unified schemas
-import { 
-  BarChart3, 
-  TrendingUp, 
-  Database, 
-  Zap, 
-  Play,
-  Square
-} from 'lucide-react';
+import { Play, Square } from 'lucide-react';
 import { ComponentSchema, ComponentType, COMPONENT_TYPES } from './WorkflowTypes';
-import { 
-  BinanceLogo, 
-  OKXLogo, 
-  UniswapLogo, 
-  TwitterLogo, 
-  BitcoinLogo, 
-  EthereumLogo, 
-  SolanaLogo, 
-  CoinMarketLogo, 
-  AILogo 
+import {
+  BinanceLogo,
+  OKXLogo,
+  UniswapLogo,
+  TwitterLogo,
+  BitcoinLogo,
+  EthereumLogo,
+  SolanaLogo,
+  CoinMarketLogo,
+  AILogo,
 } from '../components/SigTradingIcon';
 
 // Unified component registry with complete schema definitions
@@ -35,16 +28,16 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
       COMPONENT_TYPES.BINANCE_EXTRACTOR,
       COMPONENT_TYPES.BINANCE_STREAM,
       COMPONENT_TYPES.UNISWAP_EXTRACTOR,
-      COMPONENT_TYPES.COINMARKET_EXTRACTOR
+      COMPONENT_TYPES.COINMARKET_EXTRACTOR,
     ],
     icon: Play,
     style: {
       color: 'bg-green-600',
-      hoverColor: 'hover:bg-green-700'
+      hoverColor: 'hover:bg-green-700',
     },
     category: 'FLOW_CONTROL',
     description: 'Workflow start trigger point',
-    defaultConfig: {}
+    defaultConfig: {},
   },
 
   [COMPONENT_TYPES.END]: {
@@ -57,17 +50,17 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
       COMPONENT_TYPES.OKX_RESULT_COLLECTOR,
       COMPONENT_TYPES.EVM_RESULT_COLLECTOR,
       COMPONENT_TYPES.SOLANA_RESULT_COLLECTOR,
-      COMPONENT_TYPES.BITCOIN_RESULT_COLLECTOR
+      COMPONENT_TYPES.BITCOIN_RESULT_COLLECTOR,
     ],
     outputConnectables: [],
     icon: Square,
     style: {
       color: 'bg-red-600',
-      hoverColor: 'hover:bg-red-700'
+      hoverColor: 'hover:bg-red-700',
     },
     category: 'FLOW_CONTROL',
     description: 'Workflow completion point',
-    defaultConfig: {}
+    defaultConfig: {},
   },
 
   // Data Extractor Components
@@ -81,15 +74,15 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     icon: TwitterLogo,
     style: {
       color: 'bg-blue-600',
-      hoverColor: 'hover:bg-blue-700'
+      hoverColor: 'hover:bg-blue-700',
     },
     category: 'DATA_SOURCES',
     description: 'Extract data from Twitter API and user timelines',
     defaultConfig: {
       apiKey: '',
       accounts: [],
-      keywords: []
-    }
+      keywords: [],
+    },
   },
 
   [COMPONENT_TYPES.TWITTER_STREAM]: {
@@ -102,15 +95,15 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     icon: TwitterLogo,
     style: {
       color: 'bg-blue-500',
-      hoverColor: 'hover:bg-blue-600'
+      hoverColor: 'hover:bg-blue-600',
     },
     category: 'DATA_SOURCES',
     description: 'Real-time Twitter data streaming and monitoring',
     defaultConfig: {
       apiKey: '',
       accounts: [],
-      keywords: []
-    }
+      keywords: [],
+    },
   },
 
   [COMPONENT_TYPES.BINANCE_EXTRACTOR]: {
@@ -123,15 +116,15 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     icon: BinanceLogo,
     style: {
       color: 'bg-yellow-600',
-      hoverColor: 'hover:bg-yellow-700'
+      hoverColor: 'hover:bg-yellow-700',
     },
     category: 'DATA_SOURCES',
     description: 'Extract market data from Binance exchange API',
     defaultConfig: {
       apiKey: '',
       apiSecret: '',
-      symbols: []
-    }
+      symbols: [],
+    },
   },
 
   [COMPONENT_TYPES.BINANCE_STREAM]: {
@@ -144,15 +137,15 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     icon: BinanceLogo,
     style: {
       color: 'bg-yellow-500',
-      hoverColor: 'hover:bg-yellow-600'
+      hoverColor: 'hover:bg-yellow-600',
     },
     category: 'DATA_SOURCES',
     description: 'Real-time Binance market data streaming',
     defaultConfig: {
       apiKey: '',
       apiSecret: '',
-      symbols: []
-    }
+      symbols: [],
+    },
   },
 
   [COMPONENT_TYPES.UNISWAP_EXTRACTOR]: {
@@ -165,14 +158,14 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     icon: UniswapLogo,
     style: {
       color: 'bg-purple-600',
-      hoverColor: 'hover:bg-purple-700'
+      hoverColor: 'hover:bg-purple-700',
     },
     category: 'DATA_SOURCES',
     description: 'Extract liquidity and swap data from Uniswap',
     defaultConfig: {
       rpcEndpoint: '',
-      poolAddress: ''
-    }
+      poolAddress: '',
+    },
   },
 
   [COMPONENT_TYPES.COINMARKET_EXTRACTOR]: {
@@ -185,14 +178,14 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     icon: CoinMarketLogo,
     style: {
       color: 'bg-indigo-600',
-      hoverColor: 'hover:bg-indigo-700'
+      hoverColor: 'hover:bg-indigo-700',
     },
     category: 'DATA_SOURCES',
     description: 'Extract cryptocurrency market data from CoinMarketCap',
     defaultConfig: {
       apiKey: '',
-      symbols: []
-    }
+      symbols: [],
+    },
   },
 
   // AI Analysis Components
@@ -207,27 +200,27 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
       COMPONENT_TYPES.BINANCE_EXTRACTOR,
       COMPONENT_TYPES.BINANCE_STREAM,
       COMPONENT_TYPES.UNISWAP_EXTRACTOR,
-      COMPONENT_TYPES.COINMARKET_EXTRACTOR
+      COMPONENT_TYPES.COINMARKET_EXTRACTOR,
     ],
     outputConnectables: [
       COMPONENT_TYPES.BINANCE_TRADE_EXECUTOR,
       COMPONENT_TYPES.OKX_TRADE_EXECUTOR,
       COMPONENT_TYPES.BITCOIN_TRADE_EXECUTOR,
       COMPONENT_TYPES.EVM_TRADE_EXECUTOR,
-      COMPONENT_TYPES.SOLANA_TRADE_EXECUTOR
+      COMPONENT_TYPES.SOLANA_TRADE_EXECUTOR,
     ],
     icon: AILogo,
     style: {
       color: 'bg-purple-600',
-      hoverColor: 'hover:bg-purple-700'
+      hoverColor: 'hover:bg-purple-700',
     },
     category: 'AI_ANALYSIS',
     description: 'Analyze data using AI models and generate trading strategies',
     defaultConfig: {
       model: '',
       apiKey: '',
-      prompt: ''
-    }
+      prompt: '',
+    },
   },
 
   // CEX Trade Executor Components
@@ -241,7 +234,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     icon: BinanceLogo,
     style: {
       color: 'bg-yellow-600',
-      hoverColor: 'hover:bg-yellow-700'
+      hoverColor: 'hover:bg-yellow-700',
     },
     category: 'CEX_TRADING',
     description: 'Execute trades on Binance exchange',
@@ -250,8 +243,8 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
       apiSecret: '',
       tradingPairs: [],
       maxAmount: null,
-      minAmount: null
-    }
+      minAmount: null,
+    },
   },
 
   [COMPONENT_TYPES.OKX_TRADE_EXECUTOR]: {
@@ -264,7 +257,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     icon: OKXLogo,
     style: {
       color: 'bg-blue-600',
-      hoverColor: 'hover:bg-blue-700'
+      hoverColor: 'hover:bg-blue-700',
     },
     category: 'CEX_TRADING',
     description: 'Execute trades on OKX exchange',
@@ -274,8 +267,8 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
       passphrase: '',
       tradingPairs: [],
       maxAmount: null,
-      minAmount: null
-    }
+      minAmount: null,
+    },
   },
 
   // DEX Trade Executor Components
@@ -289,7 +282,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     icon: BitcoinLogo,
     style: {
       color: 'bg-orange-600',
-      hoverColor: 'hover:bg-orange-700'
+      hoverColor: 'hover:bg-orange-700',
     },
     category: 'DEX_TRADING',
     description: 'Execute Bitcoin network transactions and trades',
@@ -297,8 +290,8 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
       rpcEndpoint: '',
       privateKey: '',
       maxAmount: null,
-      minAmount: null
-    }
+      minAmount: null,
+    },
   },
 
   [COMPONENT_TYPES.EVM_TRADE_EXECUTOR]: {
@@ -311,7 +304,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     icon: EthereumLogo,
     style: {
       color: 'bg-green-600',
-      hoverColor: 'hover:bg-green-700'
+      hoverColor: 'hover:bg-green-700',
     },
     category: 'DEX_TRADING',
     description: 'Execute trades on EVM-compatible DEXs (Ethereum, BSC, Polygon)',
@@ -323,8 +316,8 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
       tradingPairs: [],
       maxAmount: null,
       minAmount: null,
-      slippagePercent: null
-    }
+      slippagePercent: null,
+    },
   },
 
   [COMPONENT_TYPES.SOLANA_TRADE_EXECUTOR]: {
@@ -337,7 +330,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     icon: SolanaLogo,
     style: {
       color: 'bg-purple-600',
-      hoverColor: 'hover:bg-purple-700'
+      hoverColor: 'hover:bg-purple-700',
     },
     category: 'DEX_TRADING',
     description: 'Execute trades on Solana-based DEXs (Jupiter, Raydium)',
@@ -346,8 +339,8 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
       privateKey: '',
       tradingPairs: [],
       maxAmount: null,
-      minAmount: null
-    }
+      minAmount: null,
+    },
   },
 
   // Result Collector Components
@@ -361,13 +354,13 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     icon: BinanceLogo,
     style: {
       color: 'bg-yellow-500',
-      hoverColor: 'hover:bg-yellow-600'
+      hoverColor: 'hover:bg-yellow-600',
     },
     category: 'CEX_TRADING',
     description: 'Collect and monitor Binance trading results',
     defaultConfig: {
-      monitorDuration: null
-    }
+      monitorDuration: null,
+    },
   },
 
   [COMPONENT_TYPES.OKX_RESULT_COLLECTOR]: {
@@ -380,13 +373,13 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     icon: OKXLogo,
     style: {
       color: 'bg-blue-500',
-      hoverColor: 'hover:bg-blue-600'
+      hoverColor: 'hover:bg-blue-600',
     },
     category: 'CEX_TRADING',
     description: 'Collect and monitor OKX trading results',
     defaultConfig: {
-      monitorDuration: null
-    }
+      monitorDuration: null,
+    },
   },
 
   [COMPONENT_TYPES.EVM_RESULT_COLLECTOR]: {
@@ -399,13 +392,13 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     icon: EthereumLogo,
     style: {
       color: 'bg-green-500',
-      hoverColor: 'hover:bg-green-600'
+      hoverColor: 'hover:bg-green-600',
     },
     category: 'DEX_TRADING',
     description: 'Collect and monitor EVM DEX trading results',
     defaultConfig: {
-      monitorDuration: null
-    }
+      monitorDuration: null,
+    },
   },
 
   [COMPONENT_TYPES.SOLANA_RESULT_COLLECTOR]: {
@@ -418,13 +411,13 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     icon: SolanaLogo,
     style: {
       color: 'bg-purple-500',
-      hoverColor: 'hover:bg-purple-600'
+      hoverColor: 'hover:bg-purple-600',
     },
     category: 'DEX_TRADING',
     description: 'Collect and monitor Solana DEX trading results',
     defaultConfig: {
-      monitorDuration: null
-    }
+      monitorDuration: null,
+    },
   },
 
   [COMPONENT_TYPES.BITCOIN_RESULT_COLLECTOR]: {
@@ -437,14 +430,14 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     icon: BitcoinLogo,
     style: {
       color: 'bg-orange-500',
-      hoverColor: 'hover:bg-orange-600'
+      hoverColor: 'hover:bg-orange-600',
     },
     category: 'DEX_TRADING',
     description: 'Collect and monitor Bitcoin network trading results',
     defaultConfig: {
-      monitorDuration: null
-    }
-  }
+      monitorDuration: null,
+    },
+  },
 };
 
 // Helper functions for component registry
@@ -459,4 +452,4 @@ export const canConnect = (sourceType: ComponentType, targetType: ComponentType)
 
 export const getComponentsByCategory = (category: string): ComponentSchema[] => {
   return Object.values(COMPONENT_REGISTRY).filter(schema => schema.category === category);
-}; 
+};

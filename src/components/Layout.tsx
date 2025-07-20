@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { BarChart3, Settings, Activity, FileText, LogOut, User, ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useState, useCallback } from 'react';
+import { BarChart3, Settings, Activity, LogOut, User, ChevronLeft, ChevronRight } from 'lucide-react';
 import { serviceManager } from '../services';
 import { User as UserType } from '../types';
 import { useTranslation } from 'react-i18next';
@@ -18,15 +18,15 @@ interface LayoutProps {
   onNavigateToWorkflowRun?: (workflowId: string, runId: string) => void;
 }
 
-export const Layout: React.FC<LayoutProps> = ({ 
-  children, 
-  currentView, 
-  onViewChange, 
-  user, 
+export const Layout: React.FC<LayoutProps> = ({
+  children,
+  currentView,
+  onViewChange,
+  user,
   onLogout,
   sidebarCollapsed: externalSidebarCollapsed,
   onSidebarCollapsedChange,
-  onNavigateToWorkflowRun
+  onNavigateToWorkflowRun,
 }) => {
   const { t } = useTranslation();
   const { theme, setTheme, isDark } = useTheme();
@@ -34,13 +34,23 @@ export const Layout: React.FC<LayoutProps> = ({
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [internalSidebarCollapsed, setInternalSidebarCollapsed] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-  
+
   // Use API service to fetch notification data
-  const [notifications, setNotifications] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState<Array<{
+    id: string;
+    title: string;
+    message: string;
+    level: string;
+    type: string;
+    read: boolean;
+    timestamp: Date;
+    workflowId?: string;
+    workflowRunId?: string;
+  }>>([]);
   const [notificationsLoading, setNotificationsLoading] = useState(false);
 
   // Fetch notification data
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
     if (notificationsLoading) return;
     console.log('🔔 Fetching notifications...');
     setNotificationsLoading(true);
@@ -53,17 +63,13 @@ export const Layout: React.FC<LayoutProps> = ({
     } finally {
       setNotificationsLoading(false);
     }
-  };
+  }, [notificationsLoading]);
 
   // Mark notification as read
   const handleMarkAsRead = async (notificationId: string) => {
     try {
       await serviceManager.getService().markNotificationAsRead(notificationId);
-      setNotifications(prev => 
-        prev.map(notif => 
-          notif.id === notificationId ? { ...notif, read: true } : notif
-        )
-      );
+      setNotifications(prev => prev.map(notif => (notif.id === notificationId ? { ...notif, read: true } : notif)));
     } catch (error) {
       console.error('Failed to mark notification as read:', error);
     }
@@ -80,10 +86,20 @@ export const Layout: React.FC<LayoutProps> = ({
   };
 
   // Handle notification click
-  const handleNotificationClick = (notification: any) => {
+  const handleNotificationClick = (notification: {
+    id: string;
+    title: string;
+    message: string;
+    level: string;
+    type: string;
+    read: boolean;
+    timestamp: Date;
+    workflowId?: string;
+    workflowRunId?: string;
+  }) => {
     // If it's a transaction type notification with workflowRunId, navigate to editor
     if (notification.type === 'Transaction' && notification.workflowRunId && onNavigateToWorkflowRun) {
-      onNavigateToWorkflowRun(notification.workflowId, notification.workflowRunId);
+      onNavigateToWorkflowRun(notification.workflowId!, notification.workflowRunId);
       setShowNotifications(false);
       // Mark as read
       if (!notification.read) {
@@ -97,15 +113,15 @@ export const Layout: React.FC<LayoutProps> = ({
     console.log('📱 Layout mounted, auto-loading notifications...');
     // Auto-load notifications when component mounts (user is authenticated)
     fetchNotifications();
-  }, []); // Run once on mount
+  }, [fetchNotifications]); // Run once on mount
 
   // Fetch data when notifications dropdown is shown (for refreshing)
   React.useEffect(() => {
     if (showNotifications) {
       fetchNotifications();
     }
-  }, [showNotifications]);
-  
+  }, [showNotifications, fetchNotifications]);
+
   const unreadCount = notifications.filter(n => !n.read).length;
 
   // Use external state or internal state
@@ -142,11 +158,16 @@ export const Layout: React.FC<LayoutProps> = ({
 
   const getNotificationIcon = (level: string) => {
     switch (level) {
-      case 'success': return '✅';
-      case 'warning': return '⚠️';
-      case 'error': return '❌';
-      case 'info': return 'ℹ️';
-      default: return '📢';
+      case 'success':
+        return '✅';
+      case 'warning':
+        return '⚠️';
+      case 'error':
+        return '❌';
+      case 'info':
+        return 'ℹ️';
+      default:
+        return '📢';
     }
   };
 
@@ -156,38 +177,49 @@ export const Layout: React.FC<LayoutProps> = ({
     const minutes = Math.floor(diff / 60000);
     const hours = Math.floor(diff / 3600000);
     const days = Math.floor(diff / 86400000);
-    
+
     let timeAgo = '';
     if (days > 0) timeAgo = `${days}d ago`;
     else if (hours > 0) timeAgo = `${hours}h ago`;
     else if (minutes > 0) timeAgo = `${minutes}m ago`;
     else timeAgo = 'now';
-    
+
     // Compact time format: 3d ago | 25/03/21 01:11:44 UTC | 25/03/21 09:11:44
-    const utcTime = timestamp.toISOString().replace('T', ' ').replace(/\.\d{3}Z/, '');
+    const utcTime = timestamp
+      .toISOString()
+      .replace('T', ' ')
+      .replace(/\.\d{3}Z/, '');
     const utcFormatted = utcTime.substring(2).replace('-', '/').replace('-', '/'); // Remove first 2 digits of year
-    
-    const localTime = timestamp.toLocaleString('en-GB', { 
-      year: '2-digit', 
-      month: '2-digit', 
-      day: '2-digit',
-      hour: '2-digit', 
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false
-    }).replace(/\//g, '/');
-    
+
+    const localTime = timestamp
+      .toLocaleString('en-GB', {
+        year: '2-digit',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+      })
+      .replace(/\//g, '/');
+
     return `${timeAgo} | ${utcFormatted} UTC | ${localTime}`;
   };
 
   return (
     <div className={`h-screen ${isDark ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'} flex`} data-sidebar-collapsed={sidebarCollapsed}>
       {/* Sidebar */}
-      <div className={`${sidebarCollapsed ? 'w-16' : 'w-64'} ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-r transition-all duration-300 relative`}>
+      <div
+        className={`${sidebarCollapsed ? 'w-16' : 'w-64'} ${
+          isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+        } border-r transition-all duration-300 relative`}
+      >
         {/* Collapse Toggle Button */}
         <button
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-          className={`absolute -right-3 top-6 z-10 ${isDark ? 'bg-gray-700 hover:bg-gray-600 border-gray-600' : 'bg-gray-200 hover:bg-gray-300 border-gray-300'} rounded-full p-1 border transition-colors`}
+          className={`absolute -right-3 top-6 z-10 ${
+            isDark ? 'bg-gray-700 hover:bg-gray-600 border-gray-600' : 'bg-gray-200 hover:bg-gray-300 border-gray-300'
+          } rounded-full p-1 border transition-colors`}
           title={sidebarCollapsed ? t('common.expand') : t('common.collapse')}
         >
           {sidebarCollapsed ? (
@@ -211,26 +243,28 @@ export const Layout: React.FC<LayoutProps> = ({
               <SigTradingIcon size="small" className="hover:scale-110 transition-transform" />
             </div>
           )}
-          
+
           {/* API Mode display - moved to top */}
           {!sidebarCollapsed && (
             <div className="mt-4 pt-4 border-t border-gray-600">
               <div className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'} flex items-center justify-between`}>
                 <span>API Mode:</span>
-                <span className={`px-2 py-1 rounded text-xs font-medium ${
-                  serviceManager.getCurrentApiType() === 'MOCK' 
-                    ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300'
-                    : 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
-                }`}>
+                <span
+                  className={`px-2 py-1 rounded text-xs font-medium ${
+                    serviceManager.getCurrentApiType() === 'MOCK'
+                      ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300'
+                      : 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
+                  }`}
+                >
                   {serviceManager.getCurrentApiType()}
                 </span>
               </div>
             </div>
           )}
         </div>
-        
+
         <nav className="mt-8">
-          {navItems.map((item) => {
+          {navItems.map(item => {
             const Icon = item.icon;
             return (
               <button
@@ -254,11 +288,11 @@ export const Layout: React.FC<LayoutProps> = ({
       {/* Main Content */}
       <div className="flex-1 overflow-visible flex flex-col">
         {/* Top Bar */}
-        <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-b px-6 py-3 flex items-center justify-between`}>
+        <div
+          className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-b px-6 py-3 flex items-center justify-between`}
+        >
           {/* Left side - Empty or Logo */}
-          <div className="flex items-center">
-            {/* 可以在这里添加面包屑导航或其他左侧内容 */}
-          </div>
+          <div className="flex items-center">{/* 可以在这里添加面包屑导航或其他左侧内容 */}</div>
 
           {/* Right side - Strategies Stats, Notifications & User Menu */}
           <div className="flex items-center space-x-4">
@@ -287,7 +321,7 @@ export const Layout: React.FC<LayoutProps> = ({
 
             {/* Notifications Bell - Compact */}
             <div className="relative menu-container">
-              <button 
+              <button
                 className={`p-2 rounded-lg ${isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} transition-colors`}
                 onClick={() => {
                   setShowNotifications(!showNotifications);
@@ -297,20 +331,31 @@ export const Layout: React.FC<LayoutProps> = ({
               >
                 <div className="relative">
                   <svg className={`w-5 h-5 ${isDark ? 'text-gray-400' : 'text-gray-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                    />
                   </svg>
                   {/* Notification Badge */}
                   {unreadCount > 0 && (
-                    <div className={`absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-xs font-medium text-white`}>
+                    <div
+                      className={`absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-xs font-medium text-white`}
+                    >
                       {unreadCount > 9 ? '9+' : unreadCount}
                     </div>
                   )}
                 </div>
               </button>
-              
+
               {/* Notifications Dropdown */}
               {showNotifications && (
-                <div className={`absolute right-0 mt-2 w-96 ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg shadow-xl border max-h-96 overflow-hidden z-50`}>
+                <div
+                  className={`absolute right-0 mt-2 w-96 ${
+                    isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+                  } rounded-lg shadow-xl border max-h-96 overflow-hidden z-50`}
+                >
                   {/* Header */}
                   <div className={`px-4 py-3 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'} flex items-center justify-between`}>
                     <div className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('navigation.notifications')}</div>
@@ -320,7 +365,7 @@ export const Layout: React.FC<LayoutProps> = ({
                       </div>
                     )}
                   </div>
-                  
+
                   {/* Notification List */}
                   <div className="max-h-80 overflow-y-auto">
                     {notificationsLoading ? (
@@ -329,47 +374,47 @@ export const Layout: React.FC<LayoutProps> = ({
                         <p className="text-sm">Loading notifications...</p>
                       </div>
                     ) : notifications.length > 0 ? (
-                      notifications.map((notification) => (
+                      notifications.map(notification => (
                         <div
                           key={notification.id}
                           onClick={() => handleNotificationClick(notification)}
-                          className={`px-4 py-3 border-b ${isDark ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-100 hover:bg-gray-50'} transition-colors ${!notification.read ? (isDark ? 'bg-blue-900 bg-opacity-20' : 'bg-blue-50') : ''} ${notification.type === 'Transaction' && notification.workflowRunId ? 'cursor-pointer' : 'cursor-default'}`}
+                          className={`px-4 py-3 border-b ${
+                            isDark ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-100 hover:bg-gray-50'
+                          } transition-colors ${!notification.read ? (isDark ? 'bg-blue-900 bg-opacity-20' : 'bg-blue-50') : ''} ${
+                            notification.type === 'Transaction' && notification.workflowRunId ? 'cursor-pointer' : 'cursor-default'
+                          }`}
                         >
                           <div className="flex items-start space-x-3">
-                            <div className="flex-shrink-0 text-lg">
-                              {getNotificationIcon(notification.level)}
-                            </div>
+                            <div className="flex-shrink-0 text-lg">{getNotificationIcon(notification.level)}</div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-2">
-                                  <p className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'} ${!notification.read ? 'font-semibold' : ''}`}>
+                                  <p
+                                    className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'} ${
+                                      !notification.read ? 'font-semibold' : ''
+                                    }`}
+                                  >
                                     {notification.title}
                                   </p>
                                   {/* Show notification type */}
-                                  <span className={`px-2 py-0.5 text-xs rounded-full ${
-                                    notification.type === 'Transaction' 
-                                      ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
-                                      : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
-                                  }`}>
+                                  <span
+                                    className={`px-2 py-0.5 text-xs rounded-full ${
+                                      notification.type === 'Transaction'
+                                        ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
+                                        : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
+                                    }`}
+                                  >
                                     {notification.type}
                                   </span>
                                 </div>
-                                {!notification.read && (
-                                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                                )}
+                                {!notification.read && <div className="w-2 h-2 bg-blue-500 rounded-full"></div>}
                               </div>
-                              <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
-                                {notification.message}
-                              </p>
+                              <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'} mt-1`}>{notification.message}</p>
                               {/* jump to workflow run */}
                               {notification.type === 'Transaction' && notification.workflowRunId && (
-                                <p className={`text-xs ${isDark ? 'text-blue-400' : 'text-blue-600'} mt-1 italic`}>
-                                  {t('dashboard.viewDetails')} →
-                                </p>
+                                <p className={`text-xs ${isDark ? 'text-blue-400' : 'text-blue-600'} mt-1 italic`}>{t('dashboard.viewDetails')} →</p>
                               )}
-                              <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'} mt-2`}>
-                                {formatTimeAgo(notification.timestamp)}
-                              </p>
+                              <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'} mt-2`}>{formatTimeAgo(notification.timestamp)}</p>
                             </div>
                           </div>
                         </div>
@@ -381,20 +426,23 @@ export const Layout: React.FC<LayoutProps> = ({
                       </div>
                     )}
                   </div>
-                  
+
                   {/* Footer */}
                   <div className={`px-4 py-3 border-t ${isDark ? 'border-gray-700' : 'border-gray-200'} flex items-center justify-between`}>
-                    <button 
+                    <button
                       onClick={handleMarkAllAsRead}
                       disabled={unreadCount === 0 || notificationsLoading}
-                      className={`text-sm ${unreadCount > 0 && !notificationsLoading 
-                        ? (isDark ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-500') 
-                        : 'text-gray-400 cursor-not-allowed'
+                      className={`text-sm ${
+                        unreadCount > 0 && !notificationsLoading
+                          ? isDark
+                            ? 'text-blue-400 hover:text-blue-300'
+                            : 'text-blue-600 hover:text-blue-500'
+                          : 'text-gray-400 cursor-not-allowed'
                       } transition-colors`}
                     >
                       Mark all as read
                     </button>
-                    <button 
+                    <button
                       onClick={() => setShowNotifications(false)}
                       className={`text-sm ${isDark ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-500'} transition-colors`}
                     >
@@ -423,7 +471,11 @@ export const Layout: React.FC<LayoutProps> = ({
               </button>
 
               {showUserMenu && (
-                <div className={`absolute right-0 mt-2 w-64 ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg shadow-lg border py-2 z-50`}>
+                <div
+                  className={`absolute right-0 mt-2 w-64 ${
+                    isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+                  } rounded-lg shadow-lg border py-2 z-50`}
+                >
                   {/* User Info Section */}
                   <div className={`px-4 py-3 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
                     <div className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{user.name}</div>
@@ -438,7 +490,9 @@ export const Layout: React.FC<LayoutProps> = ({
                         onViewChange('settings');
                         setShowUserMenu(false);
                       }}
-                      className={`w-full flex items-center space-x-3 px-4 py-2 text-left ${isDark ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'} transition-colors`}
+                      className={`w-full flex items-center space-x-3 px-4 py-2 text-left ${
+                        isDark ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'
+                      } transition-colors`}
                     >
                       <Settings className="w-4 h-4" />
                       <div>
@@ -450,12 +504,12 @@ export const Layout: React.FC<LayoutProps> = ({
                     {/* Theme & Language & Service Mode */}
                     <div className={`px-4 py-2 border-t ${isDark ? 'border-gray-700' : 'border-gray-200'} mt-2`}>
                       <div className={`text-xs font-medium ${isDark ? 'text-gray-400' : 'text-gray-500'} mb-2`}>PREFERENCES</div>
-                      
+
                       {/* Quick Theme Toggle */}
                       <div className="flex items-center justify-between mb-2">
                         <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{t('settings.theme')}</span>
                         <div className="flex items-center space-x-1">
-                          {(['light', 'dark'] as const).map((themeOption) => (
+                          {(['light', 'dark'] as const).map(themeOption => (
                             <button
                               key={themeOption}
                               onClick={() => setTheme(themeOption)}
@@ -475,7 +529,7 @@ export const Layout: React.FC<LayoutProps> = ({
                       <div className="flex items-center justify-between">
                         <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{t('settings.language')}</span>
                         <div className="flex items-center space-x-1">
-                          {(['en', 'zh'] as const).map((langOption) => (
+                          {(['en', 'zh'] as const).map(langOption => (
                             <button
                               key={langOption}
                               onClick={() => setLanguage(langOption)}
@@ -496,7 +550,9 @@ export const Layout: React.FC<LayoutProps> = ({
                     <div className={`border-t ${isDark ? 'border-gray-700' : 'border-gray-200'} mt-2 pt-2`}>
                       <button
                         onClick={onLogout}
-                        className={`w-full flex items-center space-x-2 px-4 py-2 text-left ${isDark ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'} transition-colors`}
+                        className={`w-full flex items-center space-x-2 px-4 py-2 text-left ${
+                          isDark ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'
+                        } transition-colors`}
                       >
                         <LogOut className="w-4 h-4" />
                         <span>{t('auth.logout')}</span>
@@ -509,9 +565,7 @@ export const Layout: React.FC<LayoutProps> = ({
           </div>
         </div>
         {/* Content */}
-        <div className="flex-1 overflow-y-auto">
-        {children}
-        </div>
+        <div className="flex-1 overflow-y-auto">{children}</div>
       </div>
     </div>
   );
