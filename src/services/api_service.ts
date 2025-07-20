@@ -1,4 +1,4 @@
-import { Workflow, WorkflowRun, TradeRecord } from "../types";
+import { Workflow, WorkflowRun, TradeRecord, Notification, NotificationParams } from "../types";
 
 export interface ApiService {
   // Auth
@@ -29,7 +29,7 @@ export interface ApiService {
   getReports(params?: Record<string, unknown>): Promise<unknown[]>;
 
   // Notifications
-  getNotifications(): Promise<unknown[]>;
+  getNotifications(params?: NotificationParams): Promise<Notification[]>;
   markNotificationAsRead(notificationId: string): Promise<void>;
   markAllNotificationsAsRead(): Promise<void>;
 }

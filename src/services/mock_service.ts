@@ -1,5 +1,11 @@
 import { ApiService } from "./api_service";
-import { Workflow, WorkflowRun, TradeRecord, ComponentNode } from "../types";
+import {
+  Workflow,
+  WorkflowRun,
+  TradeRecord,
+  NotificationParams,
+  Notification,
+} from "../types";
 
 export class MockApiService implements ApiService {
   private workflows: Workflow[] = [];
@@ -381,19 +387,19 @@ export class MockApiService implements ApiService {
     return run.nodeStates[nodeId].logs || ["No logs available"];
   }
 
-  async getTradeHistory(params?: any) {
+  async getTradeHistory(params?: any): Promise<TradeRecord[]> {
     await new Promise((resolve) => setTimeout(resolve, 600));
     // Return mock trade data
     return [];
   }
 
-  async getReports(params?: any) {
+  async getReports(params?: any): Promise<unknown[]> {
     await new Promise((resolve) => setTimeout(resolve, 500));
     // Return mock report data
     return [];
   }
 
-  async getNotifications(params?: any) {
+  async getNotifications(params?: NotificationParams): Promise<Notification[]> {
     await new Promise((resolve) => setTimeout(resolve, 300));
     return [...this.notifications];
   }

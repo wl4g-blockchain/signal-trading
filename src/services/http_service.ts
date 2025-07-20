@@ -1,5 +1,10 @@
 import { ApiService } from "./api_service";
-import { Workflow } from "../types";
+import {
+  Workflow,
+  TradeRecord,
+  NotificationParams,
+  Notification,
+} from "../types";
 
 export class HttpApiService implements ApiService {
   // TODO: setup on build or dynamic current domain?
@@ -90,7 +95,9 @@ export class HttpApiService implements ApiService {
     return this.request(`/workflow-runs/${runId}/nodes/${nodeId}/logs`);
   }
 
-  async getTradeHistory(params?: Record<string, unknown>) {
+  async getTradeHistory(
+    params?: Record<string, unknown>
+  ): Promise<TradeRecord[]> {
     const query = params
       ? `?${new URLSearchParams(params as Record<string, string>).toString()}`
       : "";
@@ -104,7 +111,7 @@ export class HttpApiService implements ApiService {
     return this.request(`/reports${query}`);
   }
 
-  async getNotifications(): Promise<unknown[]> {
+  async getNotifications(params?: NotificationParams): Promise<Notification[]> {
     return this.request("/notifications");
   }
 

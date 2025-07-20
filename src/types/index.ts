@@ -123,3 +123,24 @@ export interface Report {
   sharpeRatio: number;
   trades: TradeRecord[];
 }
+
+export interface Notification {
+  id: string;
+  type: 'Transaction' | 'System';
+  level: 'success' | 'warning' | 'error' | 'info';
+  title: string;
+  message: string;
+  timestamp: Date;
+  read: boolean;
+  workflowId?: string;
+  workflowRunId?: string;
+  relatedData?: Record<string, unknown>;
+}
+
+export interface NotificationParams {
+  limit?: number;
+  offset?: number;
+  unreadOnly?: boolean;
+  type?: 'Transaction' | 'System';
+  level?: 'success' | 'warning' | 'error' | 'info';
+}
