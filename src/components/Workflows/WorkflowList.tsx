@@ -66,10 +66,15 @@ export const WorkflowList: React.FC<WorkflowListProps> = ({
 
   const handleRedesign = async (workflowId: string) => {
     try {
-      const workflow = await serviceManager.getService().getWorkflow(workflowId);
-      onLoadWorkflow(workflow);
+      console.log('🔧 ReDesign clicked, workflowId:', workflowId);
+      // Trigger global redesign-workflow event instead of loading directly
+      const event = new CustomEvent('redesign-workflow', { 
+        detail: { workflowId } 
+      });
+      window.dispatchEvent(event);
+      console.log('📤 redesign-workflow event dispatched');
     } catch (error) {
-      console.error('Failed to load workflow:', error);
+      console.error('❌ Failed to trigger redesign:', error);
     }
   };
 
@@ -247,6 +252,15 @@ export const WorkflowList: React.FC<WorkflowListProps> = ({
                       </div>
                       
                       <div className="flex items-center space-x-1 ml-2 flex-shrink-0">
+                        <button
+                          onClick={() => handleRedesign(run.workflowId)}
+                          className="flex items-center space-x-1 px-2 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-xs transition-colors"
+                          title={t('workflow.redesign')}
+                        >
+                          <Play className="w-2.5 h-2.5" />
+                          <span>{t('workflow.design')}</span>
+                        </button>
+                        
                         <button
                           onClick={() => handleViewRunDetails(run.id)}
                           className={`px-2 py-1 ${isDark ? 'bg-gray-600 hover:bg-gray-500 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'} rounded text-xs transition-colors`}

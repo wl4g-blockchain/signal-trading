@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ComponentNode } from '../../types';
+import { COMPONENT_TYPES } from '../../types/WorkflowTypes';
 import {
   Radio,
   Brain,
@@ -29,43 +30,35 @@ interface NodeComponentProps {
   onNodeClick?: (nodeId: string) => void; // Add callback for node clicks in readonly mode
 }
 
-const getNodeIcon = (type: string) => {
-  switch (type) {
-    case 'start':
+const getNodeIcon = (node: ComponentNode) => {
+  // For new schema, use the icon from the node directly
+  if (node.icon) {
+    return node.icon;
+  }
+  
+  // Fallback for legacy nodes or special cases
+  switch (node.type) {
+    case COMPONENT_TYPES.START:
       return () => <div className="w-5 h-5 bg-green-400 rounded-full flex items-center justify-center text-xs font-bold text-gray-900">S</div>;
-    case 'end':
+    case COMPONENT_TYPES.END:
       return () => <div className="w-5 h-5 bg-red-400 rounded-full flex items-center justify-center text-xs font-bold text-gray-900">E</div>;
-    case 'listener':
-      return Radio;
-    case 'evaluator':
-      return Brain;
-    case 'executor':
-      return Zap;
-    case 'cex-executor':
-      return TrendingUp;
-    case 'collector':
-      return Database;
     default:
       return BarChart3;
   }
 };
 
-const getNodeColor = (type: string) => {
-  switch (type) {
-    case 'start':
+const getNodeColor = (node: ComponentNode): string => {
+  // Use the color from the node's style if available
+  if (node.style?.color) {
+    return `${node.style.color} border-${node.style.color.split('-')[1]}-500`;
+  }
+  
+  // Fallback colors for legacy nodes
+  switch (node.type) {
+    case COMPONENT_TYPES.START:
       return 'bg-green-600 border-green-500';
-    case 'end':
+    case COMPONENT_TYPES.END:
       return 'bg-red-600 border-red-500';
-    case 'listener':
-      return 'bg-blue-600 border-blue-500';
-    case 'evaluator':
-      return 'bg-purple-600 border-purple-500';
-    case 'executor':
-      return 'bg-green-600 border-green-500';
-    case 'cex-executor':
-      return 'bg-blue-600 border-blue-500';
-    case 'collector':
-      return 'bg-orange-600 border-orange-500';
     default:
       return 'bg-gray-600 border-gray-500';
   }
@@ -88,61 +81,35 @@ const getSubIcon = (nodeType: string, dataType: string) => {
 };
 
 const getDisplayType = (node: ComponentNode): string => {
+  const config = node.config || {};
+  
   switch (node.type) {
-    case 'listener':
-      return node.data?.type || 'twitter';
-    case 'evaluator':
-      return node.data?.model || 'deepseek-v3';
-    case 'executor':
-      // Show DEX name, if not available show chain name
-      const dexName = node.data?.targetDex || '';
-      switch (dexName) {
-        case 'uniswap':
-          return 'Uniswap';
-        case 'uniswap-v2':
-          return 'Uniswap V2';
-        case 'uniswap-v3':
-          return 'Uniswap V3';
-        case 'uniswap-v4':
-          return 'Uniswap V4';
-        case 'sushiswap':
-          return 'SushiSwap';
-        case '1inch':
-          return '1inch';
-        case 'quickswap':
-          return 'QuickSwap';
-        case 'pancakeswap':
-          return 'PancakeSwap';
-        case 'bakeryswap':
-          return 'BakerySwap';
-        case 'custom':
-          return 'Custom DEX';
-        default:
-          return node.data?.rpcEndpoint || 'mainnet';
-      }
-    case 'cex-executor':
-      // Show CEX name
-      const exchangeName = node.data?.exchange || '';
-      switch (exchangeName) {
-        case 'binance':
-          return 'Binance';
-        case 'okx':
-          return 'OKX';
-        case 'coinbase':
-          return 'Coinbase';
-        case 'kraken':
-          return 'Kraken';
-        case 'bybit':
-          return 'Bybit';
-        case 'kucoin':
-          return 'KuCoin';
-        default:
-          return 'Binance';
-      }
-    case 'collector':
-      return `${node.data?.monitorDuration || 30}min`;
+    case COMPONENT_TYPES.TWITTER_EXTRACTOR:
+    case COMPONENT_TYPES.TWITTER_STREAM:
+      return config.keywords?.length ? `${config.keywords.length} keywords` : 'Twitter';
+    case COMPONENT_TYPES.BINANCE_EXTRACTOR:
+    case COMPONENT_TYPES.BINANCE_STREAM:
+      return config.symbols?.length ? `${config.symbols.length} symbols` : 'Binance';
+    case COMPONENT_TYPES.AI_EVALUATOR:
+      return config.model || 'AI Model';
+    case COMPONENT_TYPES.BINANCE_TRADE_EXECUTOR:
+      return 'Binance Trading';
+    case COMPONENT_TYPES.OKX_TRADE_EXECUTOR:
+      return 'OKX Trading';
+    case COMPONENT_TYPES.EVM_TRADE_EXECUTOR:
+      return config.chain || 'EVM Trading';
+    case COMPONENT_TYPES.BITCOIN_TRADE_EXECUTOR:
+      return 'Bitcoin Trading';
+    case COMPONENT_TYPES.SOLANA_TRADE_EXECUTOR:
+      return 'Solana Trading';
+    case COMPONENT_TYPES.BINANCE_RESULT_COLLECTOR:
+    case COMPONENT_TYPES.OKX_RESULT_COLLECTOR:
+    case COMPONENT_TYPES.EVM_RESULT_COLLECTOR:
+    case COMPONENT_TYPES.SOLANA_RESULT_COLLECTOR:
+    case COMPONENT_TYPES.BITCOIN_RESULT_COLLECTOR:
+      return `${config.monitorDuration || 30}min`;
     default:
-      return node.data?.type || 'default';
+      return node.type;
   }
 };
 
@@ -158,13 +125,13 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
   const { isDark } = useTheme();
   const [showLogModal, setShowLogModal] = useState(false);
   
-  const isReadonly = node.data?.readonly || false;
-  const runStatus = node.data?.runStatus;
-  const runLogs = node.data?.runLogs || [];
+  const isReadonly = node.readonly || false;
+  const runStatus = node.runStatus;
+  const runLogs = node.runLogs || [];
   
-  const Icon = getNodeIcon(node.type);
-  const SubIcon = getSubIcon(node.type, node.data?.type);
-  const colorClass = getNodeColor(node.type);
+  const Icon = getNodeIcon(node);
+  const SubIcon = getSubIcon(node.type, node.config?.type);
+  const colorClass = getNodeColor(node);
   const displayType = getDisplayType(node);
   
   // Get run status color and icon
@@ -205,7 +172,7 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
   };
 
   // Special rendering for start/end nodes
-  if (node.type === 'start' || node.type === 'end') {
+  if (node.type === COMPONENT_TYPES.START || node.type === COMPONENT_TYPES.END) {
     return (
       <div
         className="absolute cursor-move select-none"
@@ -218,12 +185,12 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
           <Icon />
         </div>
         
-        <div className="text-center mt-2">
-          <span className={`font-medium text-sm ${isDark ? 'text-white' : 'text-gray-900'}`}>{node.data?.name}</span>
-        </div>
+                  <div className="text-center mt-2">
+            <span className={`font-medium text-sm ${isDark ? 'text-white' : 'text-gray-900'}`}>{node.name}</span>
+          </div>
 
-        {/* Output ports for start node - 四个方向 */}
-        {node.type === 'start' && (
+        {/* Output ports for start node - Multi-directional */}
+        {node.type === COMPONENT_TYPES.START && (
           <>
             {/* 右侧输出端口 */}
             <div
@@ -268,8 +235,8 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
           </>
         )}
         
-        {/* Input ports for end node - 四个方向 */}
-        {node.type === 'end' && (
+        {/* Input ports for end node - Multi-directional */}
+        {node.type === COMPONENT_TYPES.END && (
           <>
             {/* 左侧输入端口 */}
             <div
@@ -373,7 +340,7 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
             <Icon className={`w-5 h-5 ${runStatus ? getRunStatusTextColor() : 'text-white'}`} />
             {SubIcon && <SubIcon className={`w-4 h-4 ${runStatus ? getRunStatusTextColor() : 'text-white'} opacity-80`} />}
             <span className={`${runStatus ? getRunStatusTextColor() : 'text-white'} font-medium text-sm flex-1`}>
-              {node.data?.name || `${node.type.charAt(0).toUpperCase() + node.type.slice(1)}`}
+              {node.name || `${node.type.charAt(0).toUpperCase() + node.type.slice(1)}`}
             </span>
             
             {/* 运行状态指示器 */}
@@ -427,13 +394,13 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
               <span className={`${isDark ? 'text-white' : 'text-gray-900'} font-medium`}>{displayType}</span>
             </div>
           )}
-          {node.data?.status && (
+          {node.status && (
             <div className="flex items-center space-x-2">
               <div className={`w-2 h-2 rounded-full ${
-                node.data.status === 'active' ? 'bg-green-400' :
-                node.data.status === 'error' ? 'bg-red-400' : 'bg-gray-400'
+                node.status === 'running' ? 'bg-green-400' :
+                node.status === 'error' ? 'bg-red-400' : 'bg-gray-400'
               }`} />
-              <span className="capitalize">{node.data.status}</span>
+              <span className="capitalize">{node.status}</span>
             </div>
           )}
           
@@ -448,8 +415,8 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
           )}
         </div>
 
-        {/* Input/Output Ports - 四个方向的端口 */}
-        {node.inputs.length > 0 && (
+        {/* Input/Output Ports - Multi-directional ports */}
+        {(node.inputMode === 'SINGLE' || node.inputMode === 'MULTI') && (
           <>
             {/* 左侧输入端口 */}
             <div
@@ -494,7 +461,7 @@ export const NodeComponent: React.FC<NodeComponentProps> = ({
           </>
         )}
 
-        {node.outputs.length > 0 && (
+        {(node.outputMode === 'SINGLE' || node.outputMode === 'MULTI') && (
           <>
             {/* 右侧输出端口 */}
             <div

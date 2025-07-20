@@ -15,6 +15,7 @@ function App() {
   const [workflowReadOnlyMode, setWorkflowReadOnlyMode] = useState<{ workflowId: string; tradeId: string } | null>(null);
   const [readOnlyWorkflow, setReadOnlyWorkflow] = useState<Workflow | null>(null);
   const [loadingReadOnlyWorkflow, setLoadingReadOnlyWorkflow] = useState(false);
+  const [initialWorkflowId, setInitialWorkflowId] = useState<string | null>(null);
 
   useEffect(() => {
     // Check if user is already logged in
@@ -23,6 +24,14 @@ function App() {
         const currentUser = await serviceManager.getService().getCurrentUser() as User;
         if (currentUser) {
           setUser(currentUser);
+          
+          // Auto-fetch notifications after successful authentication
+          try {
+            await serviceManager.getService().getNotifications();
+            console.log('Initial notifications loaded successfully');
+          } catch (notificationError) {
+            console.error('Failed to load initial notifications:', notificationError);
+          }
         }
       } catch {
         console.log('No user logged in');
@@ -57,16 +66,24 @@ function App() {
       setCurrentView('workflow');
     };
 
+    const handleRedesignWorkflow = (event: CustomEvent) => {
+      const { workflowId } = event.detail;
+      console.log('📨 App: Received redesign-workflow event:', workflowId);
+      handleLoadWorkflowForEdit(workflowId);
+    };
+
     window.addEventListener('collapse-sidebar', handleSidebarCollapse as EventListener);
     window.addEventListener('navigate-to-workflow-run', handleWorkflowRunNavigation as EventListener);
     window.addEventListener('exit-readonly-mode', handleExitReadOnlyMode as EventListener);
     window.addEventListener('navigate-to-workflows', handleNavigateToWorkflows as EventListener);
+    window.addEventListener('redesign-workflow', handleRedesignWorkflow as EventListener);
     
     return () => {
       window.removeEventListener('collapse-sidebar', handleSidebarCollapse as EventListener);
       window.removeEventListener('navigate-to-workflow-run', handleWorkflowRunNavigation as EventListener);
       window.removeEventListener('exit-readonly-mode', handleExitReadOnlyMode as EventListener);
       window.removeEventListener('navigate-to-workflows', handleNavigateToWorkflows as EventListener);
+      window.removeEventListener('redesign-workflow', handleRedesignWorkflow as EventListener);
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -76,7 +93,15 @@ function App() {
     if (view === 'workflow') {
       setWorkflowReadOnlyMode(null);
       setReadOnlyWorkflow(null);
+      // Clear initialWorkflowId when user manually navigates to workflows (new workflow)
+      if (currentView !== 'workflow') {
+        setInitialWorkflowId(null);
+      }
+    } else {
+      // Clear initialWorkflowId when navigating away from workflow view
+      setInitialWorkflowId(null);
     }
+    
     setCurrentView(view);
     
     // Force re-render by updating state
@@ -88,8 +113,16 @@ function App() {
     }
   };
 
-  const handleLogin = (userData: User) => {
+  const handleLogin = async (userData: User) => {
     setUser(userData);
+    
+    // Auto-fetch notifications after successful login
+    try {
+      await serviceManager.getService().getNotifications();
+      console.log('Initial notifications loaded after login');
+    } catch (notificationError) {
+      console.error('Failed to load initial notifications after login:', notificationError);
+    }
   };
 
   const handleLogout = async () => {
@@ -117,12 +150,14 @@ function App() {
         ...workflow,
         nodes: workflow.nodes.map(node => ({
           ...node,
-          data: {
-            ...node.data,
-            runStatus: run.nodeStates[node.id]?.status || 'skipped',
-            runLogs: run.nodeStates[node.id]?.logs || [],
-            readonly: true
-          }
+          runStatus: (run.nodeStates[node.id]?.status as any) || 'skipped',
+          runLogs: (run.nodeStates[node.id]?.logs || []).map((log: string) => ({
+            timestamp: new Date().toISOString(),
+            level: 'info' as const,
+            message: log,
+            data: null
+          })),
+          readonly: true
         }))
       };
 
@@ -142,6 +177,16 @@ function App() {
     setWorkflowReadOnlyMode(null);
     setReadOnlyWorkflow(null);
     // Don't change currentView, let user return to previous page
+  };
+
+  // Handle loading specific workflow for editing (ReDesign functionality)
+  const handleLoadWorkflowForEdit = (workflowId: string) => {
+    console.log('🎯 App: Loading workflow for edit:', workflowId);
+    setInitialWorkflowId(workflowId);
+    setCurrentView('workflow'); // Switch to workflow view
+    // Clear read-only mode
+    setWorkflowReadOnlyMode(null);
+    setReadOnlyWorkflow(null);
   };
 
   const renderCurrentView = () => {
@@ -177,10 +222,11 @@ function App() {
       case 'workflow':
         return (
           <WorkflowPage 
-            key={`workflow-${Date.now()}`} // Force re-render when returning from read-only mode
+            key={`workflow-${Date.now()}-${initialWorkflowId || 'new'}`} // Force re-render when workflow changes
             readOnlyMode={null} 
             readOnlyWorkflow={null}
-            onExitReadOnlyMode={undefined} 
+            onExitReadOnlyMode={undefined}
+            initialWorkflowId={initialWorkflowId || undefined}
           />
         );
       case 'settings':

@@ -5,6 +5,7 @@ import {
   NotificationParams,
   Notification,
 } from "../types";
+import { authStorage } from "../utils/authStorage";
 
 export class HttpApiService implements ApiService {
   // TODO: setup on build or dynamic current domain?
@@ -12,7 +13,7 @@ export class HttpApiService implements ApiService {
   private token: string | null = null;
 
   constructor() {
-    this.token = localStorage.getItem("auth_token");
+    this.token = authStorage.getToken();
   }
 
   private async request(endpoint: string, options: RequestInit = {}) {
@@ -40,19 +41,45 @@ export class HttpApiService implements ApiService {
       method: "POST",
       body: JSON.stringify({ provider, credentials }),
     });
+    
     this.token = result.token;
-    localStorage.setItem("auth_token", result.token);
+    
+    // Store encrypted user session with default permissions
+    const defaultPermissions = ['read:workflows', 'write:workflows', 'execute:trades', 'view:notifications'];
+    authStorage.storeUserSession(result.user, result.token, defaultPermissions);
+    
     return result;
   }
 
   async logout() {
     await this.request("/auth/logout", { method: "POST" });
     this.token = null;
-    localStorage.removeItem("auth_token");
+    authStorage.clearUserSession();
   }
 
   async getCurrentUser() {
-    return this.request("/auth/me");
+    // First check local encrypted storage
+    const cachedUser = authStorage.getCurrentUser();
+    if (cachedUser && authStorage.isSessionValid()) {
+      // Extend session on active use
+      authStorage.extendSession();
+      return cachedUser;
+    }
+    
+    // If no valid cached session, try to get from server
+    try {
+      const user = await this.request("/auth/me");
+      // If server returns user, update local session
+      if (user && this.token) {
+        const defaultPermissions = ['read:workflows', 'write:workflows', 'execute:trades', 'view:notifications'];
+        authStorage.storeUserSession(user, this.token, defaultPermissions);
+      }
+      return user;
+    } catch (error) {
+      // If server request fails, clear local session
+      authStorage.clearUserSession();
+      throw error;
+    }
   }
 
   async getWorkflows() {

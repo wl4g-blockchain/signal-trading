@@ -56,45 +56,52 @@ export const WorkflowRunCanvas: React.FC<WorkflowRunCanvasProps> = ({
     window.dispatchEvent(navEvent);
   }, []);
 
-  // Handle node click to show logs in side panel
+  // Handle node click to show logs in side panel with real-time refresh
   const handleNodeClick = useCallback(async (nodeId: string) => {
     const node = nodes.find(n => n.id === nodeId);
-    if (!node || !node.data?.readonly || !node.data?.runLogs?.length) return;
+    if (!node || !node.readonly) return;
+    
+    console.log('🔍 Node clicked for logs:', nodeId, 'Node:', node);
     
     setSelectedNodeId(nodeId);
     setLoadingLogs(true);
     setLogPanelVisible(true);
     
     try {
-      // Get run ID from node or use mock data for now
-      const runId = 'run-1'; // In real implementation, this would come from context
+      // Extract run ID from URL params or use default
+      const urlParams = new URLSearchParams(window.location.search);
+      const runId = urlParams.get('runId') || 'run-1';
+      
+      console.log('📋 Fetching logs for runId:', runId, 'nodeId:', nodeId);
       const logs = await serviceManager.getService().getWorkflowRunLogs(runId, nodeId);
+      console.log('✅ Logs loaded:', logs);
       setNodeLogs(logs);
     } catch (error) {
-      console.error('Failed to load node logs:', error);
-      setNodeLogs(['Failed to load logs']);
+      console.error('❌ Failed to load node logs:', error);
+      setNodeLogs([`Error loading logs: ${error instanceof Error ? error.message : 'Unknown error'}`]);
     } finally {
       setLoadingLogs(false);
     }
   }, [nodes]);
 
-  // Auto-open the last node with logs on initialization
+  // Auto-open the last node with logs on initialization and refresh logs when selectedNodeId changes
   useEffect(() => {
     const findLastNodeWithLogs = () => {
-      // Filter nodes that have logs
-      const nodesWithLogs = nodes.filter(node => 
-        node.data?.runLogs && node.data.runLogs.length > 0
+      // Filter nodes that are in readonly mode and have run status
+      const activeNodes = nodes.filter(node => 
+        node.readonly && node.runStatus
       );
       
-      if (nodesWithLogs.length === 0) return null;
+      if (activeNodes.length === 0) return null;
       
       // First, try to find a failed node (highest priority)
-      const failedNode = nodesWithLogs.find(node => node.data?.runStatus === 'failed');
+      const failedNode = activeNodes.find(node => 
+        node.runStatus === 'failed'
+      );
       if (failedNode) return failedNode;
       
-      // If no failed node, return the last node with logs (by position or order)
-      // Assuming nodes are processed in order, the last one would be the one with highest position
-      return nodesWithLogs.reduce((lastNode, currentNode) => {
+      // If no failed node, return the last executed node (by position or order)
+      return activeNodes.reduce((lastNode, currentNode) => {
         // Compare by y position, then by x position as tiebreaker
         if (currentNode.position.y > lastNode.position.y) return currentNode;
         if (currentNode.position.y === lastNode.position.y && currentNode.position.x > lastNode.position.x) {
@@ -108,8 +115,18 @@ export const WorkflowRunCanvas: React.FC<WorkflowRunCanvasProps> = ({
     if (nodes.length > 0 && !selectedNodeId && !logPanelVisible) {
       const targetNode = findLastNodeWithLogs();
       if (targetNode) {
+        console.log('🎯 Auto-opening logs for node:', targetNode.id);
         handleNodeClick(targetNode.id);
       }
+    }
+  }, [nodes, selectedNodeId, logPanelVisible, handleNodeClick]);
+
+  // Auto-refresh logs for selected node when node data changes
+  useEffect(() => {
+    if (selectedNodeId && logPanelVisible) {
+      console.log('🔄 Auto-refreshing logs for selected node:', selectedNodeId);
+      // Re-fetch logs for currently selected node
+      handleNodeClick(selectedNodeId);
     }
   }, [nodes, selectedNodeId, logPanelVisible, handleNodeClick]);
 
@@ -393,20 +410,37 @@ export const WorkflowRunCanvas: React.FC<WorkflowRunCanvasProps> = ({
             <div className="h-full overflow-y-auto p-4 pb-20">
               {loadingLogs ? (
                 <div className="text-yellow-400 animate-pulse">Loading logs...</div>
-              ) : nodeLogs.length > 0 ? (
-                nodeLogs.map((log, index) => (
-                  <div key={index} className="mb-1 flex">
-                    <span className="text-gray-500 mr-2 select-none">
-                      [{logTimestamp}]
-                    </span>
-                    <span className="text-green-400">{log}</span>
+              ) : selectedNodeId && (() => {
+                const selectedNode = nodes.find(n => n.id === selectedNodeId);
+                const nodeRunLogs = selectedNode?.runLogs || [];
+                const apiLogs = nodeLogs; // Logs from API call
+                
+                // Prefer node's existing logs, fallback to API logs
+                const displayLogs = nodeRunLogs.length > 0 ? nodeRunLogs : 
+                  apiLogs.map((log: string) => ({
+                    timestamp: new Date().toISOString(),
+                    level: 'info' as const,
+                    message: log,
+                    data: null
+                  }));
+                
+                return displayLogs.length > 0 ? (
+                  displayLogs.map((log, index) => (
+                    <div key={index} className="mb-1 flex">
+                      <span className="text-gray-500 mr-2 select-none">
+                        [{new Date(log.timestamp).toLocaleTimeString()}]
+                      </span>
+                      <span className={`${log.level === 'error' ? 'text-red-400' : log.level === 'warn' ? 'text-yellow-400' : 'text-green-400'}`}>
+                        {log.message}
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-gray-500">
+                    No logs available for this node execution.
                   </div>
-                ))
-              ) : (
-                <div className="text-gray-500">
-                  No logs available for this node execution.
-                </div>
-              )}
+                );
+              })()}
 
               {/* Cursor Blink */}
               <div className="mt-2 flex items-center">

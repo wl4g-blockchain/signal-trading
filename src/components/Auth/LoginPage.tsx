@@ -7,7 +7,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { useTranslation } from 'react-i18next';
 
 interface LoginPageProps {
-  onLogin: (user: User) => void;
+  onLogin: (user: User) => void | Promise<void>;
 }
 
 export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
@@ -23,7 +23,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
     
     try {
       const result = await serviceManager.getService().login('google');
-      onLogin(result.user as User);
+      await Promise.resolve(onLogin(result.user as User));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
     } finally {

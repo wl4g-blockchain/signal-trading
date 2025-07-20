@@ -1,5 +1,7 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { ComponentNode, Connection } from '../../types';
+import { COMPONENT_TYPES } from '../../types/WorkflowTypes';
+import { canConnect } from '../../types/ComponentRegistry';
 import { NodeComponent } from './NodeComponent';
 import { ConnectionLine } from './ConnectionLine';
 import { NodeConfigModal } from './NodeConfigModal';
@@ -36,28 +38,15 @@ export const Canvas: React.FC<CanvasProps> = ({
   const [touchStartPositions, setTouchStartPositions] = useState<React.TouchList | null>(null);
   const [isThreeFingerPanning, setIsThreeFingerPanning] = useState(false);
 
-  // Connection rule validation
-  const canConnect = (sourceNodeId: string, targetNodeId: string): boolean => {
+  // Connection rule validation using component registry
+  const validateConnection = (sourceNodeId: string, targetNodeId: string): boolean => {
     const sourceNode = nodes.find(n => n.id === sourceNodeId);
     const targetNode = nodes.find(n => n.id === targetNodeId);
     
     if (!sourceNode || !targetNode) return false;
     
-    // Check connection rules
-    switch (targetNode.type) {
-      case 'listener':
-        return sourceNode.type === 'start';
-      case 'evaluator':
-        return sourceNode.type === 'listener' || sourceNode.type === 'evaluator';
-      case 'executor':
-        return sourceNode.type === 'evaluator';
-      case 'collector':
-        return sourceNode.type === 'executor';
-      case 'end':
-        return sourceNode.type === 'collector';
-      default:
-        return false;
-    }
+    // Use the registry validation function
+    return canConnect(sourceNode.type, targetNode.type);
   };
   const handleDragStart = useCallback((nodeId: string, event: React.MouseEvent) => {
     // Check if it's a right-click (for panning)
@@ -278,7 +267,7 @@ export const Canvas: React.FC<CanvasProps> = ({
     }
     
     // Validate connection rules
-    if (!canConnect(isConnecting.nodeId, targetNodeId)) {
+    if (!validateConnection(isConnecting.nodeId, targetNodeId)) {
       setIsConnecting(null);
       setMousePosition(null);
       window.removeEventListener('mousemove', handleMouseMoveWhileConnecting);
@@ -302,8 +291,6 @@ export const Canvas: React.FC<CanvasProps> = ({
       id: `${isConnecting.nodeId}-${targetNodeId}-${Date.now()}`,
       source: isConnecting.nodeId,
       target: targetNodeId,
-      sourceOutput: isConnecting.outputId,
-      targetInput: inputId,
     };
     onConnectionsChange([...connections, newConnection]);
     
@@ -393,7 +380,7 @@ export const Canvas: React.FC<CanvasProps> = ({
             
             // Smart calculation of source port position
             const getNodeDimensions = (nodeType: string) => {
-              if (nodeType === 'start' || nodeType === 'end') {
+              if (nodeType === COMPONENT_TYPES.START || nodeType === COMPONENT_TYPES.END) {
                 return { width: 96, height: 96, centerX: 48, centerY: 48 - 8 }; // Circle node, adjust 8px
               } else {
                 return { width: 192, height: 120, centerX: 96, centerY: 60 }; // Rectangle node
@@ -428,7 +415,7 @@ export const Canvas: React.FC<CanvasProps> = ({
               if (deltaY > 0) {
                 // Mouse is below, connect from bottom
                 sourceX = sourceNode.position.x + sourceDim.centerX;
-                if (sourceNode.type === 'start' || sourceNode.type === 'end') {
+                if (sourceNode.type === COMPONENT_TYPES.START || sourceNode.type === COMPONENT_TYPES.END) {
                   sourceY = sourceNode.position.y + 96 + 6; // Actual bottom edge of circle node + port offset
                 } else {
                   sourceY = sourceNode.position.y + sourceDim.height + 6;
@@ -436,7 +423,7 @@ export const Canvas: React.FC<CanvasProps> = ({
               } else {
                 // Mouse is above, connect from top
                 sourceX = sourceNode.position.x + sourceDim.centerX;
-                if (sourceNode.type === 'start' || sourceNode.type === 'end') {
+                if (sourceNode.type === COMPONENT_TYPES.START || sourceNode.type === COMPONENT_TYPES.END) {
                   sourceY = sourceNode.position.y - 6; // Actual top edge of circle node - port offset
                 } else {
                   sourceY = sourceNode.position.y - 6;

@@ -1,5 +1,6 @@
 import React from "react";
 import { X } from "lucide-react";
+import { COMPONENT_TYPES } from "../../types/WorkflowTypes";
 
 interface ConnectionLineProps {
   sourcePosition: { x: number; y: number };
@@ -22,7 +23,7 @@ export const ConnectionLine: React.FC<ConnectionLineProps> = ({
 }) => {
   // Calculate node dimensions and center point
   const getNodeDimensions = (nodeType: string) => {
-    if (nodeType === "start" || nodeType === "end") {
+    if (nodeType === COMPONENT_TYPES.START || nodeType === COMPONENT_TYPES.END) {
       return { width: 96, height: 96, centerX: 48, centerY: 48 - 8 }; // Circular node, adjust 8px
     } else {
       return { width: 192, height: 120, centerX: 96, centerY: 60 }; // Rectangular node
@@ -65,13 +66,13 @@ export const ConnectionLine: React.FC<ConnectionLineProps> = ({
     if (deltaY > 0) {
       // Target is below, connect from source bottom to target top
       startX = sourcePosition.x + sourceDim.centerX;
-      if (sourceNodeType === "start" || sourceNodeType === "end") {
+      if (sourceNodeType === COMPONENT_TYPES.START || sourceNodeType === COMPONENT_TYPES.END) {
         startY = sourcePosition.y + 96 + 6; // Actual bottom edge of circular node + port offset
       } else {
         startY = sourcePosition.y + sourceDim.height + 6;
       }
       endX = targetPosition.x + targetDim.centerX;
-      if (targetNodeType === "start" || targetNodeType === "end") {
+      if (targetNodeType === COMPONENT_TYPES.START || targetNodeType === COMPONENT_TYPES.END) {
         endY = targetPosition.y - 6; // Actual top edge of circular node - port offset
       } else {
         endY = targetPosition.y - 6;
@@ -79,13 +80,13 @@ export const ConnectionLine: React.FC<ConnectionLineProps> = ({
     } else {
       // Target is above, connect from source top to target bottom
       startX = sourcePosition.x + sourceDim.centerX;
-      if (sourceNodeType === "start" || sourceNodeType === "end") {
+      if (sourceNodeType === COMPONENT_TYPES.START || sourceNodeType === COMPONENT_TYPES.END) {
         startY = sourcePosition.y - 6; // Actual top edge of circular node - port offset
       } else {
         startY = sourcePosition.y - 6;
       }
       endX = targetPosition.x + targetDim.centerX;
-      if (targetNodeType === "start" || targetNodeType === "end") {
+      if (targetNodeType === COMPONENT_TYPES.START || targetNodeType === COMPONENT_TYPES.END) {
         endY = targetPosition.y + 96 + 6; // Actual bottom edge of circular node + port offset
       } else {
         endY = targetPosition.y + targetDim.height + 6;

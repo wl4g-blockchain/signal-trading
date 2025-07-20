@@ -1,30 +1,13 @@
-export interface ComponentNode {
-  id: string;
-  type: 'start' | 'end' | 'listener' | 'evaluator' | 'executor' | 'cex-executor' | 'collector';
-  position: { x: number; y: number };
-  data: any;
-  inputs: string[];
-  outputs: string[];
-}
-
-export interface Connection {
-  id: string;
-  source: string;
-  target: string;
-  sourceOutput: string;
-  targetInput: string;
-}
-
-export interface Workflow {
-  id: string;
-  name: string;
-  nodes: ComponentNode[];
-  connections: Connection[];
-  status: 'draft' | 'running' | 'paused' | 'completed';
-  createdAt: Date;
-  updatedAt?: Date;
-  lastRun?: Date;
-}
+// Re-export workflow types from dedicated workflow types file
+export type { 
+  ComponentType, 
+  ComponentNode, 
+  Connection, 
+  Workflow, 
+  ComponentSchema,
+  Position,
+  ConnectionMode
+} from './WorkflowTypes';
 
 export interface WorkflowRun {
   id: string;

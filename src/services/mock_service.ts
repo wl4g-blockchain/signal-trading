@@ -5,20 +5,31 @@ import {
   TradeRecord,
   NotificationParams,
   Notification,
+  User,
 } from "../types";
+import { COMPONENT_TYPES } from "../types/WorkflowTypes";
+import { getComponentSchema } from "../types/ComponentRegistry";
+import { authStorage } from "../utils/authStorage";
 
 export class MockApiService implements ApiService {
   private workflows: Workflow[] = [];
   private workflowRuns: WorkflowRun[] = [];
-  private currentUser: any = null;
-  private notifications: any[] = [];
+  private currentUser: { id: string; name: string; email: string } | null = null;
+  private notifications: Notification[] = [];
 
   constructor() {
     this.initMockData();
   }
 
   private initMockData() {
-    // Mock workflows
+    // Mock workflows using new unified schema
+    const startSchema = getComponentSchema(COMPONENT_TYPES.START);
+    const twitterSchema = getComponentSchema(COMPONENT_TYPES.TWITTER_EXTRACTOR);
+    const aiSchema = getComponentSchema(COMPONENT_TYPES.AI_EVALUATOR);
+    const evmSchema = getComponentSchema(COMPONENT_TYPES.EVM_TRADE_EXECUTOR);
+    const collectorSchema = getComponentSchema(COMPONENT_TYPES.BINANCE_RESULT_COLLECTOR);
+    const endSchema = getComponentSchema(COMPONENT_TYPES.END);
+    
     this.workflows = [
       {
         id: "workflow-1",
@@ -26,121 +37,125 @@ export class MockApiService implements ApiService {
         nodes: [
           {
             id: "start-1",
-            type: "start",
+            name: "Start",
+            type: COMPONENT_TYPES.START,
+            inputMode: startSchema.inputMode,
+            outputMode: startSchema.outputMode,
+            icon: startSchema.icon,
+            style: startSchema.style,
             position: { x: 100, y: 200 },
-            data: { name: "Start" },
-            inputs: [],
-            outputs: ["trigger"],
+            config: {},
+            status: "idle",
           },
           {
-            id: "listener-1",
-            type: "listener",
+            id: "twitter-1",
+            name: "Twitter Extractor",
+            type: COMPONENT_TYPES.TWITTER_EXTRACTOR,
+            inputMode: twitterSchema.inputMode,
+            outputMode: twitterSchema.outputMode,
+            icon: twitterSchema.icon,
+            style: twitterSchema.style,
             position: { x: 300, y: 200 },
-            data: {
-              name: "Twitter Listener",
-              type: "twitter",
+            config: {
+              apiKey: "twitter-api-key",
               accounts: ["elonmusk", "VitalikButerin"],
               keywords: ["ETH", "Ethereum"],
-              status: "idle",
             },
-            inputs: ["trigger"],
-            outputs: ["data"],
+            status: "idle",
           },
           {
-            id: "evaluator-1",
-            type: "evaluator",
+            id: "ai-1",
+            name: "AI Evaluator",
+            type: COMPONENT_TYPES.AI_EVALUATOR,
+            inputMode: aiSchema.inputMode,
+            outputMode: aiSchema.outputMode,
+            icon: aiSchema.icon,
+            style: aiSchema.style,
             position: { x: 500, y: 200 },
-            data: {
-              name: "AI Evaluator",
-              type: "default",
-              riskTolerance: "medium",
-              confidenceThreshold: 0.7,
-              status: "idle",
+            config: {
+              model: "deepseek-v3",
+              apiKey: "ai-api-key",
+              prompt: "Analyze crypto sentiment for trading opportunities",
             },
-            inputs: ["data"],
-            outputs: ["strategy"],
+            status: "idle",
           },
           {
-            id: "executor-1",
-            type: "executor",
+            id: "evm-1",
+            name: "EVM Trade Executor",
+            type: COMPONENT_TYPES.EVM_TRADE_EXECUTOR,
+            inputMode: evmSchema.inputMode,
+            outputMode: evmSchema.outputMode,
+            icon: evmSchema.icon,
+            style: evmSchema.style,
             position: { x: 700, y: 200 },
-            data: {
-              name: "Trade Executor",
-              maxAmountPerTx: 1000,
-              minAmountPerTx: 10,
-              slippagePercent: 1.0,
+            config: {
+              rpcEndpoint: "https://mainnet.infura.io/v3/your-key",
+              privateKey: "0x...",
               vaultAddress: "0x742d35Cc6639C0532fEb5003f13A1234567890ab",
-              targetChain: "ethereum",
-              status: "idle",
+              dexAddress: "0x...",
+              tradingPairs: ["ETH/USDT"],
+              maxAmount: 1000,
+              minAmount: 10,
+              slippagePercent: 1.0,
             },
-            inputs: ["strategy"],
-            outputs: ["tx_result"],
+            status: "idle",
           },
           {
             id: "collector-1",
-            type: "collector",
+            name: "Result Collector",
+            type: COMPONENT_TYPES.BINANCE_RESULT_COLLECTOR,
+            inputMode: collectorSchema.inputMode,
+            outputMode: collectorSchema.outputMode,
+            icon: collectorSchema.icon,
+            style: collectorSchema.style,
             position: { x: 900, y: 200 },
-            data: {
-              name: "Result Collector",
+            config: {
               monitorDuration: 30,
-              successCriteria: {
-                minProfitPercent: 0.5,
-                maxSlippagePercent: 2.0,
-              },
-              status: "idle",
             },
-            inputs: ["tx_result"],
-            outputs: ["report"],
+            status: "idle",
           },
           {
             id: "end-1",
-            type: "end",
+            name: "End",
+            type: COMPONENT_TYPES.END,
+            inputMode: endSchema.inputMode,
+            outputMode: endSchema.outputMode,
+            icon: endSchema.icon,
+            style: endSchema.style,
             position: { x: 1100, y: 200 },
-            data: { name: "End" },
-            inputs: ["report"],
-            outputs: [],
+            config: {},
+            status: "idle",
           },
         ],
         connections: [
           {
             id: "conn-1",
             source: "start-1",
-            target: "listener-1",
-            sourceOutput: "trigger",
-            targetInput: "trigger",
+            target: "twitter-1",
           },
           {
             id: "conn-2",
-            source: "listener-1",
-            target: "evaluator-1",
-            sourceOutput: "data",
-            targetInput: "data",
+            source: "twitter-1",
+            target: "ai-1",
           },
           {
             id: "conn-3",
-            source: "evaluator-1",
-            target: "executor-1",
-            sourceOutput: "strategy",
-            targetInput: "strategy",
+            source: "ai-1",
+            target: "evm-1",
           },
           {
             id: "conn-4",
-            source: "executor-1",
+            source: "evm-1",
             target: "collector-1",
-            sourceOutput: "tx_result",
-            targetInput: "tx_result",
           },
           {
             id: "conn-5",
             source: "collector-1",
             target: "end-1",
-            sourceOutput: "report",
-            targetInput: "report",
           },
         ],
         status: "draft",
         createdAt: new Date("2024-01-15"),
-        lastRun: new Date("2024-01-16"),
       },
     ];
 
@@ -160,15 +175,15 @@ export class MockApiService implements ApiService {
             status: "success",
             logs: ["Started workflow execution"],
           },
-          "listener-1": {
+          "twitter-1": {
             status: "success",
             logs: ["Fetched 5 tweets from @elonmusk", "Sentiment: Bullish"],
           },
-          "evaluator-1": {
+          "ai-1": {
             status: "success",
             logs: ["AI Analysis: BUY signal", "Confidence: 0.85"],
           },
-          "executor-1": {
+          "evm-1": {
             status: "success",
             logs: ["Trade executed: 0.5 ETH", "TX: 0xabc123..."],
           },
@@ -193,15 +208,15 @@ export class MockApiService implements ApiService {
             status: "success",
             logs: ["Started workflow execution"],
           },
-          "listener-1": {
+          "twitter-1": {
             status: "success",
             logs: ["Fetched 3 tweets from @VitalikButerin"],
           },
-          "evaluator-1": {
+          "ai-1": {
             status: "success",
             logs: ["AI Analysis: SELL signal", "Confidence: 0.75"],
           },
-          "executor-1": {
+          "evm-1": {
             status: "failed",
             logs: [
               "Trade failed: Insufficient liquidity",
@@ -289,8 +304,14 @@ export class MockApiService implements ApiService {
       provider,
     };
 
+    const mockToken = "mock-jwt-token";
+    const mockPermissions = ['read:workflows', 'write:workflows', 'execute:trades', 'view:notifications', 'admin:system'];
+    
+    // Store encrypted user session
+    authStorage.storeUserSession(this.currentUser, mockToken, mockPermissions);
+
     return {
-      token: "mock-jwt-token",
+      token: mockToken,
       user: this.currentUser,
     };
   }
@@ -298,10 +319,24 @@ export class MockApiService implements ApiService {
   async logout() {
     await new Promise((resolve) => setTimeout(resolve, 500));
     this.currentUser = null;
+    authStorage.clearUserSession();
   }
 
   async getCurrentUser() {
-    return this.currentUser;
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    
+    // First check local encrypted storage
+    const cachedUser = authStorage.getCurrentUser();
+    if (cachedUser && authStorage.isSessionValid()) {
+      // Extend session on active use
+      authStorage.extendSession();
+      this.currentUser = cachedUser;
+      return cachedUser;
+    }
+    
+    // If no valid cached session, return null (user needs to login)
+    this.currentUser = null;
+    return null;
   }
 
   async getWorkflows() {
