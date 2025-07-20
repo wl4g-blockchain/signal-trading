@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Github, Loader, Sun, Moon } from 'lucide-react';
-import { serviceManager } from '../../services';
+import { apiServiceFacade } from '../../services';
 import { User } from '../../types';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -22,7 +22,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
     setError(null);
 
     try {
-      const result = await serviceManager.getService().login('google');
+      const result = await apiServiceFacade.getService().login('google');
       await Promise.resolve(onLogin(result.user as User));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');

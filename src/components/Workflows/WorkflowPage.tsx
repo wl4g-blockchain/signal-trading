@@ -7,7 +7,7 @@ import { WorkflowRunCanvas } from './WorkflowRunCanvas';
 import { ComponentPalette, ComponentPaletteCollapsed } from './ComponentPalette';
 import { WorkflowList } from './WorkflowList';
 import { Play, Pause, Save, Settings, ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
-import { serviceManager } from '../../services';
+import { apiServiceFacade } from '../../services';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
 
@@ -69,7 +69,7 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({ readOnlyMode, readOn
   const loadWorkflowForEdit = async (workflowId: string) => {
     try {
       console.log('🔄 Fetching workflow data for edit:', workflowId);
-      const workflow = await serviceManager.getService().getWorkflow(workflowId);
+      const workflow = await apiServiceFacade.getService().getWorkflow(workflowId);
       console.log('✅ Workflow data loaded:', workflow);
 
       setWorkflowId(workflow.id);
@@ -318,7 +318,7 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({ readOnlyMode, readOn
         ...workflow,
         id: workflowId || '',
       };
-      const savedWorkflow = await serviceManager.getService().saveWorkflow(workflowToSave);
+      const savedWorkflow = await apiServiceFacade.getService().saveWorkflow(workflowToSave);
       setWorkflowId(savedWorkflow.id);
 
       console.log('✅ Workflow saved successfully');
@@ -347,7 +347,7 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({ readOnlyMode, readOn
 
     setRunning(true);
     try {
-      await serviceManager.getService().runWorkflow(workflowId);
+      await apiServiceFacade.getService().runWorkflow(workflowId);
       setIsRunning(true);
       console.log('✅ Workflow started successfully');
       alert('Workflow started successfully!');

@@ -5,7 +5,7 @@ import { WorkflowPage } from './components/Workflows/WorkflowPage';
 import { LiveDashboard } from './components/Dashboard/Dashboard';
 import { Settings } from './components/Settings/Settings';
 import { User, Workflow } from './types';
-import { serviceManager } from './services';
+import { apiServiceFacade } from './services';
 
 function App() {
   const [currentView, setCurrentView] = useState('monitor');
@@ -21,13 +21,13 @@ function App() {
     // Check if user is already logged in
     const checkAuth = async () => {
       try {
-        const currentUser = await serviceManager.getService().getCurrentUser() as User;
+        const currentUser = await apiServiceFacade.getService().getCurrentUser() as User;
         if (currentUser) {
           setUser(currentUser);
           
           // Auto-fetch notifications after successful authentication
           try {
-            await serviceManager.getService().getNotifications();
+            await apiServiceFacade.getService().getNotifications();
             console.log('Initial notifications loaded successfully');
           } catch (notificationError) {
             console.error('Failed to load initial notifications:', notificationError);
@@ -119,7 +119,7 @@ function App() {
     
     // Auto-fetch notifications after successful login
     try {
-      await serviceManager.getService().getNotifications();
+      await apiServiceFacade.getService().getNotifications();
       console.log('Initial notifications loaded after login');
     } catch (notificationError) {
       console.error('Failed to load initial notifications after login:', notificationError);
@@ -128,7 +128,7 @@ function App() {
 
   const handleLogout = async () => {
     try {
-      await serviceManager.getService().logout();
+      await apiServiceFacade.getService().logout();
       setUser(null);
     } catch (error) {
       console.error('Logout failed:', error);
@@ -140,10 +140,10 @@ function App() {
     setLoadingReadOnlyWorkflow(true);
     try {
       // Load workflow run details
-      const run = await serviceManager.getService().getWorkflowRun(runId);
+      const run = await apiServiceFacade.getService().getWorkflowRun(runId);
       console.log('📊 Workflow run loaded:', run);
       
-      const workflow = await serviceManager.getService().getWorkflow(run.workflowId);
+      const workflow = await apiServiceFacade.getService().getWorkflow(run.workflowId);
       console.log('🏗️ Workflow loaded:', workflow);
       
       // Create a read-only version of the workflow with run states

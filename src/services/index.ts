@@ -1,12 +1,12 @@
-import { ApiService } from "./api_service";
-import { HttpApiService } from "./http_service";
-import { MockApiService } from "./mock_service";
+import { ApiService } from './APIService';
+import { HttpApiService } from './HttpService';
+import { MockApiService } from './MockService';
 
-export type ApiType = "MOCK" | "API";
+export type ApiType = 'MOCK' | 'API';
 
-class ServiceManager {
+class APIServiceFacade {
   private currentService: ApiService;
-  private apiType: ApiType = "MOCK";
+  private apiType: ApiType = 'MOCK';
 
   constructor() {
     this.currentService = new MockApiService();
@@ -15,10 +15,10 @@ class ServiceManager {
   switchService(type: ApiType) {
     this.apiType = type;
     switch (type) {
-      case "API":
+      case 'API':
         this.currentService = new HttpApiService();
         break;
-      case "MOCK":
+      case 'MOCK':
       default:
         this.currentService = new MockApiService();
         break;
@@ -34,5 +34,5 @@ class ServiceManager {
   }
 }
 
-export const serviceManager = new ServiceManager();
-export type { ApiService } from "./api_service";
+export const apiServiceFacade = new APIServiceFacade();
+export type { ApiService } from './APIService';

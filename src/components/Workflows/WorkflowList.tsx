@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Workflow, WorkflowRun } from '../../types';
-import { serviceManager } from '../../services';
+import { apiServiceFacade } from '../../services';
 import { Play, History, ArrowLeft, Calendar, DollarSign } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
@@ -33,7 +33,7 @@ export const WorkflowList: React.FC<WorkflowListProps> = ({ initialWorkflowId, r
   const loadWorkflowPage = async () => {
     setLoading(true);
     try {
-      const data = await serviceManager.getService().getWorkflows();
+      const data = await apiServiceFacade.getService().getWorkflows();
       setWorkflowPage(data);
     } catch (error) {
       console.error('Failed to load workflows:', error);
@@ -45,9 +45,9 @@ export const WorkflowList: React.FC<WorkflowListProps> = ({ initialWorkflowId, r
   const loadWorkflowRuns = async (workflowId: string) => {
     setLoading(true);
     try {
-      const runs = await serviceManager.getService().getWorkflowRuns(workflowId);
+      const runs = await apiServiceFacade.getService().getWorkflowRuns(workflowId);
       // Also get workflow name for display
-      const workflow = await serviceManager.getService().getWorkflow(workflowId);
+      const workflow = await apiServiceFacade.getService().getWorkflow(workflowId);
       setWorkflowRuns(runs);
       setCurrentWorkflowName(workflow.name);
       setView('runs');
@@ -76,7 +76,7 @@ export const WorkflowList: React.FC<WorkflowListProps> = ({ initialWorkflowId, r
     try {
       // Use the same navigation approach as Dashboard/notifications to ensure page consistency
       // Trigger global workflow run navigation event
-      const run = await serviceManager.getService().getWorkflowRun(runId);
+      const run = await apiServiceFacade.getService().getWorkflowRun(runId);
       const event = new CustomEvent('navigate-to-workflow-run', {
         detail: { workflowId: run.workflowId, runId: runId },
       });

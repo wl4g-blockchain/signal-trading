@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { BarChart3, Settings, Activity, LogOut, User, ChevronLeft, ChevronRight } from 'lucide-react';
-import { serviceManager } from '../services';
+import { apiServiceFacade } from '../services';
 import { User as UserType } from '../types';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
@@ -55,7 +55,7 @@ export const Layout: React.FC<LayoutProps> = ({
     console.log('🔔 Fetching notifications...');
     setNotificationsLoading(true);
     try {
-      const data = await serviceManager.getService().getNotifications();
+      const data = await apiServiceFacade.getService().getNotifications();
       console.log('✅ Notifications loaded:', data.length, 'notifications');
       setNotifications(data);
     } catch (error) {
@@ -68,7 +68,7 @@ export const Layout: React.FC<LayoutProps> = ({
   // Mark notification as read
   const handleMarkAsRead = async (notificationId: string) => {
     try {
-      await serviceManager.getService().markNotificationAsRead(notificationId);
+      await apiServiceFacade.getService().markNotificationAsRead(notificationId);
       setNotifications(prev => prev.map(notif => (notif.id === notificationId ? { ...notif, read: true } : notif)));
     } catch (error) {
       console.error('Failed to mark notification as read:', error);
@@ -78,7 +78,7 @@ export const Layout: React.FC<LayoutProps> = ({
   // Mark all notifications as read
   const handleMarkAllAsRead = async () => {
     try {
-      await serviceManager.getService().markAllNotificationsAsRead();
+      await apiServiceFacade.getService().markAllNotificationsAsRead();
       setNotifications(prev => prev.map(notif => ({ ...notif, read: true })));
     } catch (error) {
       console.error('Failed to mark all notifications as read:', error);
@@ -251,12 +251,12 @@ export const Layout: React.FC<LayoutProps> = ({
                 <span>API Mode:</span>
                 <span
                   className={`px-2 py-1 rounded text-xs font-medium ${
-                    serviceManager.getCurrentApiType() === 'MOCK'
+                    apiServiceFacade.getCurrentApiType() === 'MOCK'
                       ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300'
                       : 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
                   }`}
                 >
-                  {serviceManager.getCurrentApiType()}
+                  {apiServiceFacade.getCurrentApiType()}
                 </span>
               </div>
             </div>

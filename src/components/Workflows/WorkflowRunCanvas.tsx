@@ -5,7 +5,7 @@ import { ConnectionLine } from './ConnectionLine';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { Edit } from 'lucide-react';
-import { serviceManager } from '../../services';
+import { apiServiceFacade } from '../../services';
 
 interface WorkflowRunCanvasProps {
   nodes: ComponentNode[];
@@ -70,7 +70,7 @@ export const WorkflowRunCanvas: React.FC<WorkflowRunCanvasProps> = ({ nodes, con
         const runId = urlParams.get('runId') || 'run-1';
 
         console.log('📋 Fetching logs for runId:', runId, 'nodeId:', nodeId);
-        const logs = await serviceManager.getService().getWorkflowRunLogs(runId, nodeId);
+        const logs = await apiServiceFacade.getService().getWorkflowRunLogs(runId, nodeId);
         console.log('✅ Logs loaded:', logs);
         setNodeLogs(logs);
       } catch (error) {
