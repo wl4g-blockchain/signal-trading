@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { ComponentType, ComponentSchema } from '../../types';
 import { Plus } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
+import { useTranslation } from 'react-i18next';
 import { COMPONENT_CATEGORIES } from '../../types/WorkflowTypes';
 import { getComponentsByCategory } from '../../types/ComponentRegistry';
+import { getComponentLocalizedName, getCategoryLocalizedName, getComponentLocalizedDescription } from '../../utils/i18nUtils';
 
 // Get component categories configuration for UI
 const getComponentCategories = () => {
@@ -20,28 +22,12 @@ interface ComponentPaletteProps {
 
 export const ComponentPalette: React.FC<ComponentPaletteProps> = ({ onAddNode }) => {
   const { isDark } = useTheme();
+  const { t, i18n } = useTranslation();
   const categories = getComponentCategories();
 
   return (
     <div className="flex-1 p-4 overflow-y-auto">
-      <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>Component Palette</h3>
-
-      {/* Connection Rules - Updated for new workflow */}
-      <div className={`mb-6 p-3 ${isDark ? 'bg-gray-700' : 'bg-white border border-gray-200'} rounded-lg`}>
-        <h4 className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'} mb-2 text-sm`}>Connection Rules</h4>
-        <div className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'} space-y-1`}>
-          <p>• Start → Data Sources</p>
-          <p>• Data Sources → AI Analysis</p>
-          <p>• AI Analysis → Trade Executors</p>
-          <p>• Trade Executors → Result Collectors</p>
-          <p>• Result Collectors → End</p>
-        </div>
-        <div className={`mt-2 text-xs ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>
-          <p>💡 Hover over components to see details</p>
-          <p>🖱️ Right-click and drag to connect components</p>
-          <p>🔍 Mouse wheel to zoom canvas</p>
-        </div>
-      </div>
+      <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>{t('workflow.componentPalette')}</h3>
 
       {/* Component Categories */}
       <div className="space-y-4">
@@ -51,7 +37,7 @@ export const ComponentPalette: React.FC<ComponentPaletteProps> = ({ onAddNode })
             className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'} border rounded-lg p-3`}
           >
             <h4 className={`font-semibold text-sm ${isDark ? 'text-white' : 'text-gray-900'} mb-3 flex items-center`}>
-              {category.title}
+              {getCategoryLocalizedName(category.components[0], i18n.language)}
               <span className={`ml-2 px-2 py-0.5 text-xs ${isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-600'} rounded`}>
                 {category.components.length}
               </span>
@@ -70,18 +56,22 @@ export const ComponentPalette: React.FC<ComponentPaletteProps> = ({ onAddNode })
                     <div className="flex items-center justify-between mb-1">
                       <div className="flex items-center space-x-2">
                         <Icon className={`w-6 h-6 ${isDark ? 'text-gray-300' : 'text-gray-600'}`} />
-                        <h5 className={`font-medium text-xs ${isDark ? 'text-white' : 'text-gray-900'}`}>{schema.name}</h5>
+                        <h5 className={`font-medium text-xs ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                          {getComponentLocalizedName(schema, i18n.language)}
+                        </h5>
                       </div>
                       <button
                         onClick={() => onAddNode(schema.type)}
                         className={`p-1 rounded ${schema.style.color} ${schema.style.hoverColor} text-white transition-all duration-200 hover:scale-105 active:scale-95`}
-                        title={`Create ${schema.name}`}
+                        title={`Create ${getComponentLocalizedName(schema, i18n.language)}`}
                       >
                         <Plus className="w-3 h-3" />
                       </button>
                     </div>
 
-                    <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'} leading-relaxed`}>{schema.description}</p>
+                    <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'} leading-relaxed`}>
+                      {getComponentLocalizedDescription(schema, i18n.language)}
+                    </p>
                   </div>
                 );
               })}
@@ -149,7 +139,7 @@ export const ComponentPaletteCollapsed: React.FC<ComponentPaletteCollapsedProps>
               } rounded-lg flex items-center justify-center transition-all duration-200 shadow-sm hover:shadow-lg hover:scale-110 active:scale-95 ${
                 readOnlyMode ? 'opacity-50' : ''
               }`}
-              aria-label={`Add ${schema.name} node`}
+              aria-label={`Add ${getComponentLocalizedName(schema, 'en')} node`}
             >
               <Icon className="w-5 h-5 text-white transition-transform group-hover:scale-105" />
             </button>
@@ -182,9 +172,11 @@ export const ComponentPaletteCollapsed: React.FC<ComponentPaletteCollapsedProps>
               <>
                 <div className="font-semibold text-xs mb-1 flex items-center gap-2">
                   <Icon className="w-4 h-4" />
-                  {schema.name}
+                  {getComponentLocalizedName(schema, 'en')}
                 </div>
-                <div className={`text-xs leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>{schema.description}</div>
+                <div className={`text-xs leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                  {getComponentLocalizedDescription(schema, 'en')}
+                </div>
                 {/* Arrow pointer pointing right */}
                 <div
                   className={`absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 border-t-[6px] border-b-[6px] border-l-[6px] ${

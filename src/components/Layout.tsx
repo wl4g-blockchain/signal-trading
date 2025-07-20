@@ -1,10 +1,10 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { BarChart3, Settings, Activity, LogOut, User, ChevronLeft, ChevronRight } from 'lucide-react';
 import { apiServiceFacade } from '../services';
 import { User as UserType } from '../types';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
-import { useLanguage } from '../contexts/LanguageContext';
+import { useLanguage } from '../hooks/useLanguage';
 import { SigTradingIcon } from './SigTradingIcon';
 
 interface LayoutProps {
@@ -48,11 +48,13 @@ export const Layout: React.FC<LayoutProps> = ({
     workflowRunId?: string;
   }>>([]);
   const [notificationsLoading, setNotificationsLoading] = useState(false);
+  const loadingRef = useRef(false);
 
   // Fetch notification data
   const fetchNotifications = useCallback(async () => {
-    if (notificationsLoading) return;
+    if (loadingRef.current) return;
     console.log('🔔 Fetching notifications...');
+    loadingRef.current = true;
     setNotificationsLoading(true);
     try {
       const data = await apiServiceFacade.getService().getNotifications();
@@ -61,9 +63,10 @@ export const Layout: React.FC<LayoutProps> = ({
     } catch (error) {
       console.error('❌ Failed to fetch notifications:', error);
     } finally {
+      loadingRef.current = false;
       setNotificationsLoading(false);
     }
-  }, [notificationsLoading]);
+  }, []);
 
   // Mark notification as read
   const handleMarkAsRead = async (notificationId: string) => {
@@ -354,24 +357,25 @@ export const Layout: React.FC<LayoutProps> = ({
                 <div
                   className={`absolute right-0 mt-2 w-96 ${
                     isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-                  } rounded-lg shadow-xl border max-h-96 overflow-hidden z-50`}
+                  } rounded-lg shadow-xl border z-50 flex flex-col`}
+                  style={{ maxHeight: '24rem' }}
                 >
                   {/* Header */}
                   <div className={`px-4 py-3 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'} flex items-center justify-between`}>
                     <div className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('navigation.notifications')}</div>
                     {unreadCount > 0 && (
                       <div className={`text-xs px-2 py-1 rounded-full ${isDark ? 'bg-blue-600 text-blue-100' : 'bg-blue-100 text-blue-700'}`}>
-                        {unreadCount} unread notifications
+                        {unreadCount} {t('notifications.unreadCount')}
                       </div>
                     )}
                   </div>
 
                   {/* Notification List */}
-                  <div className="max-h-80 overflow-y-auto">
+                  <div className="flex-1 overflow-y-auto" style={{ maxHeight: '16rem' }}>
                     {notificationsLoading ? (
                       <div className={`px-4 py-8 text-center ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                         <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-                        <p className="text-sm">Loading notifications...</p>
+                        <p className="text-sm">{t('notifications.loading')}</p>
                       </div>
                     ) : notifications.length > 0 ? (
                       notifications.map(notification => (
@@ -422,13 +426,13 @@ export const Layout: React.FC<LayoutProps> = ({
                     ) : (
                       <div className={`px-4 py-8 text-center ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                         <div className="text-3xl mb-2">🔔</div>
-                        <p className="text-sm">No notifications</p>
+                        <p className="text-sm">{t('notifications.noNotifications')}</p>
                       </div>
                     )}
                   </div>
 
                   {/* Footer */}
-                  <div className={`px-4 py-3 border-t ${isDark ? 'border-gray-700' : 'border-gray-200'} flex items-center justify-between`}>
+                  <div className={`px-4 py-3 border-t ${isDark ? 'border-gray-700' : 'border-gray-200'} flex items-center justify-between flex-shrink-0`}>
                     <button
                       onClick={handleMarkAllAsRead}
                       disabled={unreadCount === 0 || notificationsLoading}
@@ -440,13 +444,13 @@ export const Layout: React.FC<LayoutProps> = ({
                           : 'text-gray-400 cursor-not-allowed'
                       } transition-colors`}
                     >
-                      Mark all as read
+                      {t('notifications.markAllAsRead')}
                     </button>
                     <button
                       onClick={() => setShowNotifications(false)}
                       className={`text-sm ${isDark ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-500'} transition-colors`}
                     >
-                      Close
+                      {t('common.close')}
                     </button>
                   </div>
                 </div>

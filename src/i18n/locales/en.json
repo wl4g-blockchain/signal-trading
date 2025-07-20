@@ -161,5 +161,11 @@
       "okx": "OKX",
       "coinbase": "Coinbase"
     }
+  },
+  "notifications": {
+    "markAllAsRead": "Mark all as read",
+    "loading": "Loading notifications...",
+    "noNotifications": "No notifications",
+    "unreadCount": "unread notifications"
   }
-} 
+}

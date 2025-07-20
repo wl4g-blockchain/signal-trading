@@ -527,13 +527,8 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({ readOnlyMode, readOn
 
           {rightPanelCollapsed ? (
             <div className="flex flex-col items-center h-full overflow-visible" style={{ zIndex: 1 }}>
-              <div className="p-2 flex flex-col items-center mt-16 flex-shrink-0">
-                <div className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'} mb-3 writing-mode-vertical text-center`}>COMs</div>
-                <div className={`w-8 h-px ${isDark ? 'bg-gray-600' : 'bg-gray-300'} mb-3`}></div>
-              </div>
-
               {/* Scrollable component container - Fixed overflow to allow tooltips */}
-              <div className="flex-1 overflow-y-auto overflow-x-visible p-2 w-full relative" style={{ zIndex: 1 }}>
+              <div className="flex-1 overflow-y-auto overflow-x-visible p-2 w-full relative mt-16" style={{ zIndex: 1 }}>
                 <div className="space-y-2 flex flex-col items-center">
                   <ComponentPaletteCollapsed onAddNode={addNode} readOnlyMode={false} isDark={isDark} t={t} />
                 </div>

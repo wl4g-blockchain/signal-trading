@@ -340,7 +340,7 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({ node, onSave, 
     );
   };
 
-  const renderEvaluatorConfig = () => {
+  const renderAIEvaluatorConfig = () => {
     return (
       <div className="space-y-4">
         <div>
@@ -410,7 +410,7 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({ node, onSave, 
     );
   };
 
-  const renderExecutorConfig = () => {
+  const renderDexExecutorConfig = () => {
     const currentVaultAddress = getVaultAddress(config.rpcEndpoint || 'mainnet', config.customVaultAddress);
 
     // Get available DEX options based on selected chain
@@ -843,72 +843,6 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({ node, onSave, 
     );
   };
 
-  const renderCollectorConfig = () => {
-    return (
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Monitor Duration (minutes)</label>
-          <input
-            type="number"
-            value={config.monitorDuration || 30}
-            onChange={e => setConfig({ ...config, monitorDuration: Number(e.target.value) })}
-            className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
-            min="1"
-            max="1440"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Check Interval (seconds)</label>
-          <input
-            type="number"
-            value={config.checkInterval || 30}
-            onChange={e => setConfig({ ...config, checkInterval: Number(e.target.value) })}
-            className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
-            min="5"
-            max="300"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Success Criteria</label>
-          <div className="space-y-2">
-            <div>
-              <label className="block text-xs text-gray-400 mb-1">Min Profit Percentage</label>
-              <input
-                type="number"
-                step="0.1"
-                value={config.minProfitPercent || 0.5}
-                onChange={e => setConfig({ ...config, minProfitPercent: Number(e.target.value) })}
-                className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-xs text-gray-400 mb-1">Max Slippage Percentage</label>
-              <input
-                type="number"
-                step="0.1"
-                value={config.maxSlippagePercent || 2.0}
-                onChange={e => setConfig({ ...config, maxSlippagePercent: Number(e.target.value) })}
-                className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
-              />
-            </div>
-          </div>
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Database Update Settings</label>
-          <div className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              checked={config.updateDatabase !== false}
-              onChange={e => setConfig({ ...config, updateDatabase: e.target.checked })}
-              className="rounded"
-            />
-            <span className="text-sm text-gray-300">Update workflow run record in PostgreSQL</span>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   const renderCexExecutorConfig = () => {
     const exchangeOptions = [
       { value: 'binance', label: 'Binance', enabled: true },
@@ -1120,6 +1054,72 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({ node, onSave, 
     );
   };
 
+  const renderCollectorConfig = () => {
+    return (
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Monitor Duration (minutes)</label>
+          <input
+            type="number"
+            value={config.monitorDuration || 30}
+            onChange={e => setConfig({ ...config, monitorDuration: Number(e.target.value) })}
+            className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+            min="1"
+            max="1440"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Check Interval (seconds)</label>
+          <input
+            type="number"
+            value={config.checkInterval || 30}
+            onChange={e => setConfig({ ...config, checkInterval: Number(e.target.value) })}
+            className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+            min="5"
+            max="300"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Success Criteria</label>
+          <div className="space-y-2">
+            <div>
+              <label className="block text-xs text-gray-400 mb-1">Min Profit Percentage</label>
+              <input
+                type="number"
+                step="0.1"
+                value={config.minProfitPercent || 0.5}
+                onChange={e => setConfig({ ...config, minProfitPercent: Number(e.target.value) })}
+                className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-400 mb-1">Max Slippage Percentage</label>
+              <input
+                type="number"
+                step="0.1"
+                value={config.maxSlippagePercent || 2.0}
+                onChange={e => setConfig({ ...config, maxSlippagePercent: Number(e.target.value) })}
+                className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+          </div>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Database Update Settings</label>
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={config.updateDatabase !== false}
+              onChange={e => setConfig({ ...config, updateDatabase: e.target.checked })}
+              className="rounded"
+            />
+            <span className="text-sm text-gray-300">Update workflow run record in PostgreSQL</span>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const renderConfigContent = () => {
     switch (node.type) {
       case COMPONENT_TYPES.TWITTER_EXTRACTOR:
@@ -1130,11 +1130,11 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({ node, onSave, 
       case COMPONENT_TYPES.COINMARKET_EXTRACTOR:
         return renderListenerConfig();
       case COMPONENT_TYPES.AI_EVALUATOR:
-        return renderEvaluatorConfig();
+        return renderAIEvaluatorConfig();
       case COMPONENT_TYPES.EVM_TRADE_EXECUTOR:
       case COMPONENT_TYPES.BITCOIN_TRADE_EXECUTOR:
       case COMPONENT_TYPES.SOLANA_TRADE_EXECUTOR:
-        return renderExecutorConfig();
+        return renderDexExecutorConfig();
       case COMPONENT_TYPES.BINANCE_TRADE_EXECUTOR:
       case COMPONENT_TYPES.OKX_TRADE_EXECUTOR:
         return renderCexExecutorConfig();

@@ -3,7 +3,7 @@ import { Github, Loader, Sun, Moon } from 'lucide-react';
 import { apiServiceFacade } from '../../services';
 import { User } from '../../types';
 import { useTheme } from '../../contexts/ThemeContext';
-import { useLanguage } from '../../contexts/LanguageContext';
+import { useLanguage } from '../../hooks/useLanguage';
 import { useTranslation } from 'react-i18next';
 
 interface LoginPageProps {

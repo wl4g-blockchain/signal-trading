@@ -46,6 +46,7 @@ export type ComponentType = (typeof COMPONENT_TYPES)[keyof typeof COMPONENT_TYPE
 // Unified component schema interface
 export interface ComponentSchema {
   name: string;
+  nameCN: string;
   type: ComponentType;
   inputMode: ConnectionMode;
   outputMode: ConnectionMode;
@@ -57,7 +58,9 @@ export interface ComponentSchema {
     hoverColor: string;
   };
   category: string;
+  categoryCN: string;
   description: string;
+  descriptionCN: string;
   defaultConfig: Record<string, unknown>;
 }
 

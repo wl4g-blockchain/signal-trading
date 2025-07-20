@@ -9,7 +9,7 @@ import { authStorage } from "../utils/authStorage";
 
 export class HttpApiService implements ApiService {
   // TODO: setup on build or dynamic current domain?
-  private baseUrl = "/api/v1";
+  private baseUrl = "/api";
   private token: string | null = null;
 
   constructor() {

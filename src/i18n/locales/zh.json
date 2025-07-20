@@ -163,5 +163,11 @@
       "okx": "OKX",
       "coinbase": "Coinbase"
     }
+  },
+  "notifications": {
+    "markAllAsRead": "全部标记为已读",
+    "loading": "加载通知中...",
+    "noNotifications": "暂无通知",
+    "unreadCount": "条未读通知"
   }
-} 
+}
