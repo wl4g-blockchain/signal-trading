@@ -69,7 +69,7 @@ export const ComponentPalette: React.FC<ComponentPaletteProps> = ({ onAddNode })
                   >
                     <div className="flex items-center justify-between mb-1">
                       <div className="flex items-center space-x-2">
-                        <Icon className={`w-4 h-4 ${isDark ? 'text-gray-300' : 'text-gray-600'}`} />
+                        <Icon className={`w-6 h-6 ${isDark ? 'text-gray-300' : 'text-gray-600'}`} />
                         <h5 className={`font-medium text-xs ${isDark ? 'text-white' : 'text-gray-900'}`}>{schema.name}</h5>
                       </div>
                       <button
@@ -151,7 +151,7 @@ export const ComponentPaletteCollapsed: React.FC<ComponentPaletteCollapsedProps>
               }`}
               aria-label={`Add ${schema.name} node`}
             >
-              <Icon className="w-4 h-4 text-white transition-transform group-hover:scale-105" />
+              <Icon className="w-5 h-5 text-white transition-transform group-hover:scale-105" />
             </button>
           </div>
         );
@@ -181,7 +181,7 @@ export const ComponentPaletteCollapsed: React.FC<ComponentPaletteCollapsedProps>
             return (
               <>
                 <div className="font-semibold text-xs mb-1 flex items-center gap-2">
-                  <Icon className="w-3 h-3" />
+                  <Icon className="w-4 h-4" />
                   {schema.name}
                 </div>
                 <div className={`text-xs leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>{schema.description}</div>

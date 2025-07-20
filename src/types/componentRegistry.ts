@@ -1,6 +1,6 @@
 // Component Registry with unified schemas
 import { Play, Square } from 'lucide-react';
-import { ComponentSchema, ComponentType, COMPONENT_TYPES } from './WorkflowTypes';
+import { ComponentSchema, ComponentType, COMPONENT_TYPES, COMPONENT_CATEGORIES } from './WorkflowTypes';
 import {
   BinanceLogo,
   OKXLogo,
@@ -451,5 +451,13 @@ export const canConnect = (sourceType: ComponentType, targetType: ComponentType)
 };
 
 export const getComponentsByCategory = (category: string): ComponentSchema[] => {
-  return Object.values(COMPONENT_REGISTRY).filter(schema => schema.category === category);
+  const categoryConfig = COMPONENT_CATEGORIES[category as keyof typeof COMPONENT_CATEGORIES];
+  if (!categoryConfig) {
+    return Object.values(COMPONENT_REGISTRY).filter(schema => schema.category === category);
+  }
+  
+  // Return components in the order defined in COMPONENT_CATEGORIES
+  return categoryConfig.types
+    .map((type: ComponentType) => COMPONENT_REGISTRY[type])
+    .filter(Boolean);
 };

@@ -58,7 +58,7 @@ export interface ComponentSchema {
   };
   category: string;
   description: string;
-  defaultConfig: Record<string, any>;
+  defaultConfig: Record<string, unknown>;
 }
 
 // Component node interface for workflow
@@ -74,14 +74,14 @@ export interface ComponentNode {
     hoverColor: string;
   };
   position: Position;
-  config: Record<string, any>;
+  config: Record<string, unknown>;
   status?: 'idle' | 'running' | 'success' | 'error';
   runStatus?: 'queued' | 'running' | 'success' | 'failed';
   runLogs?: Array<{
     timestamp: string;
     level: 'info' | 'warn' | 'error';
     message: string;
-    data?: any;
+    data?: unknown;
   }>;
   readonly?: boolean;
 }
@@ -103,7 +103,7 @@ export interface Workflow {
   status: 'draft' | 'running' | 'paused' | 'completed' | 'error';
   createdAt: Date;
   updatedAt?: Date;
-  config?: Record<string, any>;
+  config?: Record<string, unknown>;
 }
 
 // Component categories for UI organization
@@ -127,6 +127,17 @@ export const COMPONENT_CATEGORIES = {
     name: 'AI Analysis',
     types: [COMPONENT_TYPES.AI_EVALUATOR],
   },
+  DEX_TRADING: {
+    name: 'DEX Trading',
+    types: [
+      COMPONENT_TYPES.BITCOIN_TRADE_EXECUTOR,
+      COMPONENT_TYPES.EVM_TRADE_EXECUTOR,
+      COMPONENT_TYPES.SOLANA_TRADE_EXECUTOR,
+      COMPONENT_TYPES.BITCOIN_RESULT_COLLECTOR,
+      COMPONENT_TYPES.EVM_RESULT_COLLECTOR,
+      COMPONENT_TYPES.SOLANA_RESULT_COLLECTOR,
+    ],
+  },
   CEX_TRADING: {
     name: 'CEX Trading',
     types: [
@@ -134,17 +145,6 @@ export const COMPONENT_CATEGORIES = {
       COMPONENT_TYPES.OKX_TRADE_EXECUTOR,
       COMPONENT_TYPES.BINANCE_RESULT_COLLECTOR,
       COMPONENT_TYPES.OKX_RESULT_COLLECTOR,
-    ],
-  },
-  DEX_TRADING: {
-    name: 'DEX Trading',
-    types: [
-      COMPONENT_TYPES.BITCOIN_TRADE_EXECUTOR,
-      COMPONENT_TYPES.EVM_TRADE_EXECUTOR,
-      COMPONENT_TYPES.SOLANA_TRADE_EXECUTOR,
-      COMPONENT_TYPES.EVM_RESULT_COLLECTOR,
-      COMPONENT_TYPES.SOLANA_RESULT_COLLECTOR,
-      COMPONENT_TYPES.BITCOIN_RESULT_COLLECTOR,
     ],
   },
 };
