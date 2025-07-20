@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ComponentNode } from '../../types';
+import { COMPONENT_TYPES } from '../../types/WorkflowTypes';
 import { X, Save } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
@@ -34,10 +35,10 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({ node, onSave, 
   };
 
   // Initialize configuration with correct vault address and DEX config for executor nodes
-  const getInitialConfig = () => {
-    const baseConfig = node.data || {};
+  const getInitialConfig = (): Record<string, any> => {
+    const baseConfig = (node.config || {}) as Record<string, any>;
 
-    if (node.type === 'executor') {
+    if (node.type === COMPONENT_TYPES.EVM_TRADE_EXECUTOR) {
       const chain = baseConfig.rpcEndpoint || 'mainnet';
       const needsVaultAddress = !baseConfig.vaultAddress;
       const needsDexConfig = !baseConfig.targetDex || !baseConfig.dexAddress;
@@ -85,7 +86,7 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({ node, onSave, 
     return baseConfig;
   };
 
-  const [config, setConfig] = useState(getInitialConfig());
+  const [config, setConfig] = useState<Record<string, any>>(getInitialConfig());
 
   const handleSave = () => {
     const updatedNode = {
@@ -1121,15 +1122,27 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({ node, onSave, 
 
   const renderConfigContent = () => {
     switch (node.type) {
-      case 'listener':
+      case COMPONENT_TYPES.TWITTER_EXTRACTOR:
+      case COMPONENT_TYPES.TWITTER_STREAM:
+      case COMPONENT_TYPES.BINANCE_EXTRACTOR:
+      case COMPONENT_TYPES.BINANCE_STREAM:
+      case COMPONENT_TYPES.UNISWAP_EXTRACTOR:
+      case COMPONENT_TYPES.COINMARKET_EXTRACTOR:
         return renderListenerConfig();
-      case 'evaluator':
+      case COMPONENT_TYPES.AI_EVALUATOR:
         return renderEvaluatorConfig();
-      case 'executor':
+      case COMPONENT_TYPES.EVM_TRADE_EXECUTOR:
+      case COMPONENT_TYPES.BITCOIN_TRADE_EXECUTOR:
+      case COMPONENT_TYPES.SOLANA_TRADE_EXECUTOR:
         return renderExecutorConfig();
-      case 'cex-executor':
+      case COMPONENT_TYPES.BINANCE_TRADE_EXECUTOR:
+      case COMPONENT_TYPES.OKX_TRADE_EXECUTOR:
         return renderCexExecutorConfig();
-      case 'collector':
+      case COMPONENT_TYPES.BINANCE_RESULT_COLLECTOR:
+      case COMPONENT_TYPES.OKX_RESULT_COLLECTOR:
+      case COMPONENT_TYPES.EVM_RESULT_COLLECTOR:
+      case COMPONENT_TYPES.SOLANA_RESULT_COLLECTOR:
+      case COMPONENT_TYPES.BITCOIN_RESULT_COLLECTOR:
         return renderCollectorConfig();
       default:
         return <div className="text-gray-400">No configuration available for this node type.</div>;
@@ -1140,7 +1153,7 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({ node, onSave, 
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className={`${isDark ? 'bg-gray-800' : 'bg-white border border-gray-200'} rounded-lg p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto`}>
         <div className="flex items-center justify-between mb-6">
-          <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>Configure {node.data?.name || node.type}</h2>
+          <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>Configure: {node.name || 'Untitled'}</h2>
           <button onClick={onClose} className={`p-2 ${isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} rounded-lg transition-colors`}>
             <X className={`w-5 h-5 ${isDark ? 'text-gray-400' : 'text-gray-600'}`} />
           </button>
