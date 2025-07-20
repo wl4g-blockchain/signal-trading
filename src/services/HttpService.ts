@@ -5,7 +5,7 @@ import {
   NotificationParams,
   Notification,
 } from "../types";
-import { authStorage } from "../utils/authStorage";
+import { authStorage } from "../utils/AuthStorage";
 
 export class HttpApiService implements ApiService {
   // TODO: setup on build or dynamic current domain?

@@ -97,7 +97,11 @@
     "evaluator": "评估器",
     "executor": "执行器",
     "cexExecutor": "CEX执行器",
-    "collector": "收集器"
+    "collector": "收集器",
+    "twitterFeed": "Twitter 数据源",
+    "binanceFeed": "币安数据源",
+    "uniswapFeed": "Uniswap 数据源",
+    "coinmarketFeed": "CoinMarket 数据源"
   },
   "settings": {
     "title": "设置",
@@ -127,7 +131,22 @@
     "standard": "标准",
     "fast": "快速",
     "custom": "自定义",
-    "usageInTx": "在tx.send()中的使用"
+    "usageInTx": "在tx.send()中的使用",
+    "enableWebSocket": "启用 WebSocket 推送",
+    "enableWebSocketDescription": "启用后，数据将通过WebSocket收集并缓存到下次执行周期",
+    "pollingInterval": "轮询间隔（分钟）",
+    "cacheRetention": "缓存保留时间（分钟）",
+    "dataCollectionMode": "数据收集模式",
+    "pollingMode": "轮询模式",
+    "streamingMode": "流式模式",
+    "apiKey": "API密钥",
+    "apiSecret": "API密钥",
+    "accounts": "账户",
+    "keywords": "关键词",
+    "symbols": "交易对",
+    "tradingPairs": "交易对",
+    "timeframe": "时间框架",
+    "interval": "间隔"
   },
   "nodeRunLog": {
     "noLogs": "此节点执行无可用日志。"

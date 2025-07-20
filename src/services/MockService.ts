@@ -2,7 +2,7 @@ import { ApiService } from './APIService';
 import { Workflow, WorkflowRun, TradeRecord, NotificationParams, Notification } from '../types';
 import { COMPONENT_TYPES } from '../types/WorkflowTypes';
 import { getComponentSchema } from '../types/ComponentRegistry';
-import { authStorage } from '../utils/authStorage';
+import { authStorage } from '../utils/AuthStorage';
 
 export class MockApiService implements ApiService {
   private workflows: Workflow[] = [];
@@ -17,7 +17,8 @@ export class MockApiService implements ApiService {
   private initMockData() {
     // Mock workflows using new unified schema
     const startSchema = getComponentSchema(COMPONENT_TYPES.START);
-    const twitterSchema = getComponentSchema(COMPONENT_TYPES.TWITTER_EXTRACTOR);
+    const twitterFeedSchema = getComponentSchema(COMPONENT_TYPES.TWITTER_FEED);
+    const uniswapFeedSchema = getComponentSchema(COMPONENT_TYPES.UNISWAP_FEED);
     const aiSchema = getComponentSchema(COMPONENT_TYPES.AI_EVALUATOR);
     const evmSchema = getComponentSchema(COMPONENT_TYPES.EVM_TRADE_EXECUTOR);
     const collectorSchema = getComponentSchema(COMPONENT_TYPES.BINANCE_RESULT_COLLECTOR);
@@ -41,18 +42,37 @@ export class MockApiService implements ApiService {
             status: 'idle',
           },
           {
-            id: 'twitter-1',
-            name: 'Twitter Extractor',
-            type: COMPONENT_TYPES.TWITTER_EXTRACTOR,
-            inputMode: twitterSchema.inputMode,
-            outputMode: twitterSchema.outputMode,
-            icon: twitterSchema.icon,
-            style: twitterSchema.style,
+            id: 'twitter-feed-1',
+            name: 'Twitter Feed',
+            type: COMPONENT_TYPES.TWITTER_FEED,
+            inputMode: twitterFeedSchema.inputMode,
+            outputMode: twitterFeedSchema.outputMode,
+            icon: twitterFeedSchema.icon,
+            style: twitterFeedSchema.style,
             position: { x: 300, y: 200 },
             config: {
               apiKey: 'twitter-api-key',
               accounts: ['elonmusk', 'VitalikButerin'],
               keywords: ['ETH', 'Ethereum'],
+              enableWebSocket: false,
+              pollingInterval: 5,
+              cacheRetention: 30,
+            },
+            status: 'idle',
+          },
+          {
+            id: 'uniswap-feed-1',
+            name: 'Uniswap Feed',
+            type: COMPONENT_TYPES.UNISWAP_FEED,
+            inputMode: uniswapFeedSchema.inputMode,
+            outputMode: uniswapFeedSchema.outputMode,
+            icon: uniswapFeedSchema.icon,
+            style: uniswapFeedSchema.style,
+            position: { x: 500, y: 200 },
+            config: {
+              rpcEndpoint: 'https://eth-mainnet.alchemyapi.io/v2/your-api-key',
+              poolAddress: '0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640',
+              pollingInterval: 5,
             },
             status: 'idle',
           },
@@ -64,7 +84,7 @@ export class MockApiService implements ApiService {
             outputMode: aiSchema.outputMode,
             icon: aiSchema.icon,
             style: aiSchema.style,
-            position: { x: 500, y: 200 },
+            position: { x: 700, y: 200 },
             config: {
               model: 'deepseek-v3',
               apiKey: 'ai-api-key',
@@ -80,7 +100,7 @@ export class MockApiService implements ApiService {
             outputMode: evmSchema.outputMode,
             icon: evmSchema.icon,
             style: evmSchema.style,
-            position: { x: 700, y: 200 },
+            position: { x: 900, y: 200 },
             config: {
               rpcEndpoint: 'https://mainnet.infura.io/v3/your-key',
               privateKey: '0x...',
@@ -101,7 +121,7 @@ export class MockApiService implements ApiService {
             outputMode: collectorSchema.outputMode,
             icon: collectorSchema.icon,
             style: collectorSchema.style,
-            position: { x: 900, y: 200 },
+            position: { x: 1100, y: 200 },
             config: {
               monitorDuration: 30,
             },
@@ -115,7 +135,7 @@ export class MockApiService implements ApiService {
             outputMode: endSchema.outputMode,
             icon: endSchema.icon,
             style: endSchema.style,
-            position: { x: 1100, y: 200 },
+            position: { x: 1300, y: 200 },
             config: {},
             status: 'idle',
           },
@@ -124,25 +144,30 @@ export class MockApiService implements ApiService {
           {
             id: 'conn-1',
             source: 'start-1',
-            target: 'twitter-1',
+            target: 'twitter-feed-1',
           },
           {
             id: 'conn-2',
-            source: 'twitter-1',
-            target: 'ai-1',
+            source: 'twitter-feed-1',
+            target: 'uniswap-feed-1',
           },
           {
             id: 'conn-3',
+            source: 'uniswap-feed-1',
+            target: 'ai-1',
+          },
+          {
+            id: 'conn-4',
             source: 'ai-1',
             target: 'evm-1',
           },
           {
-            id: 'conn-4',
+            id: 'conn-5',
             source: 'evm-1',
             target: 'collector-1',
           },
           {
-            id: 'conn-5',
+            id: 'conn-6',
             source: 'collector-1',
             target: 'end-1',
           },
@@ -168,9 +193,13 @@ export class MockApiService implements ApiService {
             status: 'success',
             logs: ['Started workflow execution'],
           },
-          'twitter-1': {
+          'twitter-feed-1': {
             status: 'success',
             logs: ['Fetched 5 tweets from @elonmusk', 'Sentiment: Bullish'],
+          },
+          'uniswap-feed-1': {
+            status: 'success',
+            logs: ['Fetched 10 Uniswap trades'],
           },
           'ai-1': {
             status: 'success',
@@ -201,9 +230,13 @@ export class MockApiService implements ApiService {
             status: 'success',
             logs: ['Started workflow execution'],
           },
-          'twitter-1': {
+          'twitter-feed-1': {
             status: 'success',
             logs: ['Fetched 3 tweets from @VitalikButerin'],
+          },
+          'uniswap-feed-1': {
+            status: 'failed',
+            logs: ['Failed to fetch Uniswap trades: Insufficient data'],
           },
           'ai-1': {
             status: 'success',
@@ -414,20 +447,20 @@ export class MockApiService implements ApiService {
   async getTradeHistory(params?: Record<string, unknown>): Promise<TradeRecord[]> {
     await new Promise(resolve => setTimeout(resolve, 600));
     // Return mock trade data
-    console.log('Mock getTradeHistory called with params:', params);
+    console.debug('Mock getTradeHistory called with params:', params);
     return [];
   }
 
   async getReports(params?: Record<string, unknown>): Promise<unknown[]> {
     await new Promise(resolve => setTimeout(resolve, 500));
     // Return mock report data
-    console.log('Mock getReports called with params:', params);
+    console.debug('Mock getReports called with params:', params);
     return [];
   }
 
   async getNotifications(params?: NotificationParams): Promise<Notification[]> {
     await new Promise(resolve => setTimeout(resolve, 300));
-    console.log('Mock getNotifications called with params:', params);
+    console.debug('Mock getNotifications called with params:', params);
     return [...this.notifications];
   }
 

@@ -39,7 +39,7 @@ export async function initializeDatabase() {
     await sql`CREATE INDEX IF NOT EXISTS idx_workflow_run_start_date ON t_workflow_run(start_date);`;
     await sql`CREATE INDEX IF NOT EXISTS idx_workflow_run_state ON t_workflow_run(state);`;
 
-    console.log('Database initialized successfully');
+    console.debug('Database initialized successfully');
   } catch (error) {
     console.error('Database initialization error:', error);
   }

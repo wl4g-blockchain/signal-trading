@@ -28,13 +28,13 @@ function App() {
           // Auto-fetch notifications after successful authentication
           try {
             await apiServiceFacade.getService().getNotifications();
-            console.log('Initial notifications loaded successfully');
+            console.debug('Initial notifications loaded successfully');
           } catch (notificationError) {
             console.error('Failed to load initial notifications:', notificationError);
           }
         }
       } catch {
-        console.log('No user logged in');
+        console.debug('No user logged in');
       } finally {
         setLoading(false);
       }
@@ -46,7 +46,7 @@ function App() {
   // Listen for sidebar collapse events, workflow run navigation, and exit readonly mode
   useEffect(() => {
     const handleSidebarCollapse = (event: CustomEvent) => {
-      console.log('🔄 App: Received collapse-sidebar event:', event.detail.collapsed);
+      console.debug('🔄 App: Received collapse-sidebar event:', event.detail.collapsed);
       setSidebarCollapsed(event.detail.collapsed);
     };
 
@@ -69,7 +69,7 @@ function App() {
 
     const handleRedesignWorkflow = (event: CustomEvent) => {
       const { workflowId } = event.detail;
-      console.log('📨 App: Received redesign-workflow event:', workflowId);
+      console.debug('📨 App: Received redesign-workflow event:', workflowId);
       handleLoadWorkflowForEdit(workflowId);
     };
 
@@ -120,7 +120,7 @@ function App() {
     // Auto-fetch notifications after successful login
     try {
       await apiServiceFacade.getService().getNotifications();
-      console.log('Initial notifications loaded after login');
+      console.debug('Initial notifications loaded after login');
     } catch (notificationError) {
       console.error('Failed to load initial notifications after login:', notificationError);
     }
@@ -136,15 +136,15 @@ function App() {
   };
 
   const handleNavigateToWorkflowRun = async (workflowId: string, runId: string) => {
-    console.log('🔄 Loading workflow run:', { workflowId, runId });
+    console.debug('🔄 Loading workflow run:', { workflowId, runId });
     setLoadingReadOnlyWorkflow(true);
     try {
       // Load workflow run details
       const run = await apiServiceFacade.getService().getWorkflowRun(runId);
-      console.log('📊 Workflow run loaded:', run);
+      console.debug('📊 Workflow run loaded:', run);
       
       const workflow = await apiServiceFacade.getService().getWorkflow(run.workflowId);
-      console.log('🏗️ Workflow loaded:', workflow);
+      console.debug('🏗️ Workflow loaded:', workflow);
       
       // Create a read-only version of the workflow with run states
       const workflowWithRunStates: Workflow = {
@@ -162,7 +162,7 @@ function App() {
         }))
       };
 
-      console.log('✅ Workflow with run states created:', workflowWithRunStates);
+      console.debug('✅ Workflow with run states created:', workflowWithRunStates);
       
       setReadOnlyWorkflow(workflowWithRunStates);
       setWorkflowReadOnlyMode({ workflowId, tradeId: runId });
@@ -182,7 +182,7 @@ function App() {
 
   // Handle loading specific workflow for editing (ReDesign functionality)
   const handleLoadWorkflowForEdit = (workflowId: string) => {
-    console.log('🎯 App: Loading workflow for edit:', workflowId);
+    console.debug('🎯 App: Loading workflow for edit:', workflowId);
     setInitialWorkflowId(workflowId);
     setCurrentView('workflow'); // Switch to workflow view
     // Clear read-only mode

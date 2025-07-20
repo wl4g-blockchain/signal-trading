@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ComponentNode } from '../../types';
 import { COMPONENT_TYPES } from '../../types/WorkflowTypes';
-import { X, Save } from 'lucide-react';
+import { Save, X } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
 
@@ -35,7 +35,9 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({ node, onSave, 
   };
 
   // Initialize configuration with correct vault address and DEX config for executor nodes
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const getInitialConfig = (): Record<string, any> => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const baseConfig = (node.config || {}) as Record<string, any>;
 
     if (node.type === COMPONENT_TYPES.EVM_TRADE_EXECUTOR) {
@@ -86,6 +88,7 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({ node, onSave, 
     return baseConfig;
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [config, setConfig] = useState<Record<string, any>>(getInitialConfig());
 
   const handleSave = () => {
@@ -96,246 +99,308 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({ node, onSave, 
     onSave(updatedNode);
   };
 
-  const renderListenerConfig = () => {
-    const listenerType = config.type || 'twitter';
-
+  const renderTwitterFeedConfig = () => {
     return (
       <div className="space-y-4">
+        {/* Data Collection Mode */}
         <div>
-          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>Data Source Type</label>
+          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
+            {t('nodeConfig.dataCollectionMode')}
+          </label>
+          <div className="space-y-2">
+            <label className="flex items-center space-x-2">
+              <input
+                type="radio"
+                checked={!config.enableWebSocket}
+                onChange={() => setConfig({ ...config, enableWebSocket: false })}
+                className="text-blue-600 focus:ring-blue-500"
+              />
+              <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                {t('nodeConfig.pollingMode')} - {t('nodeConfig.pollingInterval')}: {config.pollingInterval || 5} min
+              </span>
+            </label>
+            <label className="flex items-center space-x-2">
+              <input
+                type="radio"
+                checked={config.enableWebSocket}
+                onChange={() => setConfig({ ...config, enableWebSocket: true })}
+                className="text-blue-600 focus:ring-blue-500"
+              />
+              <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                {t('nodeConfig.streamingMode')} - {t('nodeConfig.cacheRetention')}: {config.cacheRetention || 30} min
+              </span>
+            </label>
+          </div>
+          <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{t('nodeConfig.enableWebSocketDescription')}</p>
+        </div>
+
+        {/* API Configuration */}
+        <div>
+          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>{t('nodeConfig.apiKey')}</label>
+          <input
+            type="password"
+            value={config.apiKey || ''}
+            onChange={e => setConfig({ ...config, apiKey: e.target.value })}
+            className={`w-full ${
+              isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'
+            } px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
+            placeholder="Enter Twitter API Key"
+          />
+        </div>
+
+        {/* Accounts */}
+        <div>
+          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
+            {t('nodeConfig.accounts')} (comma separated)
+          </label>
+          <input
+            type="text"
+            value={config.accounts?.join(', ') || ''}
+            onChange={e =>
+              setConfig({
+                ...config,
+                accounts: e.target.value
+                  .split(',')
+                  .map(s => s.trim())
+                  .filter(s => s),
+              })
+            }
+            className={`w-full ${
+              isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'
+            } px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
+            placeholder="elonmusk, VitalikButerin, trump"
+          />
+        </div>
+
+        {/* Keywords */}
+        <div>
+          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
+            {t('nodeConfig.keywords')} (comma separated)
+          </label>
+          <input
+            type="text"
+            value={config.keywords?.join(', ') || ''}
+            onChange={e =>
+              setConfig({
+                ...config,
+                keywords: e.target.value
+                  .split(',')
+                  .map(s => s.trim())
+                  .filter(s => s),
+              })
+            }
+            className={`w-full ${
+              isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'
+            } px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
+            placeholder="ETH, Bitcoin, crypto"
+          />
+        </div>
+
+        {/* Polling Interval (only show when not using WebSocket) */}
+        {!config.enableWebSocket && (
+          <div>
+            <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
+              {t('nodeConfig.pollingInterval')}
+            </label>
+            <input
+              type="number"
+              value={config.pollingInterval || 5}
+              onChange={e => setConfig({ ...config, pollingInterval: Number(e.target.value) })}
+              className={`w-full ${
+                isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'
+              } px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
+              min="1"
+              max="60"
+            />
+          </div>
+        )}
+
+        {/* Cache Retention (only show when using WebSocket) */}
+        {config.enableWebSocket && (
+          <div>
+            <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>{t('nodeConfig.cacheRetention')}</label>
+            <input
+              type="number"
+              value={config.cacheRetention || 30}
+              onChange={e => setConfig({ ...config, cacheRetention: Number(e.target.value) })}
+              className={`w-full ${
+                isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'
+              } px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
+              min="5"
+              max="1440"
+            />
+          </div>
+        )}
+
+        {/* API URLs (readonly) */}
+        <div>
+          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>API URLs (readonly)</label>
+          <textarea
+            value="https://api.twitter.com/2/tweets/search/recent\nhttps://api.twitter.com/2/users/by/username"
+            readOnly
+            className={`w-full ${
+              isDark ? 'bg-gray-600 text-gray-300 border-gray-600' : 'bg-gray-100 text-gray-600 border-gray-300'
+            } px-3 py-2 rounded border resize-none`}
+            rows={3}
+          />
+        </div>
+      </div>
+    );
+  };
+
+  const renderBinanceFeedConfig = () => {
+    return (
+      <div className="space-y-4">
+        {/* Data Collection Mode */}
+        <div>
+          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
+            {t('nodeConfig.dataCollectionMode')}
+          </label>
+          <div className="space-y-2">
+            <label className="flex items-center space-x-2">
+              <input
+                type="radio"
+                checked={!config.enableWebSocket}
+                onChange={() => setConfig({ ...config, enableWebSocket: false })}
+                className="text-blue-600 focus:ring-blue-500"
+              />
+              <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                {t('nodeConfig.pollingMode')} - {t('nodeConfig.pollingInterval')}: {config.pollingInterval || 5} min
+              </span>
+            </label>
+            <label className="flex items-center space-x-2">
+              <input
+                type="radio"
+                checked={config.enableWebSocket}
+                onChange={() => setConfig({ ...config, enableWebSocket: true })}
+                className="text-blue-600 focus:ring-blue-500"
+              />
+              <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                {t('nodeConfig.streamingMode')} - {t('nodeConfig.cacheRetention')}: {config.cacheRetention || 30} min
+              </span>
+            </label>
+          </div>
+          <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{t('nodeConfig.enableWebSocketDescription')}</p>
+        </div>
+
+        {/* API Configuration */}
+        <div>
+          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>{t('nodeConfig.apiKey')}</label>
+          <input
+            type="password"
+            value={config.apiKey || ''}
+            onChange={e => setConfig({ ...config, apiKey: e.target.value })}
+            className={`w-full ${
+              isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'
+            } px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
+            placeholder="Enter Binance API Key"
+          />
+        </div>
+
+        <div>
+          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>{t('nodeConfig.apiSecret')}</label>
+          <input
+            type="password"
+            value={config.apiSecret || ''}
+            onChange={e => setConfig({ ...config, apiSecret: e.target.value })}
+            className={`w-full ${
+              isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'
+            } px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
+            placeholder="Enter Binance API Secret"
+          />
+        </div>
+
+        {/* Trading Pairs */}
+        <div>
+          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
+            {t('nodeConfig.symbols')} (comma separated)
+          </label>
+          <input
+            type="text"
+            value={config.symbols?.join(', ') || ''}
+            onChange={e =>
+              setConfig({
+                ...config,
+                symbols: e.target.value
+                  .split(',')
+                  .map(s => s.trim())
+                  .filter(s => s),
+              })
+            }
+            className={`w-full ${
+              isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'
+            } px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
+            placeholder="BTCUSDT, ETHUSDT, BNBUSDT"
+          />
+        </div>
+
+        {/* Timeframe */}
+        <div>
+          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>{t('nodeConfig.timeframe')}</label>
           <select
-            value={listenerType}
-            onChange={e => setConfig({ ...config, type: e.target.value })}
+            value={config.timeframe || '1h'}
+            onChange={e => setConfig({ ...config, timeframe: e.target.value })}
             className={`w-full ${
               isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'
             } px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
           >
-            <option value="twitter">Twitter</option>
-            <option value="binance">Binance</option>
-            <option value="uniswap">Uniswap</option>
-            <option value="coinmarket">CoinMarket</option>
-            <option value="custom">Custom RPC API</option>
+            <option value="1h">1 Hour</option>
+            <option value="4h">4 Hours</option>
+            <option value="6h">6 Hours</option>
+            <option value="12h">12 Hours</option>
+            <option value="24h">24 Hours</option>
+            <option value="72h">72 Hours</option>
           </select>
         </div>
 
-        {listenerType === 'twitter' && (
-          <>
-            <div>
-              <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>API Key</label>
-              <input
-                type="password"
-                value={config.apiKey || ''}
-                onChange={e => setConfig({ ...config, apiKey: e.target.value })}
-                className={`w-full ${
-                  isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'
-                } px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
-                placeholder="Enter Twitter API Key"
-              />
-            </div>
-            <div>
-              <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>Twitter IDs (comma separated)</label>
-              <input
-                type="text"
-                value={config.twitterIds || ''}
-                onChange={e => setConfig({ ...config, twitterIds: e.target.value })}
-                className={`w-full ${
-                  isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'
-                } px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
-                placeholder="elonmusk, VitalikButerin, trump"
-              />
-            </div>
-            <div>
-              <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>Interval (minutes)</label>
-              <input
-                type="number"
-                value={config.interval || 5}
-                onChange={e => setConfig({ ...config, interval: Number(e.target.value) })}
-                className={`w-full ${
-                  isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'
-                } px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
-                min="1"
-                max="60"
-              />
-            </div>
-            <div>
-              <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>API URLs (readonly)</label>
-              <textarea
-                value="https://api.twitter.com/2/tweets/search/recent\nhttps://api.twitter.com/2/users/by/username"
-                readOnly
-                className={`w-full ${
-                  isDark ? 'bg-gray-600 text-gray-300 border-gray-600' : 'bg-gray-100 text-gray-600 border-gray-300'
-                } px-3 py-2 rounded border resize-none`}
-                rows={3}
-              />
-            </div>
-          </>
+        {/* Polling Interval (only show when not using WebSocket) */}
+        {!config.enableWebSocket && (
+          <div>
+            <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
+              {t('nodeConfig.pollingInterval')}
+            </label>
+            <input
+              type="number"
+              value={config.pollingInterval || 5}
+              onChange={e => setConfig({ ...config, pollingInterval: Number(e.target.value) })}
+              className={`w-full ${
+                isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'
+              } px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
+              min="1"
+              max="60"
+            />
+          </div>
         )}
 
-        {listenerType === 'binance' && (
-          <>
-            <div>
-              <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>API Key</label>
-              <input
-                type="password"
-                value={config.apiKey || ''}
-                onChange={e => setConfig({ ...config, apiKey: e.target.value })}
-                className={`w-full ${
-                  isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'
-                } px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
-                placeholder="Enter Binance API Key"
-              />
-            </div>
-            <div>
-              <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
-                Trading Pairs (comma separated)
-              </label>
-              <input
-                type="text"
-                value={config.pairs || ''}
-                onChange={e => setConfig({ ...config, pairs: e.target.value })}
-                className={`w-full ${
-                  isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'
-                } px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
-                placeholder="BTCUSDT, ETHUSDT, BNBUSDT"
-              />
-            </div>
-            <div>
-              <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>Timeframe</label>
-              <select
-                value={config.timeframe || '1h'}
-                onChange={e => setConfig({ ...config, timeframe: e.target.value })}
-                className={`w-full ${
-                  isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'
-                } px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
-              >
-                <option value="1h">1 Hour</option>
-                <option value="4h">4 Hours</option>
-                <option value="6h">6 Hours</option>
-                <option value="12h">12 Hours</option>
-                <option value="24h">24 Hours</option>
-                <option value="72h">72 Hours</option>
-              </select>
-            </div>
-            <div>
-              <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>API URLs (readonly)</label>
-              <textarea
-                value="https://api.binance.com/api/v3/ticker/24hr\nhttps://api.binance.com/api/v3/klines"
-                readOnly
-                className={`w-full ${
-                  isDark ? 'bg-gray-600 text-gray-300 border-gray-600' : 'bg-gray-100 text-gray-600 border-gray-300'
-                } px-3 py-2 rounded border resize-none`}
-                rows={2}
-              />
-            </div>
-          </>
+        {/* Cache Retention (only show when using WebSocket) */}
+        {config.enableWebSocket && (
+          <div>
+            <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>{t('nodeConfig.cacheRetention')}</label>
+            <input
+              type="number"
+              value={config.cacheRetention || 30}
+              onChange={e => setConfig({ ...config, cacheRetention: Number(e.target.value) })}
+              className={`w-full ${
+                isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'
+              } px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
+              min="5"
+              max="1440"
+            />
+          </div>
         )}
 
-        {listenerType === 'uniswap' && (
-          <>
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Pool Addresses (comma separated)</label>
-              <input
-                type="text"
-                value={config.pools || ''}
-                onChange={e => setConfig({ ...config, pools: e.target.value })}
-                className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
-                placeholder="0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Timeframe</label>
-              <select
-                value={config.timeframe || '1h'}
-                onChange={e => setConfig({ ...config, timeframe: e.target.value })}
-                className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
-              >
-                <option value="1h">1 Hour</option>
-                <option value="4h">4 Hours</option>
-                <option value="6h">6 Hours</option>
-                <option value="12h">12 Hours</option>
-                <option value="24h">24 Hours</option>
-                <option value="72h">72 Hours</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">GraphQL Endpoint (readonly)</label>
-              <input
-                value="https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3"
-                readOnly
-                className="w-full bg-gray-600 text-gray-300 px-3 py-2 rounded border border-gray-600"
-              />
-            </div>
-          </>
-        )}
-
-        {listenerType === 'coinmarket' && (
-          <>
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">API Key</label>
-              <input
-                type="password"
-                value={config.apiKey || ''}
-                onChange={e => setConfig({ ...config, apiKey: e.target.value })}
-                className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
-                placeholder="Enter CoinMarketCap API Key"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Symbols (comma separated)</label>
-              <input
-                type="text"
-                value={config.symbols || ''}
-                onChange={e => setConfig({ ...config, symbols: e.target.value })}
-                className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
-                placeholder="BTC, ETH, BNB"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">API URL (readonly)</label>
-              <input
-                value="https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest"
-                readOnly
-                className="w-full bg-gray-600 text-gray-300 px-3 py-2 rounded border border-gray-600"
-              />
-            </div>
-          </>
-        )}
-
-        {listenerType === 'custom' && (
-          <>
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Custom API URL</label>
-              <input
-                type="url"
-                value={config.customUrl || ''}
-                onChange={e => setConfig({ ...config, customUrl: e.target.value })}
-                className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
-                placeholder="https://api.example.com/data"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Headers (JSON format)</label>
-              <textarea
-                value={config.headers || '{}'}
-                onChange={e => setConfig({ ...config, headers: e.target.value })}
-                className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
-                rows={3}
-                placeholder='{"Authorization": "Bearer token", "Content-Type": "application/json"}'
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Request Method</label>
-              <select
-                value={config.method || 'GET'}
-                onChange={e => setConfig({ ...config, method: e.target.value })}
-                className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
-              >
-                <option value="GET">GET</option>
-                <option value="POST">POST</option>
-              </select>
-            </div>
-          </>
-        )}
+        {/* API URLs (readonly) */}
+        <div>
+          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>API URLs (readonly)</label>
+          <textarea
+            value="https://api.binance.com/api/v3/ticker/24hr\nhttps://api.binance.com/api/v3/klines"
+            readOnly
+            className={`w-full ${
+              isDark ? 'bg-gray-600 text-gray-300 border-gray-600' : 'bg-gray-100 text-gray-600 border-gray-300'
+            } px-3 py-2 rounded border resize-none`}
+            rows={2}
+          />
+        </div>
       </div>
     );
   };
@@ -711,7 +776,7 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({ node, onSave, 
               type="button"
               onClick={() => {
                 // TODO: Implement authorization quota query functionality
-                console.log('Query authorization allowance');
+                console.debug('Query authorization allowance');
               }}
               className="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded"
             >
@@ -1120,15 +1185,148 @@ export const NodeConfigModal: React.FC<NodeConfigModalProps> = ({ node, onSave, 
     );
   };
 
+  const renderUniswapFeedConfig = () => {
+    return (
+      <div className="space-y-4">
+        {/* RPC Endpoint */}
+        <div>
+          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>RPC Endpoint</label>
+          <input
+            type="text"
+            value={config.rpcEndpoint || ''}
+            onChange={e => setConfig({ ...config, rpcEndpoint: e.target.value })}
+            className={`w-full ${
+              isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'
+            } px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
+            placeholder="https://eth-mainnet.alchemyapi.io/v2/your-api-key"
+          />
+        </div>
+
+        {/* Pool Address */}
+        <div>
+          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>Pool Address</label>
+          <input
+            type="text"
+            value={config.poolAddress || ''}
+            onChange={e => setConfig({ ...config, poolAddress: e.target.value })}
+            className={`w-full ${
+              isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'
+            } px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
+            placeholder="0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640"
+          />
+        </div>
+
+        {/* Polling Interval */}
+        <div>
+          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>{t('nodeConfig.pollingInterval')}</label>
+          <input
+            type="number"
+            value={config.pollingInterval || 5}
+            onChange={e => setConfig({ ...config, pollingInterval: Number(e.target.value) })}
+            className={`w-full ${
+              isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'
+            } px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
+            min="1"
+            max="60"
+          />
+        </div>
+
+        {/* GraphQL Endpoint (readonly) */}
+        <div>
+          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>GraphQL Endpoint (readonly)</label>
+          <input
+            value="https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3"
+            readOnly
+            className={`w-full ${
+              isDark ? 'bg-gray-600 text-gray-300 border-gray-600' : 'bg-gray-100 text-gray-600 border-gray-300'
+            } px-3 py-2 rounded border`}
+          />
+        </div>
+      </div>
+    );
+  };
+
+  const renderCoinMarketFeedConfig = () => {
+    return (
+      <div className="space-y-4">
+        {/* API Key */}
+        <div>
+          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>{t('nodeConfig.apiKey')}</label>
+          <input
+            type="password"
+            value={config.apiKey || ''}
+            onChange={e => setConfig({ ...config, apiKey: e.target.value })}
+            className={`w-full ${
+              isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'
+            } px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
+            placeholder="Enter CoinMarketCap API Key"
+          />
+        </div>
+
+        {/* Symbols */}
+        <div>
+          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
+            {t('nodeConfig.symbols')} (comma separated)
+          </label>
+          <input
+            type="text"
+            value={config.symbols?.join(', ') || ''}
+            onChange={e =>
+              setConfig({
+                ...config,
+                symbols: e.target.value
+                  .split(',')
+                  .map(s => s.trim())
+                  .filter(s => s),
+              })
+            }
+            className={`w-full ${
+              isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'
+            } px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
+            placeholder="BTC, ETH, BNB"
+          />
+        </div>
+
+        {/* Polling Interval */}
+        <div>
+          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>{t('nodeConfig.pollingInterval')}</label>
+          <input
+            type="number"
+            value={config.pollingInterval || 5}
+            onChange={e => setConfig({ ...config, pollingInterval: Number(e.target.value) })}
+            className={`w-full ${
+              isDark ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-50 text-gray-900 border-gray-300'
+            } px-3 py-2 rounded border focus:border-blue-500 focus:outline-none`}
+            min="1"
+            max="60"
+          />
+        </div>
+
+        {/* API URL (readonly) */}
+        <div>
+          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>API URL (readonly)</label>
+          <input
+            value="https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest"
+            readOnly
+            className={`w-full ${
+              isDark ? 'bg-gray-600 text-gray-300 border-gray-600' : 'bg-gray-100 text-gray-600 border-gray-300'
+            } px-3 py-2 rounded border`}
+          />
+        </div>
+      </div>
+    );
+  };
+
   const renderConfigContent = () => {
     switch (node.type) {
-      case COMPONENT_TYPES.TWITTER_EXTRACTOR:
-      case COMPONENT_TYPES.TWITTER_STREAM:
-      case COMPONENT_TYPES.BINANCE_EXTRACTOR:
-      case COMPONENT_TYPES.BINANCE_STREAM:
-      case COMPONENT_TYPES.UNISWAP_EXTRACTOR:
-      case COMPONENT_TYPES.COINMARKET_EXTRACTOR:
-        return renderListenerConfig();
+      case COMPONENT_TYPES.TWITTER_FEED:
+        return renderTwitterFeedConfig();
+      case COMPONENT_TYPES.BINANCE_FEED:
+        return renderBinanceFeedConfig();
+      case COMPONENT_TYPES.UNISWAP_FEED:
+        return renderUniswapFeedConfig();
+      case COMPONENT_TYPES.COINMARKET_FEED:
+        return renderCoinMarketFeedConfig();
       case COMPONENT_TYPES.AI_EVALUATOR:
         return renderAIEvaluatorConfig();
       case COMPONENT_TYPES.EVM_TRADE_EXECUTOR:

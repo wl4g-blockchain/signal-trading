@@ -53,12 +53,12 @@ export const Layout: React.FC<LayoutProps> = ({
   // Fetch notification data
   const fetchNotifications = useCallback(async () => {
     if (loadingRef.current) return;
-    console.log('🔔 Fetching notifications...');
+    console.debug('🔔 Fetching notifications...');
     loadingRef.current = true;
     setNotificationsLoading(true);
     try {
       const data = await apiServiceFacade.getService().getNotifications();
-      console.log('✅ Notifications loaded:', data.length, 'notifications');
+      console.debug('✅ Notifications loaded:', data.length, 'notifications');
       setNotifications(data);
     } catch (error) {
       console.error('❌ Failed to fetch notifications:', error);
@@ -113,7 +113,7 @@ export const Layout: React.FC<LayoutProps> = ({
 
   // Auto-fetch notifications on component mount and when notifications are shown
   React.useEffect(() => {
-    console.log('📱 Layout mounted, auto-loading notifications...');
+    console.debug('📱 Layout mounted, auto-loading notifications...');
     // Auto-load notifications when component mounts (user is authenticated)
     fetchNotifications();
   }, [fetchNotifications]); // Run once on mount

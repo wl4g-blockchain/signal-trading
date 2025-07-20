@@ -60,13 +60,13 @@ export const WorkflowList: React.FC<WorkflowListProps> = ({ initialWorkflowId, r
 
   const handleRedesign = async (workflowId: string) => {
     try {
-      console.log('🔧 ReDesign clicked, workflowId:', workflowId);
+      console.debug('🔧 ReDesign clicked, workflowId:', workflowId);
       // Trigger global redesign-workflow event instead of loading directly
       const event = new CustomEvent('redesign-workflow', {
         detail: { workflowId },
       });
       window.dispatchEvent(event);
-      console.log('📤 redesign-workflow event dispatched');
+      console.debug('📤 redesign-workflow event dispatched');
     } catch (error) {
       console.error('❌ Failed to trigger redesign:', error);
     }

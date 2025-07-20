@@ -23,14 +23,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     inputMode: 'SINGLE',
     outputMode: 'MULTI',
     inputConnectables: [],
-    outputConnectables: [
-      COMPONENT_TYPES.TWITTER_EXTRACTOR,
-      COMPONENT_TYPES.TWITTER_STREAM,
-      COMPONENT_TYPES.BINANCE_EXTRACTOR,
-      COMPONENT_TYPES.BINANCE_STREAM,
-      COMPONENT_TYPES.UNISWAP_EXTRACTOR,
-      COMPONENT_TYPES.COINMARKET_EXTRACTOR,
-    ],
+    outputConnectables: [COMPONENT_TYPES.TWITTER_FEED, COMPONENT_TYPES.BINANCE_FEED, COMPONENT_TYPES.UNISWAP_FEED, COMPONENT_TYPES.COINMARKET_FEED],
     icon: Play,
     style: {
       color: 'bg-green-600',
@@ -69,11 +62,11 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     defaultConfig: {},
   },
 
-  // Data Extractor Components
-  [COMPONENT_TYPES.TWITTER_EXTRACTOR]: {
-    name: 'Twitter Extractor',
-    nameCN: 'Twitter 数据提取器',
-    type: COMPONENT_TYPES.TWITTER_EXTRACTOR,
+  // Data Source Components - Unified Feed Components
+  [COMPONENT_TYPES.TWITTER_FEED]: {
+    name: 'Twitter Feed',
+    nameCN: 'Twitter 数据源',
+    type: COMPONENT_TYPES.TWITTER_FEED,
     inputMode: 'SINGLE',
     outputMode: 'SINGLE',
     inputConnectables: [COMPONENT_TYPES.START],
@@ -85,43 +78,22 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     },
     category: 'Data Sources',
     categoryCN: '数据源',
-    description: 'Extract data from Twitter API and user timelines',
-    descriptionCN: '从Twitter API和用户时间线提取数据',
+    description: 'Extract and stream data from Twitter API with configurable data collection mode',
+    descriptionCN: '从Twitter API提取和流式传输数据，支持可配置的数据收集模式',
     defaultConfig: {
       apiKey: '',
       accounts: [],
       keywords: [],
+      enableWebSocket: false,
+      pollingInterval: 5, // minutes
+      cacheRetention: 30, // minutes
     },
   },
 
-  [COMPONENT_TYPES.TWITTER_STREAM]: {
-    name: 'Twitter Stream',
-    nameCN: 'Twitter 数据流',
-    type: COMPONENT_TYPES.TWITTER_STREAM,
-    inputMode: 'SINGLE',
-    outputMode: 'SINGLE',
-    inputConnectables: [COMPONENT_TYPES.START],
-    outputConnectables: [COMPONENT_TYPES.AI_EVALUATOR],
-    icon: TwitterLogo,
-    style: {
-      color: 'bg-blue-500',
-      hoverColor: 'hover:bg-blue-600',
-    },
-    category: 'Data Sources',
-    categoryCN: '数据源',
-    description: 'Real-time Twitter data streaming and monitoring',
-    descriptionCN: '实时Twitter数据流和监控',
-    defaultConfig: {
-      apiKey: '',
-      accounts: [],
-      keywords: [],
-    },
-  },
-
-  [COMPONENT_TYPES.BINANCE_EXTRACTOR]: {
-    name: 'Binance Extractor',
-    nameCN: '币安数据提取器',
-    type: COMPONENT_TYPES.BINANCE_EXTRACTOR,
+  [COMPONENT_TYPES.BINANCE_FEED]: {
+    name: 'Binance Feed',
+    nameCN: '币安数据源',
+    type: COMPONENT_TYPES.BINANCE_FEED,
     inputMode: 'SINGLE',
     outputMode: 'SINGLE',
     inputConnectables: [COMPONENT_TYPES.START],
@@ -133,43 +105,22 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     },
     category: 'Data Sources',
     categoryCN: '数据源',
-    description: 'Extract market data from Binance exchange API',
-    descriptionCN: '从币安交易所API提取市场数据',
+    description: 'Extract and stream market data from Binance exchange with configurable data collection mode',
+    descriptionCN: '从币安交易所提取和流式传输市场数据，支持可配置的数据收集模式',
     defaultConfig: {
       apiKey: '',
       apiSecret: '',
       symbols: [],
+      enableWebSocket: false,
+      pollingInterval: 5, // minutes
+      cacheRetention: 30, // minutes
     },
   },
 
-  [COMPONENT_TYPES.BINANCE_STREAM]: {
-    name: 'Binance Stream',
-    nameCN: '币安数据流',
-    type: COMPONENT_TYPES.BINANCE_STREAM,
-    inputMode: 'SINGLE',
-    outputMode: 'SINGLE',
-    inputConnectables: [COMPONENT_TYPES.START],
-    outputConnectables: [COMPONENT_TYPES.AI_EVALUATOR],
-    icon: BinanceLogo,
-    style: {
-      color: 'bg-yellow-500',
-      hoverColor: 'hover:bg-yellow-600',
-    },
-    category: 'Data Sources',
-    categoryCN: '数据源',
-    description: 'Real-time Binance market data streaming',
-    descriptionCN: '实时币安市场数据流',
-    defaultConfig: {
-      apiKey: '',
-      apiSecret: '',
-      symbols: [],
-    },
-  },
-
-  [COMPONENT_TYPES.UNISWAP_EXTRACTOR]: {
-    name: 'Uniswap Extractor',
-    nameCN: 'Uniswap 数据提取器',
-    type: COMPONENT_TYPES.UNISWAP_EXTRACTOR,
+  [COMPONENT_TYPES.UNISWAP_FEED]: {
+    name: 'Uniswap Feed',
+    nameCN: 'Uniswap 数据源',
+    type: COMPONENT_TYPES.UNISWAP_FEED,
     inputMode: 'SINGLE',
     outputMode: 'SINGLE',
     inputConnectables: [COMPONENT_TYPES.START],
@@ -181,18 +132,19 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     },
     category: 'Data Sources',
     categoryCN: '数据源',
-    description: 'Extract liquidity and swap data from Uniswap',
-    descriptionCN: '从Uniswap提取流动性和交换数据',
+    description: 'Extract liquidity and swap data from Uniswap with configurable polling intervals',
+    descriptionCN: '从Uniswap提取流动性和交换数据，支持可配置的轮询间隔',
     defaultConfig: {
       rpcEndpoint: '',
       poolAddress: '',
+      pollingInterval: 5, // minutes
     },
   },
 
-  [COMPONENT_TYPES.COINMARKET_EXTRACTOR]: {
-    name: 'CoinMarket Extractor',
-    nameCN: 'CoinMarket 数据提取器',
-    type: COMPONENT_TYPES.COINMARKET_EXTRACTOR,
+  [COMPONENT_TYPES.COINMARKET_FEED]: {
+    name: 'CoinMarket Feed',
+    nameCN: 'CoinMarket 数据源',
+    type: COMPONENT_TYPES.COINMARKET_FEED,
     inputMode: 'SINGLE',
     outputMode: 'SINGLE',
     inputConnectables: [COMPONENT_TYPES.START],
@@ -204,11 +156,12 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     },
     category: 'Data Sources',
     categoryCN: '数据源',
-    description: 'Extract cryptocurrency market data from CoinMarketCap',
-    descriptionCN: '从CoinMarketCap提取加密货币市场数据',
+    description: 'Extract cryptocurrency market data from CoinMarketCap with configurable polling intervals',
+    descriptionCN: '从CoinMarketCap提取加密货币市场数据，支持可配置的轮询间隔',
     defaultConfig: {
       apiKey: '',
       symbols: [],
+      pollingInterval: 5, // minutes
     },
   },
 
@@ -220,14 +173,14 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     inputMode: 'MULTI',
     outputMode: 'MULTI',
     inputConnectables: [
-      COMPONENT_TYPES.TWITTER_EXTRACTOR,
-      COMPONENT_TYPES.TWITTER_STREAM,
-      COMPONENT_TYPES.BINANCE_EXTRACTOR,
-      COMPONENT_TYPES.BINANCE_STREAM,
-      COMPONENT_TYPES.UNISWAP_EXTRACTOR,
-      COMPONENT_TYPES.COINMARKET_EXTRACTOR,
+      COMPONENT_TYPES.TWITTER_FEED,
+      COMPONENT_TYPES.BINANCE_FEED,
+      COMPONENT_TYPES.UNISWAP_FEED,
+      COMPONENT_TYPES.COINMARKET_FEED,
+      COMPONENT_TYPES.AI_EVALUATOR,
     ],
     outputConnectables: [
+      COMPONENT_TYPES.AI_EVALUATOR,
       COMPONENT_TYPES.BINANCE_TRADE_EXECUTOR,
       COMPONENT_TYPES.OKX_TRADE_EXECUTOR,
       COMPONENT_TYPES.BITCOIN_TRADE_EXECUTOR,

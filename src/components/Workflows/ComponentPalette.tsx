@@ -5,7 +5,7 @@ import { useTheme } from '../../contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { COMPONENT_CATEGORIES } from '../../types/WorkflowTypes';
 import { getComponentsByCategory } from '../../types/ComponentRegistry';
-import { getComponentLocalizedName, getCategoryLocalizedName, getComponentLocalizedDescription } from '../../utils/i18nUtils';
+import { getComponentLocalizedName, getCategoryLocalizedName, getComponentLocalizedDescription } from '../../utils/I18nUtils';
 
 // Get component categories configuration for UI
 const getComponentCategories = () => {

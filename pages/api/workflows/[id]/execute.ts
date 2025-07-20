@@ -120,8 +120,40 @@ function getInputData(nodeId: string, results: any[], connections: any[]) {
 }
 
 async function executeListener(node: any) {
-  const { type, accounts, pairs, timeframe, keywords } = node.data;
+  const { type, accounts, pairs, timeframe, keywords, enableWebSocket, pollingInterval, cacheRetention } = node.data;
   
+  // Handle unified feed components
+  if (type === 'twitter-feed') {
+    if (enableWebSocket) {
+      // WebSocket mode: return cached data from WebSocket stream
+      return await getCachedTwitterData(accounts, keywords, cacheRetention);
+    } else {
+      // Polling mode: fetch data via API
+      return await fetchTwitterData(accounts, keywords, pollingInterval);
+    }
+  }
+  
+  if (type === 'binance-feed') {
+    if (enableWebSocket) {
+      // WebSocket mode: return cached data from WebSocket stream
+      return await getCachedBinanceData(pairs, timeframe, cacheRetention);
+    } else {
+      // Polling mode: fetch data via API
+      return await fetchBinanceData(pairs, timeframe, pollingInterval);
+    }
+  }
+
+  if (type === 'uniswap-feed') {
+    // Uniswap only supports polling mode
+    return await fetchUniswapData(pairs, timeframe, pollingInterval);
+  }
+
+  if (type === 'coinmarket-feed') {
+    // CoinMarket only supports polling mode
+    return await fetchCoinMarketData(pairs, timeframe, pollingInterval);
+  }
+  
+  // Legacy extractor types for backward compatibility
   switch (type) {
     case 'twitter':
       return await fetchTwitterData(accounts, keywords);
@@ -136,6 +168,50 @@ async function executeListener(node: any) {
     default:
       throw new Error(`Unknown listener type: ${type}`);
   }
+}
+
+// Helper functions for WebSocket cached data
+async function getCachedTwitterData(accounts: string[], keywords: string[], cacheRetention: number) {
+  // In a real implementation, this would retrieve cached data from WebSocket stream
+  // For now, we'll simulate cached data
+  console.debug(`Retrieving cached Twitter data for accounts: ${accounts}, keywords: ${keywords}, retention: ${cacheRetention}min`);
+  
+  return {
+    source: 'twitter-feed',
+    mode: 'websocket',
+    data: [
+      { id: '1', text: 'Cached tweet about ETH', author: 'elonmusk', timestamp: new Date().toISOString() },
+      { id: '2', text: 'Cached tweet about Bitcoin', author: 'VitalikButerin', timestamp: new Date().toISOString() }
+    ],
+    cacheInfo: {
+      retentionMinutes: cacheRetention,
+      lastUpdated: new Date().toISOString(),
+      totalCached: 2
+    }
+  };
+}
+
+async function getCachedBinanceData(symbols: string[], timeframe: string, cacheRetention: number) {
+  // In a real implementation, this would retrieve cached data from WebSocket stream
+  // For now, we'll simulate cached data
+  console.debug(`Retrieving cached Binance data for symbols: ${symbols}, timeframe: ${timeframe}, retention: ${cacheRetention}min`);
+  
+  return {
+    source: 'binance-feed',
+    mode: 'websocket',
+    data: symbols.map(symbol => ({
+      symbol,
+      price: Math.random() * 50000,
+      volume: Math.random() * 1000000,
+      change24h: (Math.random() - 0.5) * 10,
+      timestamp: new Date().toISOString()
+    })),
+    cacheInfo: {
+      retentionMinutes: cacheRetention,
+      lastUpdated: new Date().toISOString(),
+      totalCached: symbols.length
+    }
+  };
 }
 
 async function executeEvaluator(node: any, inputData: any) {

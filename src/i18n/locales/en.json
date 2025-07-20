@@ -95,7 +95,11 @@
     "evaluator": "Evaluator",
     "executor": "Executor",
     "cexExecutor": "CEX Executor",
-    "collector": "Collector"
+    "collector": "Collector",
+    "twitterFeed": "Twitter Feed",
+    "binanceFeed": "Binance Feed",
+    "uniswapFeed": "Uniswap Feed",
+    "coinmarketFeed": "CoinMarket Feed"
   },
   "settings": {
     "title": "Settings",
@@ -125,7 +129,22 @@
     "standard": "Standard", 
     "fast": "Fast",
     "custom": "Custom",
-    "usageInTx": "Usage in tx.send()"
+    "usageInTx": "Usage in tx.send()",
+    "enableWebSocket": "Enable WebSocket Stream",
+    "enableWebSocketDescription": "When enabled, data will be collected via WebSocket and cached until next execution cycle",
+    "pollingInterval": "Polling Interval (minutes)",
+    "cacheRetention": "Cache Retention (minutes)",
+    "dataCollectionMode": "Data Collection Mode",
+    "pollingMode": "Polling Mode",
+    "streamingMode": "Streaming Mode",
+    "apiKey": "API Key",
+    "apiSecret": "API Secret",
+    "accounts": "Accounts",
+    "keywords": "Keywords",
+    "symbols": "Symbols",
+    "tradingPairs": "Trading Pairs",
+    "timeframe": "Timeframe",
+    "interval": "Interval"
   },
   "nodeRunLog": {
     "noLogs": "No logs available for this node execution."

@@ -119,7 +119,7 @@ export class GasStrategy {
     };
 
     // 4. Send transaction
-            console.log(`Sending transaction using ${strategy.gasStrategy} gas strategy:`, {
+            console.debug(`Sending transaction using ${strategy.gasStrategy} gas strategy:`, {
       gasLimit: finalTransaction.gasLimit?.toString(),
       gasPrice: gasConfig.gasPrice?.toString(),
       maxFeePerGas: gasConfig.maxFeePerGas?.toString(),
@@ -223,7 +223,7 @@ export class GasStrategy {
  * 
  * // 4. Wait for Confirmation
  * const receipt = await txResponse.wait();
- * console.log('Transaction confirmed:', receipt.transactionHash);
+ * console.debug('Transaction confirmed:', receipt.transactionHash);
  */
 
 export default GasStrategy; 

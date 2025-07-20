@@ -69,12 +69,21 @@ const getDisplayType = (node: ComponentNode): string => {
   const config = node.config || {};
 
   switch (node.type) {
-    case COMPONENT_TYPES.TWITTER_EXTRACTOR:
-    case COMPONENT_TYPES.TWITTER_STREAM:
-      return config.keywords?.length ? `${config.keywords.length} keywords` : 'Twitter';
-    case COMPONENT_TYPES.BINANCE_EXTRACTOR:
-    case COMPONENT_TYPES.BINANCE_STREAM:
-      return config.symbols?.length ? `${config.symbols.length} symbols` : 'Binance';
+    case COMPONENT_TYPES.TWITTER_FEED:
+      const twitterMode = config.enableWebSocket ? 'Stream' : 'Poll';
+      const twitterData = config.keywords?.length ? `${config.keywords.length} keywords` : 
+                         config.accounts?.length ? `${config.accounts.length} accounts` : 'Twitter';
+      return `${twitterData} (${twitterMode})`;
+    case COMPONENT_TYPES.BINANCE_FEED:
+      const binanceMode = config.enableWebSocket ? 'Stream' : 'Poll';
+      const binanceData = config.symbols?.length ? `${config.symbols.length} symbols` : 'Binance';
+      return `${binanceData} (${binanceMode})`;
+    case COMPONENT_TYPES.UNISWAP_FEED:
+      const uniswapData = config.poolAddress ? 'Pool Data' : 'Uniswap';
+      return `${uniswapData} (Poll)`;
+    case COMPONENT_TYPES.COINMARKET_FEED:
+      const coinmarketData = config.symbols?.length ? `${config.symbols.length} symbols` : 'CoinMarket';
+      return `${coinmarketData} (Poll)`;
     case COMPONENT_TYPES.AI_EVALUATOR:
       return config.model || 'AI Model';
     case COMPONENT_TYPES.BINANCE_TRADE_EXECUTOR:

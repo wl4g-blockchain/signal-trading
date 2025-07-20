@@ -1,4 +1,4 @@
-import { authStorage } from './authStorage';
+import { authStorage } from './AuthStorage';
 
 // Permission constants
 export const PERMISSIONS = {
@@ -6,15 +6,15 @@ export const PERMISSIONS = {
   READ_WORKFLOWS: 'read:workflows',
   WRITE_WORKFLOWS: 'write:workflows',
   DELETE_WORKFLOWS: 'delete:workflows',
-  
+
   // Trading permissions
   EXECUTE_TRADES: 'execute:trades',
   VIEW_TRADE_HISTORY: 'view:trade_history',
-  
+
   // Notification permissions
   VIEW_NOTIFICATIONS: 'view:notifications',
   MANAGE_NOTIFICATIONS: 'manage:notifications',
-  
+
   // System permissions
   ADMIN_SYSTEM: 'admin:system',
   MANAGE_USERS: 'manage:users',
@@ -44,12 +44,10 @@ export class PermissionUtils {
     if (authStorage.hasPermission(PERMISSIONS.ADMIN_SYSTEM)) {
       return 'admin';
     }
-    if (authStorage.hasPermission(PERMISSIONS.EXECUTE_TRADES) && 
-        authStorage.hasPermission(PERMISSIONS.WRITE_WORKFLOWS)) {
+    if (authStorage.hasPermission(PERMISSIONS.EXECUTE_TRADES) && authStorage.hasPermission(PERMISSIONS.WRITE_WORKFLOWS)) {
       return 'trader';
     }
-    if (authStorage.hasPermission(PERMISSIONS.READ_WORKFLOWS) && 
-        authStorage.hasPermission(PERMISSIONS.VIEW_TRADE_HISTORY)) {
+    if (authStorage.hasPermission(PERMISSIONS.READ_WORKFLOWS) && authStorage.hasPermission(PERMISSIONS.VIEW_TRADE_HISTORY)) {
       return 'viewer';
     }
     return 'guest';
@@ -85,4 +83,4 @@ export class PermissionUtils {
     };
     return permissionNames[permission] || permission;
   }
-} 
+}

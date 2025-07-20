@@ -58,7 +58,7 @@ export const WorkflowRunCanvas: React.FC<WorkflowRunCanvasProps> = ({ nodes, con
       const node = nodes.find(n => n.id === nodeId);
       if (!node || !node.readonly) return;
 
-      console.log('🔍 Node clicked for logs:', nodeId, 'Node:', node);
+      console.debug('🔍 Node clicked for logs:', nodeId, 'Node:', node);
 
       setSelectedNodeId(nodeId);
       setLoadingLogs(true);
@@ -69,9 +69,9 @@ export const WorkflowRunCanvas: React.FC<WorkflowRunCanvasProps> = ({ nodes, con
         const urlParams = new URLSearchParams(window.location.search);
         const runId = urlParams.get('runId') || 'run-1';
 
-        console.log('📋 Fetching logs for runId:', runId, 'nodeId:', nodeId);
+        console.debug('📋 Fetching logs for runId:', runId, 'nodeId:', nodeId);
         const logs = await apiServiceFacade.getService().getWorkflowRunLogs(runId, nodeId);
-        console.log('✅ Logs loaded:', logs);
+        console.debug('✅ Logs loaded:', logs);
         setNodeLogs(logs);
       } catch (error) {
         console.error('❌ Failed to load node logs:', error);
@@ -110,7 +110,7 @@ export const WorkflowRunCanvas: React.FC<WorkflowRunCanvasProps> = ({ nodes, con
     if (nodes.length > 0 && !selectedNodeId && !logPanelVisible) {
       const targetNode = findLastNodeWithLogs();
       if (targetNode) {
-        console.log('🎯 Auto-opening logs for node:', targetNode.id);
+        console.debug('🎯 Auto-opening logs for node:', targetNode.id);
         handleNodeClick(targetNode.id);
       }
     }
@@ -119,7 +119,7 @@ export const WorkflowRunCanvas: React.FC<WorkflowRunCanvasProps> = ({ nodes, con
   // Auto-refresh logs for selected node when node data changes
   useEffect(() => {
     if (selectedNodeId && logPanelVisible) {
-      console.log('🔄 Auto-refreshing logs for selected node:', selectedNodeId);
+      console.debug('🔄 Auto-refreshing logs for selected node:', selectedNodeId);
       // Re-fetch logs for currently selected node
       handleNodeClick(selectedNodeId);
     }

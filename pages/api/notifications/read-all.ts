@@ -11,7 +11,7 @@ export default async function handler(
   try {
     // 这里应该更新数据库中所有通知的状态
     // 目前只是模拟操作
-    console.log('Marking all notifications as read');
+    console.debug('Marking all notifications as read');
     
     res.status(200).json({ 
       success: true, 

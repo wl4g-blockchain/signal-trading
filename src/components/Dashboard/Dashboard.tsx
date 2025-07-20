@@ -101,10 +101,10 @@ export const LiveDashboard: React.FC<LiveDashboardProps> = ({ showReports, onNav
   };
 
   const handleTradeClick = (trade: TradeRecord) => {
-    console.log('🔍 Trade clicked:', trade);
+    console.debug('🔍 Trade clicked:', trade);
 
     if (onNavigateToWorkflowRun && trade.workflowRunId) {
-      console.log('🚀 Navigating to workflow run:', { workflowId: trade.workflowId, runId: trade.workflowRunId });
+      console.debug('🚀 Navigating to workflow run:', { workflowId: trade.workflowId, runId: trade.workflowRunId });
       // Pass the workflow run ID instead of trade ID
       onNavigateToWorkflowRun(trade.workflowId, trade.workflowRunId);
     } else {

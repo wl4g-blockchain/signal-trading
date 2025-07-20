@@ -13,7 +13,7 @@ export default async function handler(
   try {
     // 这里应该更新数据库中的通知状态
     // 目前只是模拟操作
-    console.log(`Marking notification ${id} as read`);
+    console.debug(`Marking notification ${id} as read`);
     
     res.status(200).json({ 
       success: true, 

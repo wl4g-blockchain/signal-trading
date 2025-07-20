@@ -18,7 +18,7 @@ interface WorkflowPageProps {
   onExitReadOnlyMode?: () => void;
 }
 
-export const WorkflowPage: React.FC<WorkflowPageProps> = ({ readOnlyMode, readOnlyWorkflow, initialWorkflowId, onExitReadOnlyMode }) => {
+export const WorkflowPage: React.FC<WorkflowPageProps> = ({ readOnlyMode, readOnlyWorkflow, initialWorkflowId }) => {
   const { isDark } = useTheme();
   const { t } = useTranslation();
   const [nodes, setNodes] = useState<ComponentNode[]>([]);
@@ -43,11 +43,11 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({ readOnlyMode, readOn
 
   // Load workflow data based on different modes
   useEffect(() => {
-    console.log('📄 WorkflowPage useEffect triggered:', { readOnlyMode, readOnlyWorkflow, initialWorkflowId });
+    console.debug('📄 WorkflowPage useEffect triggered:', { readOnlyMode, readOnlyWorkflow, initialWorkflowId });
 
     // Handle read-only mode with provided workflow data
     if (readOnlyMode && readOnlyWorkflow) {
-      console.log('🔧 Setting up read-only workflow:', readOnlyWorkflow);
+      console.debug('🔧 Setting up read-only workflow:', readOnlyWorkflow);
 
       setWorkflowId(readOnlyWorkflow.id);
       setWorkflowName(readOnlyWorkflow.name);
@@ -56,11 +56,11 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({ readOnlyMode, readOn
       setShowWorkflowList(false);
       setHasInitialized(true);
 
-      console.log('✅ Read-only workflow setup complete');
+      console.debug('✅ Read-only workflow setup complete');
     }
     // Handle initialWorkflowId for ReDesign from workflow runs
     else if (initialWorkflowId && !readOnlyMode) {
-      console.log('🚀 Loading workflow for ReDesign, workflowId:', initialWorkflowId);
+      console.debug('🚀 Loading workflow for ReDesign, workflowId:', initialWorkflowId);
       loadWorkflowForEdit(initialWorkflowId);
     }
   }, [readOnlyMode, readOnlyWorkflow, initialWorkflowId]);
@@ -68,9 +68,9 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({ readOnlyMode, readOn
   // Function to load workflow for editing
   const loadWorkflowForEdit = async (workflowId: string) => {
     try {
-      console.log('🔄 Fetching workflow data for edit:', workflowId);
+      console.debug('🔄 Fetching workflow data for edit:', workflowId);
       const workflow = await apiServiceFacade.getService().getWorkflow(workflowId);
-      console.log('✅ Workflow data loaded:', workflow);
+      console.debug('✅ Workflow data loaded:', workflow);
 
       setWorkflowId(workflow.id);
       setWorkflowName(workflow.name);
@@ -79,7 +79,7 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({ readOnlyMode, readOn
       setShowWorkflowList(false);
       setHasInitialized(true);
 
-      console.log('🎯 Workflow loaded for editing:', workflow.name);
+      console.debug('🎯 Workflow loaded for editing:', workflow.name);
     } catch (error) {
       console.error('❌ Failed to load workflow for editing:', error);
     }
@@ -89,7 +89,7 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({ readOnlyMode, readOn
   const handleRightPanelToggle = () => {
     const newRightPanelState = !rightPanelCollapsed;
 
-    console.log('🔄 WorkflowPage: Toggling right panel from', rightPanelCollapsed, 'to', newRightPanelState);
+    console.debug('🔄 WorkflowPage: Toggling right panel from', rightPanelCollapsed, 'to', newRightPanelState);
 
     // Update right panel state immediately
     setRightPanelCollapsed(newRightPanelState);
@@ -99,7 +99,7 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({ readOnlyMode, readOn
     if (newRightPanelState) {
       const event = new CustomEvent('collapse-sidebar', { detail: { collapsed: newRightPanelState } });
       window.dispatchEvent(event);
-      console.log('📡 WorkflowPage: Dispatched collapse-sidebar event with collapsed:', newRightPanelState);
+      console.debug('📡 WorkflowPage: Dispatched collapse-sidebar event with collapsed:', newRightPanelState);
     }
 
     // Hide workflow list when collapsing panels
@@ -145,7 +145,7 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({ readOnlyMode, readOn
   // Listen for sidebar collapse events to sync right panel state
   useEffect(() => {
     const handleSidebarCollapse = (event: CustomEvent) => {
-      console.log('🔄 WorkflowPage: Received sidebar collapse event:', event.detail.collapsed);
+      console.debug('🔄 WorkflowPage: Received sidebar collapse event:', event.detail.collapsed);
       // Sync right panel with sidebar state
       setRightPanelCollapsed(event.detail.collapsed);
     };
@@ -162,7 +162,7 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({ readOnlyMode, readOn
     const layoutElement = document.querySelector('[data-sidebar-collapsed]');
     if (layoutElement) {
       const currentSidebarState = layoutElement.getAttribute('data-sidebar-collapsed') === 'true';
-      console.log('🔄 WorkflowPage: Syncing initial state with sidebar:', currentSidebarState);
+      console.debug('🔄 WorkflowPage: Syncing initial state with sidebar:', currentSidebarState);
       setRightPanelCollapsed(currentSidebarState);
     }
   }, []);
@@ -170,7 +170,7 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({ readOnlyMode, readOn
   // Initialize with start and end nodes only for new workflows
   useEffect(() => {
     if (nodes.length === 0 && !readOnlyMode && !hasInitialized && workflowId === null) {
-      console.log('🚀 Initializing default start/end nodes for new workflow');
+      console.debug('🚀 Initializing default start/end nodes for new workflow');
 
       const startSchema = getComponentSchema(COMPONENT_TYPES.START);
       const endSchema = getComponentSchema(COMPONENT_TYPES.END);
@@ -238,7 +238,7 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({ readOnlyMode, readOn
 
     // Check each node's configuration
     nodes.forEach(node => {
-      const nodeErrors = validateNodeConfig(node);
+      const nodeErrors = validateNode(node);
       if (nodeErrors.length > 0) {
         errors.push(`Node "${node.name}": ${nodeErrors.join(', ')}`);
       }
@@ -247,25 +247,38 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({ readOnlyMode, readOn
     return { isValid: errors.length === 0, errors };
   };
 
-  // Function to validate individual node configuration
-  const validateNodeConfig = (node: ComponentNode): string[] => {
+  const validateNode = (node: ComponentNode): string[] => {
     const errors: string[] = [];
     const config = node.config || {};
 
     switch (node.type) {
-      case COMPONENT_TYPES.TWITTER_EXTRACTOR:
-      case COMPONENT_TYPES.TWITTER_STREAM:
+      case COMPONENT_TYPES.TWITTER_FEED:
         if (!config.apiKey) errors.push('API key is required');
-        if (!config.accounts?.length && !config.keywords?.length) {
-          errors.push('At least one account or keyword is required');
+        if (!Array.isArray(config.accounts) || !config.accounts.length) {
+          if (!Array.isArray(config.keywords) || !config.keywords.length) {
+            errors.push('At least one account or keyword is required');
+          }
         }
         break;
 
-      case COMPONENT_TYPES.BINANCE_EXTRACTOR:
-      case COMPONENT_TYPES.BINANCE_STREAM:
+      case COMPONENT_TYPES.BINANCE_FEED:
         if (!config.apiKey) errors.push('API key is required');
         if (!config.apiSecret) errors.push('API secret is required');
-        if (!config.symbols?.length) errors.push('At least one symbol is required');
+        if (!Array.isArray(config.symbols) || !config.symbols.length) {
+          errors.push('At least one symbol is required');
+        }
+        break;
+
+      case COMPONENT_TYPES.UNISWAP_FEED:
+        if (!config.rpcEndpoint) errors.push('RPC endpoint is required');
+        if (!config.poolAddress) errors.push('Pool address is required');
+        break;
+
+      case COMPONENT_TYPES.COINMARKET_FEED:
+        if (!config.apiKey) errors.push('API key is required');
+        if (!Array.isArray(config.symbols) || !config.symbols.length) {
+          errors.push('At least one symbol is required');
+        }
         break;
 
       case COMPONENT_TYPES.AI_EVALUATOR:
@@ -277,7 +290,9 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({ readOnlyMode, readOn
       case COMPONENT_TYPES.BINANCE_TRADE_EXECUTOR:
         if (!config.apiKey) errors.push('API key is required');
         if (!config.apiSecret) errors.push('API secret is required');
-        if (!config.tradingPairs?.length) errors.push('Trading pairs are required');
+        if (!Array.isArray(config.tradingPairs) || !config.tradingPairs.length) {
+          errors.push('Trading pairs are required');
+        }
         if (!config.maxAmount) errors.push('Maximum amount is required');
         break;
 
@@ -285,7 +300,9 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({ readOnlyMode, readOn
         if (!config.rpcEndpoint) errors.push('RPC endpoint is required');
         if (!config.privateKey) errors.push('Private key is required');
         if (!config.vaultAddress) errors.push('Vault address is required');
-        if (!config.tradingPairs?.length) errors.push('Trading pairs are required');
+        if (!Array.isArray(config.tradingPairs) || !config.tradingPairs.length) {
+          errors.push('Trading pairs are required');
+        }
         break;
     }
 
@@ -321,7 +338,7 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({ readOnlyMode, readOn
       const savedWorkflow = await apiServiceFacade.getService().saveWorkflow(workflowToSave);
       setWorkflowId(savedWorkflow.id);
 
-      console.log('✅ Workflow saved successfully');
+      console.debug('✅ Workflow saved successfully');
       alert('Workflow saved successfully!');
     } catch (error) {
       console.error('❌ Failed to save workflow:', error);
@@ -349,7 +366,7 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({ readOnlyMode, readOn
     try {
       await apiServiceFacade.getService().runWorkflow(workflowId);
       setIsRunning(true);
-      console.log('✅ Workflow started successfully');
+      console.debug('✅ Workflow started successfully');
       alert('Workflow started successfully!');
     } catch (error) {
       console.error('❌ Failed to run workflow:', error);
@@ -360,7 +377,7 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({ readOnlyMode, readOn
   };
 
   const handleLoadWorkflow = (workflow: Workflow) => {
-    console.log('📄 Loading workflow:', workflow);
+    console.debug('📄 Loading workflow:', workflow);
 
     setWorkflowId(workflow.id);
     setWorkflowName(workflow.name);
@@ -369,7 +386,7 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({ readOnlyMode, readOn
     setShowWorkflowList(false);
     setHasInitialized(true);
 
-    console.log('✅ Workflow loaded successfully:', workflow.name);
+    console.debug('✅ Workflow loaded successfully:', workflow.name);
   };
 
   return (
@@ -385,7 +402,9 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({ readOnlyMode, readOn
               onChange={e => setWorkflowName(e.target.value)}
               disabled={!!readOnlyMode}
               className={`${
-                isDark ? 'bg-gray-700 text-white border-gray-600 focus:border-blue-500' : 'bg-gray-50 text-gray-900 border-gray-300 focus:border-blue-500'
+                isDark
+                  ? 'bg-gray-700 text-white border-gray-600 focus:border-blue-500'
+                  : 'bg-gray-50 text-gray-900 border-gray-300 focus:border-blue-500'
               } px-3 py-2 rounded border focus:outline-none ${readOnlyMode ? 'cursor-not-allowed opacity-50' : ''}`}
             />
             <div className="flex items-center space-x-2">
@@ -427,19 +446,23 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({ readOnlyMode, readOn
                 saving || readOnlyMode ? `${isDark ? 'bg-gray-600' : 'bg-gray-400'} cursor-not-allowed` : 'bg-blue-600 hover:bg-blue-700'
               } text-white`}
             >
-              {saving ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Save className="w-4 h-4" />}
+              {saving ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <Save className="w-4 h-4" />
+              )}
               <span>{saving ? t('workflow.saving') || 'Saving' : t('common.save') || 'Save'}</span>
             </button>
 
             <button
               onClick={() => {
-                console.log('🆕 Creating new workflow');
+                console.debug('🆕 Creating new workflow');
                 setWorkflowId(null);
                 setWorkflowName(t('workflow.untitledWorkflow') || 'Untitled Workflow');
                 setNodes([]);
                 setConnections([]);
                 setHasInitialized(false);
-                console.log('✅ New workflow state set');
+                console.debug('✅ New workflow state set');
               }}
               disabled={!!readOnlyMode}
               className={`p-2 ${isDark ? 'bg-gray-600 hover:bg-gray-500' : 'bg-gray-600 hover:bg-gray-500'} text-white rounded transition-colors ${
@@ -457,7 +480,9 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({ readOnlyMode, readOn
                   const event = new CustomEvent('canvas-zoom', { detail: { action: 'in' } });
                   window.dispatchEvent(event);
                 }}
-                className={`px-2 py-1 ${isDark ? 'bg-gray-600 hover:bg-gray-500 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'} rounded text-xs`}
+                className={`px-2 py-1 ${
+                  isDark ? 'bg-gray-600 hover:bg-gray-500 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
+                } rounded text-xs`}
               >
                 +
               </button>
@@ -467,7 +492,9 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({ readOnlyMode, readOn
                   const event = new CustomEvent('canvas-zoom', { detail: { action: 'out' } });
                   window.dispatchEvent(event);
                 }}
-                className={`px-2 py-1 ${isDark ? 'bg-gray-600 hover:bg-gray-500 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'} rounded text-xs`}
+                className={`px-2 py-1 ${
+                  isDark ? 'bg-gray-600 hover:bg-gray-500 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
+                } rounded text-xs`}
               >
                 -
               </button>
@@ -476,7 +503,9 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({ readOnlyMode, readOn
                   const event = new CustomEvent('canvas-zoom', { detail: { action: 'reset' } });
                   window.dispatchEvent(event);
                 }}
-                className={`px-2 py-1 ${isDark ? 'bg-gray-600 hover:bg-gray-500 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'} rounded text-xs`}
+                className={`px-2 py-1 ${
+                  isDark ? 'bg-gray-600 hover:bg-gray-500 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
+                } rounded text-xs`}
               >
                 {t('common.reset') || 'Reset'}
               </button>
@@ -513,9 +542,9 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({ readOnlyMode, readOn
           {/* Right Panel Toggle Button */}
           <button
             onClick={handleRightPanelToggle}
-            className={`absolute -left-3 top-6 z-10 ${isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'} rounded-full p-1 border ${
-              isDark ? 'border-gray-600' : 'border-gray-300'
-            } transition-colors`}
+            className={`absolute -left-3 top-6 z-10 ${
+              isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'
+            } rounded-full p-1 border ${isDark ? 'border-gray-600' : 'border-gray-300'} transition-colors`}
             title={rightPanelCollapsed ? t('common.expand') || 'Expand' : t('common.collapse') || 'Collapse'}
           >
             {rightPanelCollapsed ? (
@@ -530,7 +559,7 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({ readOnlyMode, readOn
               {/* Scrollable component container - Fixed overflow to allow tooltips */}
               <div className="flex-1 overflow-y-auto overflow-x-visible p-2 w-full relative mt-16" style={{ zIndex: 1 }}>
                 <div className="space-y-2 flex flex-col items-center">
-                  <ComponentPaletteCollapsed onAddNode={addNode} readOnlyMode={false} isDark={isDark} t={t} />
+                  <ComponentPaletteCollapsed onAddNode={addNode} readOnlyMode={false} isDark={isDark} />
                 </div>
               </div>
             </div>
