@@ -46,6 +46,7 @@ function App() {
   // Listen for sidebar collapse events, workflow run navigation, and exit readonly mode
   useEffect(() => {
     const handleSidebarCollapse = (event: CustomEvent) => {
+      console.log('🔄 App: Received collapse-sidebar event:', event.detail.collapsed);
       setSidebarCollapsed(event.detail.collapsed);
     };
 

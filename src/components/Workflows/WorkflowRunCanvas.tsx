@@ -4,7 +4,7 @@ import { NodeComponent } from './NodeComponent';
 import { ConnectionLine } from './ConnectionLine';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
-import { Edit, X } from 'lucide-react';
+import { Edit } from 'lucide-react';
 import { serviceManager } from '../../services';
 
 interface WorkflowRunCanvasProps {
@@ -350,7 +350,7 @@ export const WorkflowRunCanvas: React.FC<WorkflowRunCanvasProps> = ({
       </div>
       
       {/* Floating Action Button - Return to Design Editor (position adjusts when log panel opens) */}
-      <div className={`absolute top-4 z-10 transition-all duration-300`} style={{ 
+      <div className={`absolute top-4 z-5 transition-all duration-300`} style={{ 
         right: logPanelVisible ? `${logPanelWidth + 20}px` : '16px' 
       }}>
         <button
@@ -365,7 +365,7 @@ export const WorkflowRunCanvas: React.FC<WorkflowRunCanvasProps> = ({
 
       {/* Sliding Log Panel - Displays execution logs for selected node */}
       <div 
-        className={`absolute top-0 right-0 h-full ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-l shadow-2xl transform transition-transform duration-300 ease-in-out z-20 ${
+        className={`absolute top-0 right-0 h-full ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-l shadow-2xl transform transition-transform duration-300 ease-in-out z-10 ${
           logPanelVisible ? 'translate-x-0' : 'translate-x-full'
         }`}
         style={{ width: `${logPanelWidth}px` }}

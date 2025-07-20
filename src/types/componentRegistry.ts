@@ -1,16 +1,24 @@
 // Component Registry with unified schemas
 import { 
-  Twitter, 
   BarChart3, 
   TrendingUp, 
   Database, 
-  Brain, 
   Zap, 
-  Bitcoin,
   Play,
   Square
 } from 'lucide-react';
 import { ComponentSchema, ComponentType, COMPONENT_TYPES } from './WorkflowTypes';
+import { 
+  BinanceLogo, 
+  OKXLogo, 
+  UniswapLogo, 
+  TwitterLogo, 
+  BitcoinLogo, 
+  EthereumLogo, 
+  SolanaLogo, 
+  CoinMarketLogo, 
+  AILogo 
+} from '../components/SigTradingIcon';
 
 // Unified component registry with complete schema definitions
 export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
@@ -70,7 +78,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     outputMode: 'SINGLE',
     inputConnectables: [COMPONENT_TYPES.START],
     outputConnectables: [COMPONENT_TYPES.AI_EVALUATOR],
-    icon: Twitter,
+    icon: TwitterLogo,
     style: {
       color: 'bg-blue-600',
       hoverColor: 'hover:bg-blue-700'
@@ -91,7 +99,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     outputMode: 'SINGLE',
     inputConnectables: [COMPONENT_TYPES.START],
     outputConnectables: [COMPONENT_TYPES.AI_EVALUATOR],
-    icon: Twitter,
+    icon: TwitterLogo,
     style: {
       color: 'bg-blue-500',
       hoverColor: 'hover:bg-blue-600'
@@ -112,7 +120,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     outputMode: 'SINGLE',
     inputConnectables: [COMPONENT_TYPES.START],
     outputConnectables: [COMPONENT_TYPES.AI_EVALUATOR],
-    icon: BarChart3,
+    icon: BinanceLogo,
     style: {
       color: 'bg-yellow-600',
       hoverColor: 'hover:bg-yellow-700'
@@ -133,7 +141,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     outputMode: 'SINGLE',
     inputConnectables: [COMPONENT_TYPES.START],
     outputConnectables: [COMPONENT_TYPES.AI_EVALUATOR],
-    icon: BarChart3,
+    icon: BinanceLogo,
     style: {
       color: 'bg-yellow-500',
       hoverColor: 'hover:bg-yellow-600'
@@ -154,7 +162,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     outputMode: 'SINGLE',
     inputConnectables: [COMPONENT_TYPES.START],
     outputConnectables: [COMPONENT_TYPES.AI_EVALUATOR],
-    icon: Database,
+    icon: UniswapLogo,
     style: {
       color: 'bg-purple-600',
       hoverColor: 'hover:bg-purple-700'
@@ -174,7 +182,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     outputMode: 'SINGLE',
     inputConnectables: [COMPONENT_TYPES.START],
     outputConnectables: [COMPONENT_TYPES.AI_EVALUATOR],
-    icon: TrendingUp,
+    icon: CoinMarketLogo,
     style: {
       color: 'bg-indigo-600',
       hoverColor: 'hover:bg-indigo-700'
@@ -208,7 +216,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
       COMPONENT_TYPES.EVM_TRADE_EXECUTOR,
       COMPONENT_TYPES.SOLANA_TRADE_EXECUTOR
     ],
-    icon: Brain,
+    icon: AILogo,
     style: {
       color: 'bg-purple-600',
       hoverColor: 'hover:bg-purple-700'
@@ -230,7 +238,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     outputMode: 'SINGLE',
     inputConnectables: [COMPONENT_TYPES.AI_EVALUATOR],
     outputConnectables: [COMPONENT_TYPES.BINANCE_RESULT_COLLECTOR],
-    icon: Zap,
+    icon: BinanceLogo,
     style: {
       color: 'bg-yellow-600',
       hoverColor: 'hover:bg-yellow-700'
@@ -253,7 +261,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     outputMode: 'SINGLE',
     inputConnectables: [COMPONENT_TYPES.AI_EVALUATOR],
     outputConnectables: [COMPONENT_TYPES.OKX_RESULT_COLLECTOR],
-    icon: Zap,
+    icon: OKXLogo,
     style: {
       color: 'bg-blue-600',
       hoverColor: 'hover:bg-blue-700'
@@ -278,7 +286,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     outputMode: 'SINGLE',
     inputConnectables: [COMPONENT_TYPES.AI_EVALUATOR],
     outputConnectables: [COMPONENT_TYPES.BITCOIN_RESULT_COLLECTOR],
-    icon: Bitcoin,
+    icon: BitcoinLogo,
     style: {
       color: 'bg-orange-600',
       hoverColor: 'hover:bg-orange-700'
@@ -300,7 +308,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     outputMode: 'SINGLE',
     inputConnectables: [COMPONENT_TYPES.AI_EVALUATOR],
     outputConnectables: [COMPONENT_TYPES.EVM_RESULT_COLLECTOR],
-    icon: Zap,
+    icon: EthereumLogo,
     style: {
       color: 'bg-green-600',
       hoverColor: 'hover:bg-green-700'
@@ -326,7 +334,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     outputMode: 'SINGLE',
     inputConnectables: [COMPONENT_TYPES.AI_EVALUATOR],
     outputConnectables: [COMPONENT_TYPES.SOLANA_RESULT_COLLECTOR],
-    icon: Zap,
+    icon: SolanaLogo,
     style: {
       color: 'bg-purple-600',
       hoverColor: 'hover:bg-purple-700'
@@ -350,7 +358,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     outputMode: 'SINGLE',
     inputConnectables: [COMPONENT_TYPES.BINANCE_TRADE_EXECUTOR],
     outputConnectables: [COMPONENT_TYPES.END],
-    icon: Database,
+    icon: BinanceLogo,
     style: {
       color: 'bg-yellow-500',
       hoverColor: 'hover:bg-yellow-600'
@@ -369,7 +377,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     outputMode: 'SINGLE',
     inputConnectables: [COMPONENT_TYPES.OKX_TRADE_EXECUTOR],
     outputConnectables: [COMPONENT_TYPES.END],
-    icon: Database,
+    icon: OKXLogo,
     style: {
       color: 'bg-blue-500',
       hoverColor: 'hover:bg-blue-600'
@@ -388,7 +396,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     outputMode: 'SINGLE',
     inputConnectables: [COMPONENT_TYPES.EVM_TRADE_EXECUTOR],
     outputConnectables: [COMPONENT_TYPES.END],
-    icon: Database,
+    icon: EthereumLogo,
     style: {
       color: 'bg-green-500',
       hoverColor: 'hover:bg-green-600'
@@ -407,7 +415,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     outputMode: 'SINGLE',
     inputConnectables: [COMPONENT_TYPES.SOLANA_TRADE_EXECUTOR],
     outputConnectables: [COMPONENT_TYPES.END],
-    icon: Database,
+    icon: SolanaLogo,
     style: {
       color: 'bg-purple-500',
       hoverColor: 'hover:bg-purple-600'
@@ -426,7 +434,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     outputMode: 'SINGLE',
     inputConnectables: [COMPONENT_TYPES.BITCOIN_TRADE_EXECUTOR],
     outputConnectables: [COMPONENT_TYPES.END],
-    icon: Database,
+    icon: BitcoinLogo,
     style: {
       color: 'bg-orange-500',
       hoverColor: 'hover:bg-orange-600'

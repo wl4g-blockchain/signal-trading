@@ -35,7 +35,7 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({
   const [saving, setSaving] = useState(false);
   const [running, setRunning] = useState(false);
   const [canvasScale, setCanvasScale] = useState(100);
-  const [rightPanelCollapsed, setRightPanelCollapsed] = useState(false);
+  const [rightPanelCollapsed, setRightPanelCollapsed] = useState(true);
   const [logPanelVisible, setLogPanelVisible] = useState(false);
   const [logPanelWidth, setLogPanelWidth] = useState(480);
   const [hasInitialized, setHasInitialized] = useState(false);
@@ -90,17 +90,22 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({
     }
   };
 
-  // Asymmetric panel behavior: Right panel collapse affects left, but not vice versa
+  // Special logic: Only collapse left sidebar when right panel is collapsed
   const handleRightPanelToggle = () => {
     const newRightPanelState = !rightPanelCollapsed;
+    
+    console.log('🔄 WorkflowPage: Toggling right panel from', rightPanelCollapsed, 'to', newRightPanelState);
     
     // Update right panel state immediately
     setRightPanelCollapsed(newRightPanelState);
     
-    // Immediately notify App component to synchronize left menu state
-    // This ensures both panels change simultaneously for better UX
-    const event = new CustomEvent('collapse-sidebar', { detail: { collapsed: newRightPanelState } });
-    window.dispatchEvent(event);
+    // Special logic: Only notify App component when collapsing right panel
+    // This ensures left sidebar is also collapsed when right panel is collapsed
+    if (newRightPanelState) {
+      const event = new CustomEvent('collapse-sidebar', { detail: { collapsed: newRightPanelState } });
+      window.dispatchEvent(event);
+      console.log('📡 WorkflowPage: Dispatched collapse-sidebar event with collapsed:', newRightPanelState);
+    }
     
     // Hide workflow list when collapsing panels
     if (newRightPanelState) {
@@ -140,6 +145,31 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({
     return () => {
       window.removeEventListener('canvas-scale-update', handleScaleUpdate as EventListener);
     };
+  }, []);
+
+  // Listen for sidebar collapse events to sync right panel state
+  useEffect(() => {
+    const handleSidebarCollapse = (event: CustomEvent) => {
+      console.log('🔄 WorkflowPage: Received sidebar collapse event:', event.detail.collapsed);
+      // Sync right panel with sidebar state
+      setRightPanelCollapsed(event.detail.collapsed);
+    };
+
+    window.addEventListener('collapse-sidebar', handleSidebarCollapse as EventListener);
+    return () => {
+      window.removeEventListener('collapse-sidebar', handleSidebarCollapse as EventListener);
+    };
+  }, []);
+
+  // Sync initial state with App component on mount
+  useEffect(() => {
+    // Get the current sidebar state from App component
+    const layoutElement = document.querySelector('[data-sidebar-collapsed]');
+    if (layoutElement) {
+      const currentSidebarState = layoutElement.getAttribute('data-sidebar-collapsed') === 'true';
+      console.log('🔄 WorkflowPage: Syncing initial state with sidebar:', currentSidebarState);
+      setRightPanelCollapsed(currentSidebarState);
+    }
   }, []);
 
   // Initialize with start and end nodes only for new workflows
@@ -510,7 +540,7 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({
           </button>
 
           {rightPanelCollapsed ? (
-            <div className="flex flex-col items-center h-full">
+            <div className="flex flex-col items-center h-full overflow-visible" style={{ zIndex: 1 }}>
               <div className="p-2 flex flex-col items-center mt-16 flex-shrink-0">
                 <div className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'} mb-3 writing-mode-vertical text-center`}>
                   COMs
@@ -518,8 +548,8 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({
                 <div className={`w-8 h-px ${isDark ? 'bg-gray-600' : 'bg-gray-300'} mb-3`}></div>
               </div>
               
-              {/* Scrollable component container */}
-              <div className="flex-1 overflow-y-auto p-2 w-full">
+              {/* Scrollable component container - Fixed overflow to allow tooltips */}
+              <div className="flex-1 overflow-y-auto overflow-x-visible p-2 w-full relative" style={{ zIndex: 1 }}>
                 <div className="space-y-2 flex flex-col items-center">
                   <ComponentPaletteCollapsed 
                     onAddNode={addNode} 
@@ -537,7 +567,7 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({
       )}
 
       {/* Workflow List Panel */}
-      <div className={`absolute bottom-0 left-0 z-10 transition-all duration-300`} style={{
+      <div className={`absolute bottom-0 left-0 z-0 transition-all duration-300`} style={{
         right: readOnlyMode 
           ? (logPanelVisible ? `${logPanelWidth}px` : '0px')
           : (rightPanelCollapsed ? '48px' : '320px')

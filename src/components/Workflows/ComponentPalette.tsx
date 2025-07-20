@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ComponentType } from '../../types';
 import { Plus } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
-import { useTranslation } from 'react-i18next';
 import { COMPONENT_CATEGORIES } from '../../types/WorkflowTypes';
 import { getComponentsByCategory } from '../../types/ComponentRegistry';
 
@@ -21,7 +20,6 @@ interface ComponentPaletteProps {
 
 export const ComponentPalette: React.FC<ComponentPaletteProps> = ({ onAddNode }) => {
   const { isDark } = useTheme();
-  const { t } = useTranslation();
   const categories = getComponentCategories();
 
   return (
@@ -58,35 +56,35 @@ export const ComponentPalette: React.FC<ComponentPaletteProps> = ({ onAddNode })
               </span>
             </h4>
             
-                          <div className="space-y-2">
-                {category.components.map((schema) => {
-                  const Icon = schema.icon;
-                  return (
-                    <div 
-                      key={schema.type} 
-                      className={`${isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-white border border-gray-200 hover:border-gray-300'} rounded-lg p-2 group transition-all duration-200`}
-                    >
-                      <div className="flex items-center justify-between mb-1">
-                        <div className="flex items-center space-x-2">
-                          <Icon className={`w-4 h-4 ${isDark ? 'text-gray-300' : 'text-gray-600'}`} />
-                          <h5 className={`font-medium text-xs ${isDark ? 'text-white' : 'text-gray-900'}`}>{schema.name}</h5>
-                        </div>
-                        <button
-                          onClick={() => onAddNode(schema.type)}
-                          className={`p-1 rounded ${schema.style.color} ${schema.style.hoverColor} text-white transition-all duration-200 hover:scale-105 active:scale-95`}
-                          title={`Create ${schema.name}`}
-                        >
-                          <Plus className="w-3 h-3" />
-                        </button>
+            <div className="space-y-2">
+              {category.components.map((schema) => {
+                const Icon = schema.icon;
+                return (
+                  <div 
+                    key={schema.type} 
+                    className={`${isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-white border border-gray-200 hover:border-gray-300'} rounded-lg p-2 transition-all duration-200`}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="flex items-center space-x-2">
+                        <Icon className={`w-4 h-4 ${isDark ? 'text-gray-300' : 'text-gray-600'}`} />
+                        <h5 className={`font-medium text-xs ${isDark ? 'text-white' : 'text-gray-900'}`}>{schema.name}</h5>
                       </div>
-                      
-                      <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'} leading-relaxed`}>
-                        {schema.description}
-                      </p>
+                      <button
+                        onClick={() => onAddNode(schema.type)}
+                        className={`p-1 rounded ${schema.style.color} ${schema.style.hoverColor} text-white transition-all duration-200 hover:scale-105 active:scale-95`}
+                        title={`Create ${schema.name}`}
+                      >
+                        <Plus className="w-3 h-3" />
+                      </button>
                     </div>
-                  );
-                })}
-              </div>
+                    
+                    <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'} leading-relaxed`}>
+                      {schema.description}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         ))}
       </div>
@@ -109,39 +107,94 @@ export const ComponentPaletteCollapsed: React.FC<ComponentPaletteCollapsedProps>
   t 
 }) => {
   const categories = getComponentCategories();
+  const [hoveredComponent, setHoveredComponent] = useState<string | null>(null);
+  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+  const [tooltipVisible, setTooltipVisible] = useState(false);
 
   // Flatten all components from all categories
   const allComponents = categories.reduce((acc, category) => {
     return acc.concat(category.components);
-  }, [] as any[]);
+  }, [] as Array<{ type: string; name: string; description: string; icon: React.ComponentType; style: { color: string; hoverColor: string } }>);
+
+  const handleMouseEnter = (schema: { type: string; name: string; description: string; icon: React.ComponentType; style: { color: string; hoverColor: string } }, event: React.MouseEvent) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    setTooltipPosition({
+      x: rect.left - 10,
+      y: rect.top + rect.height / 2
+    });
+    setHoveredComponent(schema.type);
+    setTooltipVisible(true);
+  };
+
+  const handleMouseLeave = () => {
+    setTooltipVisible(false);
+    // Delay hiding the component to allow for fade out animation
+    setTimeout(() => {
+      if (!tooltipVisible) {
+        setHoveredComponent(null);
+      }
+    }, 300);
+  };
+
+
 
   return (
     <>
       {allComponents.map((schema) => {
         const Icon = schema.icon;
+        // const isHovered = hoveredComponent === schema.type;
+        
         return (
-          <div key={schema.type} className="group relative">
+          <div key={schema.type} className="relative mb-2">
             <button
               onClick={() => !readOnlyMode && onAddNode(schema.type)}
+              onMouseEnter={(e) => handleMouseEnter(schema, e)}
+              onMouseLeave={handleMouseLeave}
               disabled={!!readOnlyMode}
-              className={`w-8 h-8 ${readOnlyMode ? 'bg-gray-500 cursor-not-allowed' : `${schema.style.color} ${schema.style.hoverColor}`} rounded-lg flex items-center justify-center transition-all duration-200 shadow-sm hover:shadow-lg hover:scale-110 active:scale-95 ${readOnlyMode ? 'opacity-50' : ''} group-hover:brightness-110`}
+              className={`w-8 h-8 ${readOnlyMode ? 'bg-gray-500 cursor-not-allowed' : `${schema.style.color} ${schema.style.hoverColor}`} rounded-lg flex items-center justify-center transition-all duration-200 shadow-sm hover:shadow-lg hover:scale-110 active:scale-95 ${readOnlyMode ? 'opacity-50' : ''}`}
               aria-label={`Add ${schema.name} node`}
             >
               <Icon className="w-4 h-4 text-white transition-transform group-hover:scale-105" />
             </button>
-            {/* Enhanced Tooltip - Display to left and higher z-index */}
-            <div className={`absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 rounded-lg text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none ${isDark ? 'bg-gray-900 text-white border border-gray-600' : 'bg-white text-gray-800 border border-gray-300'} shadow-2xl min-w-[200px] whitespace-nowrap`} 
-                 style={{ zIndex: 50000 }}>
-              <div className="font-semibold text-xs mb-1">{schema.name}</div>
-              <div className={`text-xs leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-600'} whitespace-normal`}>
-                {schema.description}
-              </div>
-              {/* Arrow pointer pointing right */}
-              <div className={`absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 border-t-[6px] border-b-[6px] border-l-[6px] ${isDark ? 'border-l-gray-900' : 'border-l-white'} border-t-transparent border-b-transparent`}></div>
-            </div>
+            
+
           </div>
         );
       })}
+      
+      {/* Global tooltip */}
+      {hoveredComponent && (
+        <div 
+          className={`fixed px-3 py-2 rounded-lg text-xs whitespace-normal ${isDark ? 'bg-gray-900 text-white border border-gray-600' : 'bg-white text-gray-800 border border-gray-300'} shadow-2xl min-w-[200px] max-w-[250px] transition-all duration-300 ease-in-out ${tooltipVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
+          style={{ 
+            zIndex: 999,
+            left: tooltipPosition.x,
+            top: tooltipPosition.y,
+            transform: 'translate(-100%, -50%)',
+            pointerEvents: 'none'
+          }}
+        >
+          {(() => {
+            const schema = allComponents.find(c => c.type === hoveredComponent);
+            if (!schema) return null;
+            const Icon = schema.icon;
+            
+            return (
+              <>
+                <div className="font-semibold text-xs mb-1 flex items-center gap-2">
+                  <Icon className="w-3 h-3" />
+                  {schema.name}
+                </div>
+                <div className={`text-xs leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                  {schema.description}
+                </div>
+                {/* Arrow pointer pointing right */}
+                <div className={`absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 border-t-[6px] border-b-[6px] border-l-[6px] ${isDark ? 'border-l-gray-900' : 'border-l-white'} border-t-transparent border-b-transparent`}></div>
+              </>
+            );
+          })()}
+        </div>
+      )}
     </>
   );
 };

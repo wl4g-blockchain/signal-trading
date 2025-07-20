@@ -1,79 +1,100 @@
 import React from 'react';
 
 interface SigTradingIconProps {
-  size?: 'small' | 'large';
+  size?: 'small' | 'medium' | 'large';
   className?: string;
 }
 
 export const SigTradingIcon: React.FC<SigTradingIconProps> = ({ 
-  size = 'large', 
+  size = 'medium', 
   className = '' 
 }) => {
-  const isSmall = size === 'small';
-  const iconSize = isSmall ? 32 : 48;
-  
+  const sizeClasses = {
+    small: 'w-6 h-6',
+    medium: 'w-8 h-8',
+    large: 'w-12 h-12'
+  };
+
   return (
-    <div className={`${className} ${isSmall ? 'w-8 h-8' : 'w-12 h-12'}`}>
-      <svg
-        width={iconSize}
-        height={iconSize}
-        viewBox="0 0 48 48"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        className="drop-shadow-lg"
-      >
-        {/* Background Circle */}
-        <circle
-          cx="24"
-          cy="24"
-          r="22"
-          fill="url(#gradient1)"
-          stroke="rgba(59, 130, 246, 0.3)"
-          strokeWidth="2"
-        />
-        
-        {/* Signal Wave Lines */}
-        <path
-          d="M8 24 C12 16, 20 16, 24 24 C28 32, 36 32, 40 24"
-          stroke="white"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          fill="none"
-          opacity="0.9"
-        />
-        
-        {/* Trading Arrow Up */}
-        <path
-          d="M18 30 L24 18 L30 30"
-          stroke="white"
-          strokeWidth="3"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-          opacity="0.8"
-        />
-        
-        {/* Center Dot */}
-        <circle
-          cx="24"
-          cy="24"
-          r="2.5"
-          fill="white"
-          opacity="0.9"
-        />
-        
-        {/* Trading Indicator Dots */}
-        <circle cx="15" cy="20" r="1.5" fill="rgba(34, 197, 94, 0.8)" />
-        <circle cx="33" cy="28" r="1.5" fill="rgba(239, 68, 68, 0.8)" />
-        
-        <defs>
-          <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#3B82F6" />
-            <stop offset="50%" stopColor="#1D4ED8" />
-            <stop offset="100%" stopColor="#1E3A8A" />
-          </linearGradient>
-        </defs>
+    <div className={`${sizeClasses[size]} ${className}`}>
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="currentColor"/>
+        <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
       </svg>
     </div>
   );
-}; 
+};
+
+// Official platform logos for component palette
+export const BinanceLogo: React.FC<{ className?: string }> = ({ className = 'w-4 h-4' }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="24" height="24" rx="4" fill="#F3BA2F"/>
+    <path d="M7.5 12L12 7.5L16.5 12L12 16.5L7.5 12Z" fill="#FFFFFF"/>
+    <path d="M9.5 10L12 7.5L14.5 10L12 12.5L9.5 10Z" fill="#FFFFFF"/>
+  </svg>
+);
+
+export const OKXLogo: React.FC<{ className?: string }> = ({ className = 'w-4 h-4' }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="24" height="24" rx="4" fill="#000000"/>
+    <path d="M8 8L16 16M16 8L8 16" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+export const UniswapLogo: React.FC<{ className?: string }> = ({ className = 'w-4 h-4' }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="24" height="24" rx="4" fill="#FF007A"/>
+    <path d="M12 6L8 10L12 14L16 10L12 6Z" fill="#FFFFFF"/>
+    <path d="M8 10L12 14L16 10" stroke="#FFFFFF" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+export const TwitterLogo: React.FC<{ className?: string }> = ({ className = 'w-4 h-4' }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="24" height="24" rx="4" fill="#1DA1F2"/>
+    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" fill="#FFFFFF"/>
+  </svg>
+);
+
+export const BitcoinLogo: React.FC<{ className?: string }> = ({ className = 'w-4 h-4' }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="24" height="24" rx="4" fill="#F7931A"/>
+    <path d="M17.5 10.5C17.5 8.5 15.5 7 13 7H10V17H13C15.5 17 17.5 15.5 17.5 13.5C17.5 12.5 17 11.5 16 11C17 10.5 17.5 10.5 17.5 10.5Z" fill="#FFFFFF"/>
+    <path d="M14 9H12V11H14C14.5 11 15 11.5 15 12C15 12.5 14.5 13 14 13H12V15H14C15.5 15 16.5 14 16.5 12.5C16.5 11 15.5 10 14 10V9Z" fill="#FFFFFF"/>
+  </svg>
+);
+
+export const EthereumLogo: React.FC<{ className?: string }> = ({ className = 'w-4 h-4' }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="24" height="24" rx="4" fill="#627EEA"/>
+    <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#FFFFFF"/>
+    <path d="M2 17L12 22L22 17" stroke="#FFFFFF" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M2 12L12 17L22 12" stroke="#FFFFFF" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+export const SolanaLogo: React.FC<{ className?: string }> = ({ className = 'w-4 h-4' }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="24" height="24" rx="4" fill="#14F195"/>
+    <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#FFFFFF"/>
+    <path d="M2 17L12 22L22 17" stroke="#FFFFFF" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M2 12L12 17L22 12" stroke="#FFFFFF" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+export const CoinMarketLogo: React.FC<{ className?: string }> = ({ className = 'w-4 h-4' }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="24" height="24" rx="4" fill="#3861FB"/>
+    <path d="M12 6L8 10L12 14L16 10L12 6Z" fill="#FFFFFF"/>
+    <path d="M8 10L12 14L16 10" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+export const AILogo: React.FC<{ className?: string }> = ({ className = 'w-4 h-4' }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="24" height="24" rx="4" fill="#8B5CF6"/>
+    <path d="M12 6L8 10L12 14L16 10L12 6Z" fill="#FFFFFF"/>
+    <path d="M8 10L12 14L16 10" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+); 
