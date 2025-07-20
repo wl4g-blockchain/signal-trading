@@ -23,7 +23,6 @@ export interface ApiService {
   getWorkflowRuns(workflowId: string): Promise<WorkflowRun[]>;
   getWorkflowRun(id: string): Promise<WorkflowRun>;
   getWorkflowRunLogs(runId: string, nodeId: string): Promise<string[]>;
-  readWorkflowLogByNodeId(runId: string, nodeId: string): Promise<string[]>; // Alias for getWorkflowRunLogs
 
   // Trading
   getTradeHistory(params?: Record<string, unknown>): Promise<TradeRecord[]>;

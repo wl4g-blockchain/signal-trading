@@ -223,8 +223,8 @@ export class MockApiService implements ApiService {
         relatedData: {
           workflowName: "ETH Arbitrage Strategy",
           profit: 125.5,
-          txHash: "0xabc123..."
-        }
+          txHash: "0xabc123...",
+        },
       },
       {
         id: "notif-2",
@@ -238,8 +238,8 @@ export class MockApiService implements ApiService {
         workflowRunId: "run-2",
         relatedData: {
           workflowName: "BTC Trading Strategy",
-          slippage: 2.5
-        }
+          slippage: 2.5,
+        },
       },
       {
         id: "notif-3",
@@ -251,8 +251,8 @@ export class MockApiService implements ApiService {
         read: true,
         workflowId: "workflow-1",
         relatedData: {
-          workflowName: "ETH Arbitrage Strategy"
-        }
+          workflowName: "ETH Arbitrage Strategy",
+        },
       },
       {
         id: "notif-4",
@@ -266,9 +266,9 @@ export class MockApiService implements ApiService {
         workflowRunId: "run-2",
         relatedData: {
           workflowName: "SOL Trading Strategy",
-          error: "Insufficient liquidity"
-        }
-      }
+          error: "Insufficient liquidity",
+        },
+      },
     ];
   }
 
@@ -379,11 +379,6 @@ export class MockApiService implements ApiService {
       return ["No logs available"];
     }
     return run.nodeStates[nodeId].logs || ["No logs available"];
-  }
-
-  async readWorkflowLogByNodeId(runId: string, nodeId: string) {
-    // Alias for getWorkflowRunLogs to match user expectations  
-    return this.getWorkflowRunLogs(runId, nodeId);
   }
 
   async getTradeHistory(params?: any) {

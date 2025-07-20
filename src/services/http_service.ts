@@ -90,11 +90,6 @@ export class HttpApiService implements ApiService {
     return this.request(`/workflow-runs/${runId}/nodes/${nodeId}/logs`);
   }
 
-  async readWorkflowLogByNodeId(runId: string, nodeId: string) {
-    // Alias for getWorkflowRunLogs to match user expectations
-    return this.getWorkflowRunLogs(runId, nodeId);
-  }
-
   async getTradeHistory(params?: Record<string, unknown>) {
     const query = params
       ? `?${new URLSearchParams(params as Record<string, string>).toString()}`

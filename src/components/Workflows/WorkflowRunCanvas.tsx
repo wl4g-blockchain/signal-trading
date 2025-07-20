@@ -68,7 +68,7 @@ export const WorkflowRunCanvas: React.FC<WorkflowRunCanvasProps> = ({
     try {
       // Get run ID from node or use mock data for now
       const runId = 'run-1'; // In real implementation, this would come from context
-      const logs = await serviceManager.getService().readWorkflowLogByNodeId(runId, nodeId);
+      const logs = await serviceManager.getService().getWorkflowRunLogs(runId, nodeId);
       setNodeLogs(logs);
     } catch (error) {
       console.error('Failed to load node logs:', error);
