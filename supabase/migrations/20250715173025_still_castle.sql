@@ -35,7 +35,7 @@ INSERT INTO t_workflow (name, flow_json) VALUES
 ('ETH Arbitrage Strategy', '{
   "nodes": [
     {
-      "id": "start-1",
+      "id": "START",
       "type": "start",
       "position": {"x": 100, "y": 200},
       "data": {"name": "Start"},
@@ -73,7 +73,7 @@ INSERT INTO t_workflow (name, flow_json) VALUES
       "outputs": ["data"]
     },
     {
-      "id": "end-1",
+      "id": "END",
       "type": "end", 
       "position": {"x": 700, "y": 200},
       "data": {"name": "End"},
@@ -84,7 +84,7 @@ INSERT INTO t_workflow (name, flow_json) VALUES
   "connections": [
     {
       "id": "conn-1",
-      "source": "start-1",
+      "source": "START",
       "target": "twitter-feed-1", 
       "sourceOutput": "trigger",
       "targetInput": "trigger"

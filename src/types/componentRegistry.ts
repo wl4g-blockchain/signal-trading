@@ -189,8 +189,8 @@ export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
     ],
     icon: AILogo,
     style: {
-      color: 'bg-emerald-600',
-      hoverColor: 'hover:bg-emerald-700',
+      color: 'bg-blue-600',
+      hoverColor: 'hover:bg-blue-700',
     },
     category: 'AI Analysis',
     categoryCN: 'AI 分析',

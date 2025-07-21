@@ -18,7 +18,7 @@ export class MockApiService implements ApiService {
     // Mock workflows using new unified schema
     const startSchema = getComponentSchema(COMPONENT_TYPES.START);
     const twitterFeedSchema = getComponentSchema(COMPONENT_TYPES.TWITTER_FEED);
-    const uniswapFeedSchema = getComponentSchema(COMPONENT_TYPES.UNISWAP_FEED);
+    const binanceFeedSchema = getComponentSchema(COMPONENT_TYPES.BINANCE_FEED);
     const aiSchema = getComponentSchema(COMPONENT_TYPES.AI_EVALUATOR);
     const evmSchema = getComponentSchema(COMPONENT_TYPES.EVM_TRADE_EXECUTOR);
     const collectorSchema = getComponentSchema(COMPONENT_TYPES.BINANCE_RESULT_COLLECTOR);
@@ -30,14 +30,14 @@ export class MockApiService implements ApiService {
         name: 'ETH Arbitrage Strategy',
         nodes: [
           {
-            id: 'start-1',
+            id: 'START',
             name: 'Start',
             type: COMPONENT_TYPES.START,
             inputMode: startSchema.inputMode,
             outputMode: startSchema.outputMode,
             icon: startSchema.icon,
             style: startSchema.style,
-            position: { x: 100, y: 200 },
+            position: { x: 100, y: 100 },
             config: {},
             status: 'idle',
           },
@@ -49,7 +49,7 @@ export class MockApiService implements ApiService {
             outputMode: twitterFeedSchema.outputMode,
             icon: twitterFeedSchema.icon,
             style: twitterFeedSchema.style,
-            position: { x: 300, y: 200 },
+            position: { x: 300, y: 50 },
             config: {
               apiKey: 'twitter-api-key',
               accounts: ['elonmusk', 'VitalikButerin'],
@@ -61,14 +61,14 @@ export class MockApiService implements ApiService {
             status: 'idle',
           },
           {
-            id: 'uniswap-feed-1',
-            name: 'Uniswap Feed',
-            type: COMPONENT_TYPES.UNISWAP_FEED,
-            inputMode: uniswapFeedSchema.inputMode,
-            outputMode: uniswapFeedSchema.outputMode,
-            icon: uniswapFeedSchema.icon,
-            style: uniswapFeedSchema.style,
-            position: { x: 500, y: 200 },
+            id: 'binance-feed-1',
+            name: 'Binance Feed',
+            type: COMPONENT_TYPES.BINANCE_FEED,
+            inputMode: binanceFeedSchema.inputMode,
+            outputMode: binanceFeedSchema.outputMode,
+            icon: binanceFeedSchema.icon,
+            style: binanceFeedSchema.style,
+            position: { x: 300, y: 200 },
             config: {
               rpcEndpoint: 'https://eth-mainnet.alchemyapi.io/v2/your-api-key',
               poolAddress: '0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640',
@@ -84,7 +84,7 @@ export class MockApiService implements ApiService {
             outputMode: aiSchema.outputMode,
             icon: aiSchema.icon,
             style: aiSchema.style,
-            position: { x: 700, y: 200 },
+            position: { x: 700, y: 80 },
             config: {
               model: 'deepseek-v3',
               apiKey: 'ai-api-key',
@@ -100,7 +100,7 @@ export class MockApiService implements ApiService {
             outputMode: evmSchema.outputMode,
             icon: evmSchema.icon,
             style: evmSchema.style,
-            position: { x: 900, y: 200 },
+            position: { x: 1000, y: 80 },
             config: {
               rpcEndpoint: 'https://mainnet.infura.io/v3/your-key',
               privateKey: '0x...',
@@ -121,39 +121,44 @@ export class MockApiService implements ApiService {
             outputMode: collectorSchema.outputMode,
             icon: collectorSchema.icon,
             style: collectorSchema.style,
-            position: { x: 1100, y: 200 },
+            position: { x: 1100, y: 300 },
             config: {
               monitorDuration: 30,
             },
             status: 'idle',
           },
           {
-            id: 'end-1',
+            id: 'END',
             name: 'End',
             type: COMPONENT_TYPES.END,
             inputMode: endSchema.inputMode,
             outputMode: endSchema.outputMode,
             icon: endSchema.icon,
             style: endSchema.style,
-            position: { x: 1300, y: 200 },
+            position: { x: 1500, y: 400 },
             config: {},
             status: 'idle',
           },
         ],
         connections: [
           {
-            id: 'conn-1',
-            source: 'start-1',
+            id: 'conn-0',
+            source: 'START',
             target: 'twitter-feed-1',
+          },
+          {
+            id: 'conn-1',
+            source: 'START',
+            target: 'binance-feed-1',
           },
           {
             id: 'conn-2',
             source: 'twitter-feed-1',
-            target: 'uniswap-feed-1',
+            target: 'ai-1',
           },
           {
             id: 'conn-3',
-            source: 'uniswap-feed-1',
+            source: 'binance-feed-1',
             target: 'ai-1',
           },
           {
@@ -169,7 +174,7 @@ export class MockApiService implements ApiService {
           {
             id: 'conn-6',
             source: 'collector-1',
-            target: 'end-1',
+            target: 'END',
           },
         ],
         status: 'draft',
@@ -189,7 +194,7 @@ export class MockApiService implements ApiService {
         profit: { amount: 125.5, percentage: 2.5 },
         params: { trigger: 'manual' },
         nodeStates: {
-          'start-1': {
+          'START': {
             status: 'success',
             logs: ['Started workflow execution'],
           },
@@ -197,7 +202,7 @@ export class MockApiService implements ApiService {
             status: 'success',
             logs: ['Fetched 5 tweets from @elonmusk', 'Sentiment: Bullish'],
           },
-          'uniswap-feed-1': {
+          'binance-feed-1': {
             status: 'success',
             logs: ['Fetched 10 Uniswap trades'],
           },
@@ -213,7 +218,7 @@ export class MockApiService implements ApiService {
             status: 'success',
             logs: ['Trade completed successfully', 'Profit: $125.50'],
           },
-          'end-1': { status: 'success', logs: ['Workflow completed'] },
+          'END': { status: 'success', logs: ['Workflow completed'] },
         },
       },
       {
@@ -226,7 +231,7 @@ export class MockApiService implements ApiService {
         profit: { amount: -25.0, percentage: -0.5 },
         params: { trigger: 'scheduled' },
         nodeStates: {
-          'start-1': {
+          'START': {
             status: 'success',
             logs: ['Started workflow execution'],
           },
@@ -234,7 +239,7 @@ export class MockApiService implements ApiService {
             status: 'success',
             logs: ['Fetched 3 tweets from @VitalikButerin'],
           },
-          'uniswap-feed-1': {
+          'binance-feed-1': {
             status: 'failed',
             logs: ['Failed to fetch Uniswap trades: Insufficient data'],
           },
@@ -247,7 +252,7 @@ export class MockApiService implements ApiService {
             logs: ['Trade failed: Insufficient liquidity', 'Error: Slippage too high'],
           },
           'collector-1': { status: 'skipped', logs: [] },
-          'end-1': { status: 'skipped', logs: [] },
+          'END': { status: 'skipped', logs: [] },
         },
       },
     ];
