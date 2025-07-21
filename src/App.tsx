@@ -8,7 +8,7 @@ import { User, Workflow } from './types';
 import { apiServiceFacade } from './services';
 
 function App() {
-  const [currentView, setCurrentView] = useState('monitor');
+  const [currentView, setCurrentView] = useState('DASHBOARD');
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
@@ -21,10 +21,10 @@ function App() {
     // Check if user is already logged in
     const checkAuth = async () => {
       try {
-        const currentUser = await apiServiceFacade.getService().getCurrentUser() as User;
+        const currentUser = (await apiServiceFacade.getService().getCurrentUser()) as User;
         if (currentUser) {
           setUser(currentUser);
-          
+
           // Auto-fetch notifications after successful authentication
           try {
             await apiServiceFacade.getService().getNotifications();
@@ -64,7 +64,7 @@ function App() {
       // Force clear read-only mode and navigate to workflows
       setWorkflowReadOnlyMode(null);
       setReadOnlyWorkflow(null);
-      setCurrentView('workflow');
+      setCurrentView('WORKFLOWS');
     };
 
     const handleRedesignWorkflow = (event: CustomEvent) => {
@@ -78,7 +78,7 @@ function App() {
     window.addEventListener('exit-readonly-mode', handleExitReadOnlyMode as EventListener);
     window.addEventListener('navigate-to-workflows', handleNavigateToWorkflows as EventListener);
     window.addEventListener('redesign-workflow', handleRedesignWorkflow as EventListener);
-    
+
     return () => {
       window.removeEventListener('collapse-sidebar', handleSidebarCollapse as EventListener);
       window.removeEventListener('navigate-to-workflow-run', handleWorkflowRunNavigation as EventListener);
@@ -91,32 +91,32 @@ function App() {
   // Handle view changes and clear read-only mode when user actively navigates to workflows
   const handleViewChange = (view: string) => {
     // Always clear read-only mode when user clicks workflows menu to ensure design mode
-    if (view === 'workflow') {
+    if (view === 'WORKFLOWS') {
       setWorkflowReadOnlyMode(null);
       setReadOnlyWorkflow(null);
       // Clear initialWorkflowId when user manually navigates to workflows (new workflow)
-      if (currentView !== 'workflow') {
+      if (currentView !== 'WORKFLOWS') {
         setInitialWorkflowId(null);
       }
     } else {
       // Clear initialWorkflowId when navigating away from workflow view
       setInitialWorkflowId(null);
     }
-    
+
     setCurrentView(view);
-    
+
     // Force re-render by updating state
-    if (view === 'workflow' && workflowReadOnlyMode) {
+    if (view === 'WORKFLOWS' && workflowReadOnlyMode) {
       // Add a small delay to ensure state updates are applied
       setTimeout(() => {
-        setCurrentView('workflow');
+        setCurrentView('WORKFLOWS');
       }, 10);
     }
   };
 
   const handleLogin = async (userData: User) => {
     setUser(userData);
-    
+
     // Auto-fetch notifications after successful login
     try {
       await apiServiceFacade.getService().getNotifications();
@@ -142,10 +142,10 @@ function App() {
       // Load workflow run details
       const run = await apiServiceFacade.getService().getWorkflowRun(runId);
       console.debug('📊 Workflow run loaded:', run);
-      
+
       const workflow = await apiServiceFacade.getService().getWorkflow(run.workflowId);
       console.debug('🏗️ Workflow loaded:', workflow);
-      
+
       // Create a read-only version of the workflow with run states
       const workflowWithRunStates: Workflow = {
         ...workflow,
@@ -156,14 +156,14 @@ function App() {
             timestamp: new Date().toISOString(),
             level: 'info' as const,
             message: log,
-            data: null
+            data: null,
           })),
-          readonly: true
-        }))
+          readonly: true,
+        })),
       };
 
       console.debug('✅ Workflow with run states created:', workflowWithRunStates);
-      
+
       setReadOnlyWorkflow(workflowWithRunStates);
       setWorkflowReadOnlyMode({ workflowId, tradeId: runId });
       // Don't change currentView, keep user's current menu selection state
@@ -184,7 +184,7 @@ function App() {
   const handleLoadWorkflowForEdit = (workflowId: string) => {
     console.debug('🎯 App: Loading workflow for edit:', workflowId);
     setInitialWorkflowId(workflowId);
-    setCurrentView('workflow'); // Switch to workflow view
+    setCurrentView('WORKFLOWS'); // Switch to workflow view
     // Clear read-only mode
     setWorkflowReadOnlyMode(null);
     setReadOnlyWorkflow(null);
@@ -203,28 +203,19 @@ function App() {
     // If there's a read-only workflow, show WorkflowPage in read-only mode
     if (workflowReadOnlyMode && readOnlyWorkflow) {
       return (
-        <WorkflowPage 
-          readOnlyMode={workflowReadOnlyMode} 
-          readOnlyWorkflow={readOnlyWorkflow}
-          onExitReadOnlyMode={handleExitReadOnlyMode} 
-        />
+        <WorkflowPage readOnlyMode={workflowReadOnlyMode} readOnlyWorkflow={readOnlyWorkflow} onExitReadOnlyMode={handleExitReadOnlyMode} />
       );
     }
 
     // Normal view rendering logic - ensure clean state for workflow design
     switch (currentView) {
-      case 'monitor':
+      case 'DASHBOARD':
+        return <LiveDashboard showReports={true} onNavigateToWorkflowRun={handleNavigateToWorkflowRun} />;
+      case 'WORKFLOWS':
         return (
-          <LiveDashboard 
-            showReports={true} 
-            onNavigateToWorkflowRun={handleNavigateToWorkflowRun}
-          />
-        );
-      case 'workflow':
-        return (
-          <WorkflowPage 
+          <WorkflowPage
             key={`workflow-${Date.now()}-${initialWorkflowId || 'new'}`} // Force re-render when workflow changes
-            readOnlyMode={null} 
+            readOnlyMode={null}
             readOnlyWorkflow={null}
             onExitReadOnlyMode={undefined}
             initialWorkflowId={initialWorkflowId || undefined}
@@ -233,12 +224,7 @@ function App() {
       case 'settings':
         return <Settings />;
       default:
-        return (
-          <LiveDashboard 
-            showReports={true} 
-            onNavigateToWorkflowRun={handleNavigateToWorkflowRun}
-          />
-        );
+        return <LiveDashboard showReports={true} onNavigateToWorkflowRun={handleNavigateToWorkflowRun} />;
     }
   };
 
@@ -255,8 +241,8 @@ function App() {
   }
 
   return (
-    <Layout 
-      currentView={currentView} 
+    <Layout
+      currentView={currentView}
       onViewChange={handleViewChange}
       user={user}
       onLogout={handleLogout}

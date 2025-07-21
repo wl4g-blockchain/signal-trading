@@ -1,23 +1,122 @@
 import React from 'react';
 
-interface SigTradingIconProps {
+interface SignalTradingIconProps {
   size?: 'small' | 'medium' | 'large';
   className?: string;
+  variant?: 'default' | 'mono' | 'gradient';
 }
 
-export const SigTradingIcon: React.FC<SigTradingIconProps> = ({ size = 'medium', className = '' }) => {
+export const SignalTradingIcon: React.FC<SignalTradingIconProps> = ({ size = 'medium', className = '', variant = 'default' }) => {
   const sizeClasses = {
-    small: 'w-6 h-6',
-    medium: 'w-8 h-8',
+    small: 'w-8 h-8',
+    medium: 'w-10 h-10',
     large: 'w-12 h-12',
   };
 
+  const gradientId = `signal-gradient-${Math.random().toString(36).substr(2, 9)}`;
+
+  if (variant === 'gradient') {
+    return (
+      <div className={`${sizeClasses[size]} ${className}`}>
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#3B82F6" />
+              <stop offset="50%" stopColor="#8B5CF6" />
+              <stop offset="100%" stopColor="#EC4899" />
+            </linearGradient>
+          </defs>
+
+          {/* 外圈科技感圆环 */}
+          <circle cx="24" cy="24" r="22" fill="none" stroke={`url(#${gradientId})`} strokeWidth="2" strokeDasharray="4 2" opacity="0.6" />
+
+          {/* 主体信号波形 */}
+          <path
+            d="M8 24 L12 16 L16 28 L20 12 L24 32 L28 8 L32 36 L36 20 L40 24"
+            stroke={`url(#${gradientId})`}
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
+          />
+
+          {/* 交易箭头指示器 */}
+          <polygon points="38,18 42,22 38,26 40,24 38,22" fill={`url(#${gradientId})`} opacity="0.8" />
+
+          {/* 数据点 */}
+          <circle cx="16" cy="28" r="2" fill={`url(#${gradientId})`} opacity="0.9" />
+          <circle cx="24" cy="32" r="2" fill={`url(#${gradientId})`} opacity="0.9" />
+          <circle cx="32" cy="36" r="2" fill={`url(#${gradientId})`} opacity="0.9" />
+
+          {/* 中心科技核心 */}
+          <circle cx="24" cy="24" r="3" fill={`url(#${gradientId})`} opacity="0.3" />
+          <circle cx="24" cy="24" r="1.5" fill={`url(#${gradientId})`} />
+        </svg>
+      </div>
+    );
+  }
+
+  if (variant === 'mono') {
+    return (
+      <div className={`${sizeClasses[size]} ${className}`}>
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          {/* 外圈科技感圆环 */}
+          <circle cx="24" cy="24" r="22" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="4 2" opacity="0.4" />
+
+          {/* 主体信号波形 */}
+          <path
+            d="M8 24 L12 16 L16 28 L20 12 L24 32 L28 8 L32 36 L36 20 L40 24"
+            stroke="currentColor"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
+          />
+
+          {/* 交易箭头指示器 */}
+          <polygon points="38,18 42,22 38,26 40,24 38,22" fill="currentColor" opacity="0.8" />
+
+          {/* 数据点 */}
+          <circle cx="16" cy="28" r="2" fill="currentColor" opacity="0.7" />
+          <circle cx="24" cy="32" r="2" fill="currentColor" opacity="0.7" />
+          <circle cx="32" cy="36" r="2" fill="currentColor" opacity="0.7" />
+
+          {/* 中心科技核心 */}
+          <circle cx="24" cy="24" r="3" fill="currentColor" opacity="0.2" />
+          <circle cx="24" cy="24" r="1.5" fill="currentColor" />
+        </svg>
+      </div>
+    );
+  }
+
+  // default variant
   return (
     <div className={`${sizeClasses[size]} ${className}`}>
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="currentColor" />
-        <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        {/* 外圈科技感圆环 */}
+        <circle cx="24" cy="24" r="22" fill="none" stroke="#3B82F6" strokeWidth="2" strokeDasharray="4 2" opacity="0.6" />
+
+        {/* 主体信号波形 */}
+        <path
+          d="M8 24 L12 16 L16 28 L20 12 L24 32 L28 8 L32 36 L36 20 L40 24"
+          stroke="#8B5CF6"
+          strokeWidth="3"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+
+        {/* 交易箭头指示器 */}
+        <polygon points="38,18 42,22 38,26 40,24 38,22" fill="#EC4899" opacity="0.8" />
+
+        {/* 数据点 */}
+        <circle cx="16" cy="28" r="2" fill="#10B981" opacity="0.9" />
+        <circle cx="24" cy="32" r="2" fill="#F59E0B" opacity="0.9" />
+        <circle cx="32" cy="36" r="2" fill="#EF4444" opacity="0.9" />
+
+        {/* 中心科技核心 */}
+        <circle cx="24" cy="24" r="3" fill="#3B82F6" opacity="0.3" />
+        <circle cx="24" cy="24" r="1.5" fill="#3B82F6" />
       </svg>
     </div>
   );

@@ -183,7 +183,7 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({ readOnlyMode, readOn
         outputMode: startSchema.outputMode,
         icon: startSchema.icon,
         style: startSchema.style,
-        position: { x: 50, y: 200 },
+        position: { x: 50, y: 100 },
         config: { ...startSchema.defaultConfig },
         status: 'idle',
       };
@@ -196,7 +196,7 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({ readOnlyMode, readOn
         outputMode: endSchema.outputMode,
         icon: endSchema.icon,
         style: endSchema.style,
-        position: { x: 800, y: 200 },
+        position: { x: 1280, y: 200 }, // x 更靠右，y 与 start 相同
         config: { ...endSchema.defaultConfig },
         status: 'idle',
       };
@@ -218,7 +218,7 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({ readOnlyMode, readOn
       outputMode: schema.outputMode,
       icon: schema.icon,
       style: schema.style,
-      position: { x: 100 + Math.random() * 300, y: 100 + Math.random() * 200 },
+      position: { x: 400 + Math.random() * 400, y: 100 + Math.random() * 50 },
       config: { ...schema.defaultConfig },
       status: 'idle',
     };
@@ -394,7 +394,11 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({ readOnlyMode, readOn
       {/* Main Canvas Area */}
       <div className="flex-1 flex flex-col">
         {/* Toolbar */}
-        <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-b p-4 flex items-center justify-between`}>
+        <div
+          className={`${
+            isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+          } border-b p-4 flex items-center justify-between`}
+        >
           <div className="flex items-center space-x-4">
             <input
               type="text"
@@ -436,7 +440,9 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({ readOnlyMode, readOn
               ) : (
                 <Play className="w-4 h-4" />
               )}
-              <span>{running ? t('workflow.starting') || 'Starting' : isRunning ? t('workflow.stop') || 'Stop' : t('workflow.run') || 'Run'}</span>
+              <span>
+                {running ? t('workflow.starting') || 'Starting' : isRunning ? t('workflow.stop') || 'Stop' : t('workflow.run') || 'Run'}
+              </span>
             </button>
 
             <button
@@ -465,9 +471,9 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({ readOnlyMode, readOn
                 console.debug('✅ New workflow state set');
               }}
               disabled={!!readOnlyMode}
-              className={`p-2 ${isDark ? 'bg-gray-600 hover:bg-gray-500' : 'bg-gray-600 hover:bg-gray-500'} text-white rounded transition-colors ${
-                readOnlyMode ? 'cursor-not-allowed opacity-50' : ''
-              }`}
+              className={`p-2 ${
+                isDark ? 'bg-gray-600 hover:bg-gray-500' : 'bg-gray-600 hover:bg-gray-500'
+              } text-white rounded transition-colors ${readOnlyMode ? 'cursor-not-allowed opacity-50' : ''}`}
               title="New Workflow"
             >
               <Settings className="w-4 h-4" />
@@ -583,16 +589,20 @@ export const WorkflowPage: React.FC<WorkflowPageProps> = ({ readOnlyMode, readOn
           onClick={() => setShowWorkflowList(!showWorkflowList)}
         >
           {showWorkflowList ? (
-            <ChevronDown className={`w-5 h-5 ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-700'} transition-colors`} />
+            <ChevronDown
+              className={`w-5 h-5 ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-700'} transition-colors`}
+            />
           ) : (
-            <ChevronUp className={`w-5 h-5 ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-700'} transition-colors`} />
+            <ChevronUp
+              className={`w-5 h-5 ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-700'} transition-colors`}
+            />
           )}
         </div>
 
         <div
-          className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-t transition-all duration-300 overflow-hidden ${
-            showWorkflowList ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-          }`}
+          className={`${
+            isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+          } border-t transition-all duration-300 overflow-hidden ${showWorkflowList ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
           style={{ height: showWorkflowList ? '40vh' : '0' }}
         >
           <WorkflowList onLoadWorkflow={handleLoadWorkflow} initialWorkflowId={readOnlyWorkflow?.id} readOnlyMode={!!readOnlyMode} />

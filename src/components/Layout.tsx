@@ -5,7 +5,7 @@ import { User as UserType } from '../types';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../hooks/useLanguage';
-import { SigTradingIcon } from './SigTradingIcon';
+import { SignalTradingIcon } from './SignalTradingIcon';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -36,17 +36,19 @@ export const Layout: React.FC<LayoutProps> = ({
   const [showNotifications, setShowNotifications] = useState(false);
 
   // Use API service to fetch notification data
-  const [notifications, setNotifications] = useState<Array<{
-    id: string;
-    title: string;
-    message: string;
-    level: string;
-    type: string;
-    read: boolean;
-    timestamp: Date;
-    workflowId?: string;
-    workflowRunId?: string;
-  }>>([]);
+  const [notifications, setNotifications] = useState<
+    Array<{
+      id: string;
+      title: string;
+      message: string;
+      level: string;
+      type: string;
+      read: boolean;
+      timestamp: Date;
+      workflowId?: string;
+      workflowRunId?: string;
+    }>
+  >([]);
   const [notificationsLoading, setNotificationsLoading] = useState(false);
   const loadingRef = useRef(false);
 
@@ -138,8 +140,8 @@ export const Layout: React.FC<LayoutProps> = ({
   };
 
   const navItems = [
-    { id: 'monitor', label: t('navigation.dashboard'), icon: Activity },
-    { id: 'workflow', label: t('navigation.workflows'), icon: BarChart3 },
+    { id: 'DASHBOARD', label: t('navigation.dashboard'), icon: Activity },
+    { id: 'WORKFLOWS', label: t('navigation.workflows'), icon: BarChart3 },
   ];
 
   // Close menus when clicking outside
@@ -210,7 +212,10 @@ export const Layout: React.FC<LayoutProps> = ({
   };
 
   return (
-    <div className={`h-screen ${isDark ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'} flex`} data-sidebar-collapsed={sidebarCollapsed}>
+    <div
+      className={`h-screen ${isDark ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'} flex`}
+      data-sidebar-collapsed={sidebarCollapsed}
+    >
       {/* Sidebar */}
       <div
         className={`${sidebarCollapsed ? 'w-16' : 'w-64'} ${
@@ -235,15 +240,15 @@ export const Layout: React.FC<LayoutProps> = ({
         <div className="p-6">
           {!sidebarCollapsed ? (
             <div className="flex items-center space-x-3">
-              <SigTradingIcon size="large" />
+              <SignalTradingIcon size="large" />
               <div>
                 <h1 className="text-xl font-bold text-blue-400">SigTrading</h1>
                 <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'} mt-1`}>Focus on AI Trading</p>
               </div>
             </div>
           ) : (
-            <div className="flex justify-center" title="SigTrading">
-              <SigTradingIcon size="small" className="hover:scale-110 transition-transform" />
+            <div className="flex flex-col justify-center items-center min-h-[64px] -mt-5 hover:scale-100 transition-transform cursor-pointer select-none" title="Signal Trading">
+              <SignalTradingIcon size="medium" className="w-12 h-12 hover:scale-110 transition-transform ml-[-8px]" />
             </div>
           )}
 
@@ -273,7 +278,9 @@ export const Layout: React.FC<LayoutProps> = ({
               <button
                 key={item.id}
                 onClick={() => onViewChange(item.id)}
-                className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center px-3' : 'px-6'} py-3 text-left transition-colors ${
+                className={`w-full flex items-center ${
+                  sidebarCollapsed ? 'justify-center px-3' : 'px-6'
+                } py-3 text-left transition-colors ${
                   currentView === item.id
                     ? 'bg-blue-600 text-white border-r-2 border-blue-400'
                     : `${isDark ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'}`
@@ -292,7 +299,9 @@ export const Layout: React.FC<LayoutProps> = ({
       <div className="flex-1 overflow-visible flex flex-col">
         {/* Top Bar */}
         <div
-          className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-b px-6 py-3 flex items-center justify-between`}
+          className={`${
+            isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+          } border-b px-6 py-3 flex items-center justify-between`}
         >
           {/* Left side - Empty or Logo */}
           <div className="flex items-center">{/* 可以在这里添加面包屑导航或其他左侧内容 */}</div>
@@ -333,7 +342,12 @@ export const Layout: React.FC<LayoutProps> = ({
                 title={t('navigation.notifications')}
               >
                 <div className="relative">
-                  <svg className={`w-5 h-5 ${isDark ? 'text-gray-400' : 'text-gray-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    className={`w-5 h-5 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -364,7 +378,9 @@ export const Layout: React.FC<LayoutProps> = ({
                   <div className={`px-4 py-3 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'} flex items-center justify-between`}>
                     <div className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('navigation.notifications')}</div>
                     {unreadCount > 0 && (
-                      <div className={`text-xs px-2 py-1 rounded-full ${isDark ? 'bg-blue-600 text-blue-100' : 'bg-blue-100 text-blue-700'}`}>
+                      <div
+                        className={`text-xs px-2 py-1 rounded-full ${isDark ? 'bg-blue-600 text-blue-100' : 'bg-blue-100 text-blue-700'}`}
+                      >
                         {unreadCount} {t('notifications.unreadCount')}
                       </div>
                     )}
@@ -416,9 +432,13 @@ export const Layout: React.FC<LayoutProps> = ({
                               <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'} mt-1`}>{notification.message}</p>
                               {/* jump to workflow run */}
                               {notification.type === 'Transaction' && notification.workflowRunId && (
-                                <p className={`text-xs ${isDark ? 'text-blue-400' : 'text-blue-600'} mt-1 italic`}>{t('dashboard.viewDetails')} →</p>
+                                <p className={`text-xs ${isDark ? 'text-blue-400' : 'text-blue-600'} mt-1 italic`}>
+                                  {t('dashboard.viewDetails')} →
+                                </p>
                               )}
-                              <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'} mt-2`}>{formatTimeAgo(notification.timestamp)}</p>
+                              <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'} mt-2`}>
+                                {formatTimeAgo(notification.timestamp)}
+                              </p>
                             </div>
                           </div>
                         </div>
@@ -432,7 +452,11 @@ export const Layout: React.FC<LayoutProps> = ({
                   </div>
 
                   {/* Footer */}
-                  <div className={`px-4 py-3 border-t ${isDark ? 'border-gray-700' : 'border-gray-200'} flex items-center justify-between flex-shrink-0`}>
+                  <div
+                    className={`px-4 py-3 border-t ${
+                      isDark ? 'border-gray-700' : 'border-gray-200'
+                    } flex items-center justify-between flex-shrink-0`}
+                  >
                     <button
                       onClick={handleMarkAllAsRead}
                       disabled={unreadCount === 0 || notificationsLoading}
@@ -448,7 +472,9 @@ export const Layout: React.FC<LayoutProps> = ({
                     </button>
                     <button
                       onClick={() => setShowNotifications(false)}
-                      className={`text-sm ${isDark ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-500'} transition-colors`}
+                      className={`text-sm ${
+                        isDark ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-500'
+                      } transition-colors`}
                     >
                       {t('common.close')}
                     </button>
@@ -461,7 +487,9 @@ export const Layout: React.FC<LayoutProps> = ({
             <div className="relative menu-container">
               <button
                 onClick={() => setShowUserMenu(!showUserMenu)}
-                className={`flex items-center space-x-3 px-3 py-2 rounded-lg ${isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} transition-colors`}
+                className={`flex items-center space-x-3 px-3 py-2 rounded-lg ${
+                  isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
+                } transition-colors`}
               >
                 {user.avatar ? (
                   <img src={user.avatar} alt={user.name} className="w-8 h-8 rounded-full" />
@@ -520,7 +548,9 @@ export const Layout: React.FC<LayoutProps> = ({
                               className={`px-2 py-1 text-xs rounded transition-colors ${
                                 theme === themeOption
                                   ? 'bg-blue-600 text-white'
-                                  : `${isDark ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`
+                                  : `${
+                                      isDark ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    }`
                               }`}
                             >
                               {themeOption === 'light' ? '☀️' : '🌙'}
@@ -540,7 +570,9 @@ export const Layout: React.FC<LayoutProps> = ({
                               className={`px-2 py-1 text-xs rounded transition-colors ${
                                 language === langOption
                                   ? 'bg-blue-600 text-white'
-                                  : `${isDark ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`
+                                  : `${
+                                      isDark ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    }`
                               }`}
                             >
                               {langOption === 'en' ? 'EN' : '中'}

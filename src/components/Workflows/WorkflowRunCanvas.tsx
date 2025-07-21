@@ -380,7 +380,9 @@ export const WorkflowRunCanvas: React.FC<WorkflowRunCanvasProps> = ({ nodes, con
       <div
         className={`absolute top-0 right-0 h-full ${
           isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-        } border-l shadow-2xl transform transition-transform duration-300 ease-in-out z-10 ${logPanelVisible ? 'translate-x-0' : 'translate-x-full'}`}
+        } border-l shadow-2xl transform transition-transform duration-300 ease-in-out z-10 ${
+          logPanelVisible ? 'translate-x-0' : 'translate-x-full'
+        }`}
         style={{ width: `${logPanelWidth}px` }}
       >
         {/* Resize Handle - Drag left border to adjust panel width */}
@@ -399,7 +401,9 @@ export const WorkflowRunCanvas: React.FC<WorkflowRunCanvasProps> = ({ nodes, con
           <div className="flex items-center space-x-3">
             <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>Node Execution Log</h3>
             {selectedNodeId && (
-              <span className={`px-2 py-1 rounded text-xs font-medium ${isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'}`}>
+              <span
+                className={`px-2 py-1 rounded text-xs font-medium ${isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'}`}
+              >
                 {selectedNodeId}
               </span>
             )}
@@ -443,7 +447,11 @@ export const WorkflowRunCanvas: React.FC<WorkflowRunCanvasProps> = ({ nodes, con
                     displayLogs.map((log, index) => (
                       <div key={index} className="mb-1 flex">
                         <span className="text-gray-500 mr-2 select-none">[{new Date(log.timestamp).toLocaleTimeString()}]</span>
-                        <span className={`${log.level === 'error' ? 'text-red-400' : log.level === 'warn' ? 'text-yellow-400' : 'text-green-400'}`}>
+                        <span
+                          className={`${
+                            log.level === 'error' ? 'text-red-400' : log.level === 'warn' ? 'text-yellow-400' : 'text-green-400'
+                          }`}
+                        >
                           {log.message}
                         </span>
                       </div>

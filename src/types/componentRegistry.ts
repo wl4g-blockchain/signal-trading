@@ -11,7 +11,7 @@ import {
   SolanaLogo,
   CoinMarketLogo,
   AILogo,
-} from '../components/SigTradingIcon';
+} from '../components/SignalTradingIcon';
 
 // Unified component registry with complete schema definitions
 export const COMPONENT_REGISTRY: Record<ComponentType, ComponentSchema> = {
