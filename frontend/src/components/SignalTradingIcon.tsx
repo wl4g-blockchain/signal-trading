@@ -253,12 +253,12 @@ export const SolanaLogo: React.FC<{ className?: string }> = ({ className = 'w-4 
     </g>
     <defs>
       <linearGradient id="pn47x3vj" x1="2.494" x2="22.809" y1="22.671" y2="-0.233" gradientUnits="userSpaceOnUse">
-        <stop offset="0.08" stop-color="#9945FF"></stop>
-        <stop offset="0.3" stop-color="#8752F3"></stop>
-        <stop offset="0.5" stop-color="#5497D5"></stop>
-        <stop offset="0.6" stop-color="#43B4CA"></stop>
-        <stop offset="0.72" stop-color="#28E0B9"></stop>
-        <stop offset="0.97" stop-color="#19FB9B"></stop>
+        <stop offset="0.08" stopColor="#9945FF"></stop>
+        <stop offset="0.3" stopColor="#8752F3"></stop>
+        <stop offset="0.5" stopColor="#5497D5"></stop>
+        <stop offset="0.6" stopColor="#43B4CA"></stop>
+        <stop offset="0.72" stopColor="#28E0B9"></stop>
+        <stop offset="0.97" stopColor="#19FB9B"></stop>
       </linearGradient>
     </defs>
   </svg>

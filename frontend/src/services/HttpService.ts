@@ -8,8 +8,8 @@ import {
 import { authStorage } from "../utils/AuthStorage";
 
 export class HttpApiService implements ApiService {
-  // 更改为实际的后端API地址，而不是Next.js风格的/api路径
-  private baseUrl = process.env.VITE_API_BASE_URL || "http://localhost:3001/api";
+  // TODO: 更改为实际的后端API地址，而不是Next.js风格的/api路径
+  private baseUrl = location.origin + "/api";
   private token: string | null = null;
 
   constructor() {
